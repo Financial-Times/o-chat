@@ -1,0 +1,64 @@
+.o-comment-client {
+    &.comment-order-normal .comment-editor-container {
+        margin-bottom: 10px;
+    }
+
+    &.comment-order-inverted .comment-editor-container {
+        margin-top: 10px;
+    }
+
+    .comment-editor-container {
+        .comment-editor-header {
+            margin-bottom: 4px;
+
+            .comment-editor-auth {
+                .comment-settings {
+                    float: right;
+                }
+            }
+        }
+
+        .comment-editor-input {
+            border: 1px solid $borderColor;
+            padding: 5px 10px;
+            background: oColorsGetPaletteColor(white);
+            cursor: text;
+
+            textarea {
+                width: 100%;
+                border: 0;
+                resize: none;
+                padding: 0;
+                height: 60px;
+                margin-top: 5px;
+                outline: 0;
+                color: oColorsGetPaletteColor(grey-tint5);
+                font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+                font-size: 12px;
+            }
+        }
+
+        .comment-editor-footer {
+            border: 1px solid $borderColor;
+            border-top: 0;
+
+            .comment-editor-submit {
+                float: right;
+
+                button {
+                    @include comment-button();
+                    border-radius: 0;
+                    font-size: 12px;
+                    font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+                    text-shadow: none;
+                    min-height: 28px;
+                    line-height: 28px;
+                }
+            }
+        }
+    }
+
+    .comment-editor-terms {
+        padding-bottom: 16px;
+    }
+}
