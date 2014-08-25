@@ -84,149 +84,25 @@
           </ul>
           <div class="scrollspy">
             <ul class="nav nav-list bs-docs-sidenav affix-top">
-              <li><a href="#commentUtilities"><i class="alert alert-success"></i><span>commentUtilities</span></a>
+              <li><a href="#addAuthNotAvailableMessage"><i class="alert alert-info"></i><span>addAuthNotAvailableMessage</span></a>
               </li>
             </ul>
           </div>
         </div>
         <div class="span9">
-          <section id="commentUtilities">
-            <h1>commentUtilities</h1>
+          <section id="addAuthNotAvailableMessage">
+            <h1>addAuthNotAvailableMessage</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-success radius ctx-type">declaration</div><span>commentUtilities</span>
+              <div class="label label-info radius ctx-type">method</div><span>this.addAuthNotAvailableMessage()</span>
             </p>
           </section>
-          <div class="description"> </div>
-          <pre><code class="language-javascript">var commentUtilities = require('comment-utilities');
-var commentUi = require('comment-ui');
-var sizzle = require('sizzle');
-var oDate = require('o-date');
+          <div class="description"><p>Inserts message when authentication is not available.</p> </div>
+          <pre><code class="language-javascript">this.addAuthNotAvailableMessage = function () {
+        var authContainer = sizzle('.comment-editor-auth', widgetContainer);
 
-var templates = require('./templates.js');
-var utils = require('./utils.js');
-
-function WidgetUi (widgetContainer, datetimeFormat) {
-    &quot;use strict&quot;;
-
-    commentUi.WidgetUi.apply(this, arguments);
-
-    var self = this;
-
-    var events = new commentUtilities.Events();
-
-    this.on = events.on;
-    this.off = events.off;
-
-    this.orderType = &quot;normal&quot;;
-
-    this.render = function (commentsData, orderType) {
-        this.orderType = orderType;
-
-        var addEditor = function () {
-            widgetContainer.appendChild(
-                commentUi.utils.toDOM(
-                    templates.editor.render({
-                        submitButtonLabel: &quot;Submit Comment&quot;,
-                        termMessageTemplate: commentUi.templates.termsAndGuidelinesTemplate.render(),
-                        signInTemplate: templates.signIn.render()
-                    })
-                )
-            );
-        };
-
-        var addComments = function () {
-            widgetContainer.appendChild(
-                commentUi.utils.toDOM(
-                    templates.comments.render({
-                        comments: commentsData,
-                        orderType: orderType
-                    })
-                )
-            );
-        };
-
-        if (orderType === 'inverted') {
-            commentsData.reverse();
-            addComments();
-            addEditor();
-
-            var commentContainer = sizzle('.comment-container', widgetContainer)[0];
-            commentContainer.scrollTop = 99999;
-        } else {
-            addEditor();
-            addComments();
-        }
-
-        try { oDate.init(); } catch(e) {}
-
-        commentUi.utils.addEventListener('click', sizzle('.signIn', widgetContainer)[0], function (event) {
-            events.trigger('signIn');
-
-            if (event.preventDefault) {
-                event.preventDefault();
-            } else {
-                event.returnValue = false;
-            }
-        });
-
-        commentUi.utils.addEventListener('click', sizzle('.comment-editor-submit &gt; button')[0], function () {
-            events.trigger('postComment');
-        });
-
-        commentUi.utils.addEventListener('click', sizzle('.comment-editor-input')[0], function (event) {
-            sizzle('.comment-editor-input textarea')[0].focus();
-            self.clearEditorError();
-
-            if (event.preventDefault) {
-                event.preventDefault();
-            } else {
-                event.returnValue = false;
-            }
-        });
-    };
-
-    this.login = function (pseudonym) {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl &amp;&amp; authEl.length) {
-            var pseudonymPlaceholder = commentUi.utils.toDOM('&lt;span class=&quot;comment-pseudonym&quot;&gt;' + pseudonym + '&lt;/span&gt;');
-            authEl[0].innerHTML = &quot;&quot;;
-            authEl[0].appendChild(pseudonymPlaceholder);
-        }
-    };
-
-    this.logout = function () {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl &amp;&amp; authEl.length) {
-            authEl[0].innerHTML = templates.signIn.render();
-        }
-    };
-
-    this.changePseudonym = function (pseudonym) {
-        var pseudonymPlaceholder = sizzle('.comment-pseudonym', widgetContainer);
-
-        if (pseudonymPlaceholder &amp;&amp; pseudonymPlaceholder.length) {
-            pseudonymPlaceholder[0].innerHTML = pseudonym;
-        }
-    };
-
-    this.getCurrentPseudonym = function () {
-        var pseudonymArea = sizzle('.comment-editor-auth .comment-pseudonym', widgetContainer);
-
-        if (pseudonymArea &amp;&amp; pseudonymArea.length) {
-            return pseudonymArea[0].innerHTML;
-        }
-
-        return &quot;&quot;;
-    };
-
-    this.hideSignInLink = function () {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl &amp;&amp; authEl.length) {
-            authEl[0].innerHTML = &quot;&quot;;
+        if (authContainer.length) {
+            authContainer[0].innerHTML = commentUi.utils.toDOM(commentUi.templates.unavailableTemplate.render());
         }
     };
 

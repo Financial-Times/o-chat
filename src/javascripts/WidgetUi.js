@@ -130,6 +130,28 @@ function WidgetUi (widgetContainer, datetimeFormat) {
         }
     };
 
+    this.makeReadOnly = function () {
+        var commentEditorInputContainer = sizzle('.comment-editor-input', widgetContainer);
+
+        if (commentEditorInputContainer && commentEditorInputContainer.length) {
+            commentEditorInputContainer = commentEditorInputContainer[0];
+
+            commentEditorInputContainer.className += " disabled";
+            sizzle('textarea', commentEditorInputContainer).setAttribute('disabled', 'disabled');
+        }
+    };
+
+    /**
+     * Inserts message when authentication is not available.
+     */
+    this.addAuthNotAvailableMessage = function () {
+        var authContainer = sizzle('.comment-editor-auth', widgetContainer);
+
+        if (authContainer.length) {
+            authContainer[0].innerHTML = commentUi.utils.toDOM(commentUi.templates.unavailableTemplate.render());
+        }
+    };
+
 
     this.addComment = function (content, pseudonym, id, timestamp) {
         var commentContainer = sizzle('.comment-container', widgetContainer)[0];
