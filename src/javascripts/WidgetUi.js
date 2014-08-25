@@ -137,7 +137,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
             commentEditorInputContainer = commentEditorInputContainer[0];
 
             commentEditorInputContainer.className += " disabled";
-            sizzle('textarea', commentEditorInputContainer).setAttribute('disabled', 'disabled');
+            sizzle('textarea', commentEditorInputContainer)[0].setAttribute('disabled', 'disabled');
         }
     };
 
