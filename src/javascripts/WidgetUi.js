@@ -148,7 +148,8 @@ function WidgetUi (widgetContainer, datetimeFormat) {
         var authContainer = sizzle('.comment-editor-auth', widgetContainer);
 
         if (authContainer.length) {
-            authContainer[0].innerHTML = commentUi.utils.toDOM(commentUi.templates.unavailableTemplate.render());
+            authContainer[0].innerHTML = "";
+            authContainer[0].appendChild(commentUi.utils.toDOM(commentUi.templates.unavailableTemplate.render()));
         }
     };
 
