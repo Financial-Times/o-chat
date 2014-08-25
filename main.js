@@ -8,9 +8,6 @@ var config = require('./src/javascripts/config.js'),
  */
 config.set(defaultConfig);
 
-commentUtilities.logger.enable();
-commentUtilities.logger.setLevel('debug');
-
 /**
  * Enable data caching.
  */

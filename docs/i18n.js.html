@@ -74,325 +74,33 @@
             <li><a href="index.html">Main</a></li>
             <li><a href="auth.js.html">auth.js</a></li>
             <li><a href="config.js.html">config.js</a></li>
-            <li><a href="i18n.js.html">i18n.js</a></li>
+            <li class="active"><a href="i18n.js.html">i18n.js</a></li>
             <li><a href="main.js.html">main.js</a></li>
             <li><a href="messageQueue.js.html">messageQueue.js</a></li>
             <li><a href="userDialogs.js.html">userDialogs.js</a></li>
             <li><a href="utils.js.html">utils.js</a></li>
             <li><a href="Widget.js.html">Widget.js</a></li>
-            <li class="active"><a href="WidgetUi.js.html">WidgetUi.js</a></li>
+            <li><a href="WidgetUi.js.html">WidgetUi.js</a></li>
           </ul>
           <div class="scrollspy">
             <ul class="nav nav-list bs-docs-sidenav affix-top">
-              <li><a href="#commentUtilities"><i class="alert alert-success"></i><span>commentUtilities</span></a>
+              <li><a href="#errors"><i class="alert alert-success"></i><span>errors</span></a>
               </li>
             </ul>
           </div>
         </div>
         <div class="span9">
-          <section id="commentUtilities">
-            <h1>commentUtilities</h1>
+          <section id="errors">
+            <h1>errors</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-success radius ctx-type">declaration</div><span>commentUtilities</span>
+              <div class="label label-success radius ctx-type">property</div><span>exports.errors</span>
             </p>
           </section>
           <div class="description"> </div>
-          <pre><code class="language-javascript">var commentUtilities = require('comment-utilities');
-var commentUi = require('comment-ui');
-var sizzle = require('sizzle');
-var oDate = require('o-date');
-
-var templates = require('./templates.js');
-var utils = require('./utils.js');
-
-function WidgetUi (widgetContainer, datetimeFormat) {
-    &quot;use strict&quot;;
-
-    commentUi.WidgetUi.apply(this, arguments);
-
-    var self = this;
-
-    var events = new commentUtilities.Events();
-
-    this.on = events.on;
-    this.off = events.off;
-
-    this.orderType = &quot;normal&quot;;
-
-    this.render = function (commentsData, orderType) {
-        this.orderType = orderType;
-
-        var addEditor = function () {
-            widgetContainer.appendChild(
-                commentUi.utils.toDOM(
-                    templates.editor.render({
-                        submitButtonLabel: &quot;Submit Comment&quot;,
-                        termMessageTemplate: commentUi.templates.termsAndGuidelinesTemplate.render(),
-                        signInTemplate: templates.signIn.render()
-                    })
-                )
-            );
-        };
-
-        var addComments = function () {
-            widgetContainer.appendChild(
-                commentUi.utils.toDOM(
-                    templates.comments.render({
-                        comments: commentsData,
-                        orderType: orderType
-                    })
-                )
-            );
-        };
-
-        if (orderType === 'inverted') {
-            commentsData.reverse();
-            addComments();
-            addEditor();
-
-            var commentContainer = sizzle('.comment-container', widgetContainer)[0];
-            commentContainer.scrollTop = 99999;
-        } else {
-            addEditor();
-            addComments();
-        }
-
-        try { oDate.init(); } catch(e) {}
-
-        commentUi.utils.addEventListener('click', sizzle('.signIn', widgetContainer)[0], function (event) {
-            events.trigger('signIn');
-
-            if (event.preventDefault) {
-                event.preventDefault();
-            } else {
-                event.returnValue = false;
-            }
-        });
-
-        commentUi.utils.addEventListener('click', sizzle('.comment-editor-submit &gt; button')[0], function () {
-            events.trigger('postComment');
-        });
-
-        commentUi.utils.addEventListener('click', sizzle('.comment-editor-input')[0], function (event) {
-            sizzle('.comment-editor-input textarea')[0].focus();
-            self.clearEditorError();
-
-            if (event.preventDefault) {
-                event.preventDefault();
-            } else {
-                event.returnValue = false;
-            }
-        });
-    };
-
-    this.login = function (pseudonym) {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl &amp;&amp; authEl.length) {
-            var pseudonymPlaceholder = commentUi.utils.toDOM('&lt;span class=&quot;comment-pseudonym&quot;&gt;' + pseudonym + '&lt;/span&gt;');
-            authEl[0].innerHTML = &quot;&quot;;
-            authEl[0].appendChild(pseudonymPlaceholder);
-        }
-    };
-
-    this.logout = function () {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl &amp;&amp; authEl.length) {
-            authEl[0].innerHTML = templates.signIn.render();
-        }
-    };
-
-    this.changePseudonym = function (pseudonym) {
-        var pseudonymPlaceholder = sizzle('.comment-pseudonym', widgetContainer);
-
-        if (pseudonymPlaceholder &amp;&amp; pseudonymPlaceholder.length) {
-            pseudonymPlaceholder[0].innerHTML = pseudonym;
-        }
-    };
-
-    this.getCurrentPseudonym = function () {
-        var pseudonymArea = sizzle('.comment-editor-auth .comment-pseudonym', widgetContainer);
-
-        if (pseudonymArea &amp;&amp; pseudonymArea.length) {
-            return pseudonymArea[0].innerHTML;
-        }
-
-        return &quot;&quot;;
-    };
-
-    this.hideSignInLink = function () {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl &amp;&amp; authEl.length) {
-            authEl[0].innerHTML = &quot;&quot;;
-        }
-    };
-
-
-    this.addComment = function (content, pseudonym, id, timestamp) {
-        var commentContainer = sizzle('.comment-container', widgetContainer)[0];
-
-        var commentDom = commentUi.utils.toDOM(
-            templates.comment.render({
-                commentId: id,
-                content: content,
-                dateToShow: this.formatTimestamp(timestamp || new Date()),
-                datetime: utils.date.toISOString(timestamp || new Date()),
-                relativeTime: this.isRelativeTime(timestamp || new Date()),
-                author: {
-                    displayName: pseudonym
-                }
-            })
-        );
-
-        if (this.orderType === &quot;normal&quot;) {
-            commentContainer.scrollTop = 0;
-            commentContainer.insertBefore(commentDom, commentContainer.firstChild);
-        } else if (this.orderType === &quot;inverted&quot;) {
-            commentContainer.appendChild(commentDom);
-            commentContainer.scrollTop = 99999;
-        }
-
-        if (this.isRelativeTime(timestamp || new Date())) {
-            commentDom = sizzle('#commentid-' + id, widgetContainer)[0];
-            try { oDate.init(commentDom); } catch(e) {}
-            if (!timestamp) {
-                var commentTimestampTime = sizzle('.comment-timestamp time', commentDom);
-                if (commentTimestampTime &amp;&amp; commentTimestampTime.length) {
-                    commentTimestampTime[0].innerHTML = &quot;just now&quot;;
-                }
-            }
-        }
-    };
-
-    this.removeComment = function (id) {
-        var comment = sizzle('#commentid-'+id, widgetContainer);
-        if (comment &amp;&amp; comment.length) {
-            comment[0].parentNode.removeChild(comment[0]);
-        }
-    };
-
-    this.getCurrentComment = function () {
-        var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
-
-        if (commentArea &amp;&amp; commentArea.length) {
-            return commentArea[0].value.replace(/(?:\r\n|\r|\n)/g, '&lt;br /&gt;');
-        }
-
-        return &quot;&quot;;
-    };
-
-    this.emptyCommentArea = function () {
-        var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
-
-        if (commentArea &amp;&amp; commentArea.length) {
-            commentArea[0].value = &quot;&quot;;
-        }
-    };
-
-    this.repopulateCommentArea = function (text) {
-        var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
-
-        if (commentArea &amp;&amp; commentArea.length) {
-            commentArea[0].value = text.replace(/&lt;br \/&gt;/g, '\n');
-        }
-    };
-
-    this.addSettingsLink = function (options) {
-        var loginBarContainer = sizzle('.comment-editor-auth', widgetContainer);
-        if (loginBarContainer &amp;&amp; loginBarContainer.length) {
-            loginBarContainer[0].appendChild(commentUi.utils.toDOM(commentUi.templates.commentingSettingsLink.render({
-                withoutSeparator: true
-            })));
-        } else {
-            return;
-        }
-
-        var settingsLink = sizzle('.comment-settings-text', loginBarContainer[0]);
-        if (settingsLink &amp;&amp; settingsLink.length) {
-            commentUi.utils.addEventListener('click', settingsLink[0], function () {
-                if (options &amp;&amp; typeof options.onClick === 'function') {
-                    options.onClick();
-                }
-            });
-
-            if (options &amp;&amp; typeof options.onAdded === 'function') {
-                options.onAdded();
-            }
-        }
-    };
-
-    this.removeSettingsLink = function () {
-        var settingsLink = sizzle('.comment-settings', widgetContainer);
-        if (settingsLink &amp;&amp; settingsLink.length) {
-            settingsLink[0].parentNode.removeChild(settingsLink[0]);
-        }
-    };
-
-    this.setEditorError = function (err) {
-        var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
-
-        editorErrorContainer.innerHTML = err;
-        editorErrorContainer.style.display = 'block';
-    };
-
-    this.clearEditorError = function () {
-        var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
-
-        editorErrorContainer.style.display = 'none';
-        editorErrorContainer.innerHTML = '';
-    };
-
-    this.formatTimestamp = function (timestampOrDate) {
-        var timestamp = utils.date.toTimestamp(timestampOrDate);
-        var isRelative = this.isRelativeTime(timestampOrDate);
-
-        if (isRelative) {
-            // relative time
-            var timeAgo = oDate.timeAgo(timestamp);
-            if (timeAgo === &quot;0 seconds ago&quot;) {
-                return &quot;just now&quot;;
-            } else {
-                return timeAgo;
-            }
-        } else {
-            // absolute time
-            return oDate.format(timestamp, datetimeFormat.absoluteFormat);
-        }
-    };
-
-    this.isRelativeTime = function (timestampOrDate) {
-        var timestamp = utils.date.toTimestamp(timestampOrDate);
-
-        if (datetimeFormat.absoluteFormat === -1 ||
-            new Date().getTime() - timestamp &gt; datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
-
-            return false;
-        } else {
-            return true;
-        }
-    };
-}
-
-WidgetUi.__extend = function(child) {
-    &quot;use strict&quot;;
-
-    if (typeof Object.create === 'function') {
-        child.prototype = Object.create(WidgetUi.prototype);
-        child.prototype = Object.create(WidgetUi.prototype);
-    } else {
-        var Tmp = function () {};
-        Tmp.prototype = WidgetUi.prototype;
-        child.prototype = new Tmp();
-        child.prototype.constructor = child;
-    }
-};
-
-commentUi.WidgetUi.__extend(WidgetUi);
-
-module.exports = WidgetUi;</code></pre>
+          <pre><code class="language-javascript">exports.errors = {
+    emptyComment: &quot;It seems you're attempting to post an empty comment.&quot;
+};</code></pre>
         </div>
       </div>
     </div>

@@ -11,6 +11,8 @@ function WidgetUi (widgetContainer, datetimeFormat) {
 
     commentUi.WidgetUi.apply(this, arguments);
 
+    var self = this;
+
     var events = new commentUtilities.Events();
 
     this.on = events.on;
@@ -74,6 +76,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
 
         commentUi.utils.addEventListener('click', sizzle('.comment-editor-input')[0], function (event) {
             sizzle('.comment-editor-input textarea')[0].focus();
+            self.clearEditorError();
 
             if (event.preventDefault) {
                 event.preventDefault();
@@ -128,7 +131,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
     };
 
 
-    this.addComment = function (content, author, id, timestamp) {
+    this.addComment = function (content, pseudonym, id, timestamp) {
         var commentContainer = sizzle('.comment-container', widgetContainer)[0];
 
         var commentDom = commentUi.utils.toDOM(
@@ -139,7 +142,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
                 datetime: utils.date.toISOString(timestamp || new Date()),
                 relativeTime: this.isRelativeTime(timestamp || new Date()),
                 author: {
-                    displayName: author
+                    displayName: pseudonym
                 }
             })
         );
@@ -193,7 +196,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
         var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
 
         if (commentArea && commentArea.length) {
-            commentArea[0].value = text;
+            commentArea[0].value = text.replace(/<br \/>/g, '\n');
         }
     };
 
@@ -226,6 +229,20 @@ function WidgetUi (widgetContainer, datetimeFormat) {
         if (settingsLink && settingsLink.length) {
             settingsLink[0].parentNode.removeChild(settingsLink[0]);
         }
+    };
+
+    this.setEditorError = function (err) {
+        var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
+
+        editorErrorContainer.innerHTML = err;
+        editorErrorContainer.style.display = 'block';
+    };
+
+    this.clearEditorError = function () {
+        var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
+
+        editorErrorContainer.style.display = 'none';
+        editorErrorContainer.innerHTML = '';
     };
 
     this.formatTimestamp = function (timestampOrDate) {

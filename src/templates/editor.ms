@@ -8,6 +8,7 @@
 
     <div class="comment-editor-input">
         <textarea></textarea>
+        <div class="comment-editor-error"></div>
     </div>
 
     <div class="comment-editor-footer">

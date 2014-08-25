@@ -7,6 +7,7 @@ var commentUi = require('comment-ui');
 var oCommentData = require('o-comment-data');
 var commentUtilities = require('comment-utilities');
 var userDialogs = require('./userDialogs.js');
+var i18n = require('./i18n.js');
 
 /**
  * Incorporates the communication with the content creation service,
@@ -23,8 +24,7 @@ var userDialogs = require('./userDialogs.js');
  *  - url: canonical URL of the page
  *  - title: Title of the page
  *     
- * #####Optional fields:
- *  - stream_type: livecomments, livechat, liveblog. By default it is livecomments.
+ * ##### Optional fields:
  *  - authPageReload: if authentication needs a page reload. By default it's false.
  * 
  * @param {object} config Configuration object. See in the description the fields that are mandatory.
@@ -45,6 +45,7 @@ var Widget = function () {
         absoluteFormat: 'date'
     };
 
+    // merge user date preferences with the default preferences
     if (this.config.datetimeFormat) {
         if (typeof this.config.datetimeFormat === 'string') {
             this.datetimeFormat.absoluteFormat = this.config.datetimeFormat;
@@ -79,9 +80,13 @@ var Widget = function () {
             }
 
             if (data.hasOwnProperty('collection')) {
+                // initial collection info
+                
                 callback(null, data.collection);
             } else if (data.hasOwnProperty('comment')) {
-                console.log(data.comment);
+                // comment received through streaming
+
+                self.ui.addComment(data.comment.content, data.comment.author.displayName, data.comment.commentId, data.comment.timestamp);
             }
         });
     };
@@ -92,12 +97,15 @@ var Widget = function () {
                 self.collectionId = commentsData.collectionId;
                 self.trigger('ready.widget');
 
+                // determine if there are messages to post before being logged in.
+                // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
                 if (self.config.authPageReload === true && messageQueue.hasMessage(self.collectionId)) {
                     commentUtilities.logger.log("Force flag set.");
 
                     self.forceMode = true;
                 }
 
+                // normalize the comments data
                 for (var index = 0; index < commentsData.comments.length; index++) {
                     commentsData.comments[index].dateToShow = self.ui.formatTimestamp(commentsData.comments[index].timestamp);
                     commentsData.comments[index].datetime = utils.date.toISOString(commentsData.comments[index].timestamp);
@@ -105,8 +113,11 @@ var Widget = function () {
                         commentsData.comments[index].relativeTime = true;
                     }
                 }
+
+                // render the widget in the DOM
                 self.ui.render(commentsData.comments, self.config.order);
 
+                // all fine, no errors with the rendering
                 callback();
 
 
@@ -117,29 +128,37 @@ var Widget = function () {
 
                     self.trigger('loaded.auth', authData);
 
+                    // determine if the user will need a page reload to post a comment
                     if (self.config.authPageReload === true && (!authData || (!authData.token && authData.pseudonym !== false))) {
                         self.authPageReload = true;
                     }
 
-                    if (authData && authData.token) {
-                        auth.getInstance().login(authData.token, authData.displayName);
-                    } else if (authData.pseudonym === false) {
-                        auth.getInstance().pseudonymMissing = true;
+                    if (authData) {
+                        if (authData.token) {
+                            // user has a token, login
+                            auth.login(authData.token, authData.displayName);
+                        } else if (authData.pseudonym === false) {
+                            // the user doesn't have pseudonym
 
-                        if (self.forceMode === true) {
-                            loginRequiredPseudonymMissing({
-                                success: function () {},
-                                failure: function () {
-                                    messageQueue.clear(self.collectionId);
-                                }
-                            });
+                            auth.pseudonymMissing = true;
+
+                            // the user is forced to finisht the login process
+                            // ask to set a pseudonym instantly
+                            if (self.forceMode === true) {
+                                auth.loginRequiredPseudonymMissing({
+                                    success: function () {},
+                                    failure: function () {
+                                        messageQueue.clear(self.collectionId);
+                                    }
+                                });
+                            }
+
+                            self.ui.hideSignInLink();
+                        } else if (authData.serviceUp === false) {
+                            self.ui.makeReadOnly();
+                            self.ui.hideSignInLink();
+                            self.ui.addAuthNotAvailableMessage();
                         }
-
-                        self.ui.hideSignInLink();
-                    } else if (authData.serviceUp === false) {
-                        self.ui.makeReadOnly();
-                        self.ui.hideSignInLink();
-                        self.ui.addAuthNotAvailableMessage();
                     }
                 });
             } else {
@@ -166,7 +185,7 @@ var Widget = function () {
                     };
 
                     if (err || !currentAuthData) {
-                        loginRequired({
+                        auth.loginRequired({
                             success: function () {
                                 showSettingsDialog();
                             }
@@ -186,93 +205,47 @@ var Widget = function () {
     }
 
 
-    auth.getInstance().on('login.auth', function (token, pseudonym) {
+    auth.on('login.auth', function (token, pseudonym) {
         self.ui.login(pseudonym);
         login();
 
+        // after login, post the comments from the message queue
         if (self.forceMode) {
             messageQueue.postComments(self.collectionId, function (commentBody) {
-                self.trigger('commentPosted.tracking', [self.collectionId, {
-                    bodyHtml: commentBody,
-                    author: {
-                        displayName: pseudonym
-                    }
-                }]);
+                triggerCommentPostedEvent(commentBody, pseudonym);
             });
         }
     });
 
-    auth.getInstance().on('logout.auth', function () {
+    auth.on('logout.auth', function () {
         logout();
     });
 
-
+    // sign in button pressed
     self.ui.on('signIn', function () {
-        loginRequired();
+        auth.loginRequired();
     });
 
-
-    function loginRequiredPseudonymMissing (delegate) {
-        commentUtilities.logger.log('pseudonymMissing');
-
-        userDialogs.showSetPseudonymDialog({
-            success: function (authData) {
-                if (authData && authData.token) {
-                    auth.getInstance().login(authData.token, authData.displayName);
-                }
-
-                if (delegate && delegate.success) {
-                    delegate.success();
-                }
-            },
-            failure: function () {
-                if (delegate && delegate.failure) {
-                    delegate.failure();
-                }
+    function triggerCommentPostedEvent (commentBody, authorPseudonym) {
+        self.trigger('commentPosted.tracking', [self.collectionId, {
+            bodyHtml: commentBody,
+            author: {
+                displayName: authorPseudonym
             }
-        });
+        }]);
     }
 
-    function loginRequiredAfterASuccess (delegate) {
-        oCommentData.api.getAuth(function (err, authData) {
-            if (authData && authData.pseudonym === false) {
-                loginRequiredPseudonymMissing(delegate);
-            } else {
-                if (delegate && delegate.failure) {
-                    delegate.failure();
-                }
-            }
-        });
-    }
-
-    function loginRequired (delegate) {
-        oCommentData.api.getAuth(function (err, authData) {
-            if (authData && authData.pseudonym === false) {
-                loginRequiredPseudonymMissing(delegate);
-            } else if (!authData || !authData.token) {
-                self.trigger('loginRequired.authAction', {
-                    success: function () {
-                        loginRequiredAfterASuccess(delegate);
-                    },
-                    failure: function () {
-                        if (delegate && delegate.failure) {
-                            delegate.failure();
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    self.on('loginRequired.authAction', function () {
-        commentUtilities.logger.log('loginRequired.authAction');
-    });
-
-
-
-
+    /**
+     * Post a comment.
+     * Known fact is that the user is logged in and the comment body is not blank.
+     *
+     * Insert the comment in the DOM instantly, and try to post the comment with the API.
+     * If successful, leave the comment in the DOM and change the ID with the real comment ID.
+     * If unsuccessful, remove the comment from the DOM, repopulate the comment area with the comment and show the error message.
+     * @return {[type]} [description]
+     */
     var postComment = function () {
-        var id = 'inProgress-1234';
+        var id = 'commentId-' + (Math.random() + 1).toString(36).substring(7);
 
         var commentBody = self.ui.getCurrentComment();
         var authorPseudonym = self.ui.getCurrentPseudonym();
@@ -288,30 +261,44 @@ var Widget = function () {
                 commentUtilities.logger.debug('postComment error:', err);
                 self.ui.removeComment(id);
                 self.ui.repopulateCommentArea(commentBody);
+
+                self.ui.setEditorError(commentUi.i18n.texts.genericError);
+
                 return;
             }
 
             commentUtilities.logger.debug('postComment result:', postCommentResult);
 
-            if (postCommentResult && postCommentResult.success === true) {
-                self.trigger('commentPosted.tracking', [self.collectionId, {
-                    bodyHtml: commentBody,
-                    author: {
-                        displayName: authorPseudonym
+            if (postCommentResult) {
+                if (postCommentResult.success === true) {
+                    triggerCommentPostedEvent(commentBody, authorPseudonym);
+                } else {
+                    self.ui.removeComment(id);
+                    self.ui.repopulateCommentArea(commentBody);
+
+                    if (postCommentResult.errorMessage) {
+                        self.ui.setEditorError(postCommentResult.errorMessage);
+                    } else {
+                        self.ui.setEditorError(commentUi.i18n.texts.genericError);
                     }
-                }]);
+
+                    return;
+                }
             } else {
-                self.ui.removeComment(id);
-                self.ui.repopulateCommentArea(commentBody);
-                return;
+                self.ui.setEditorError(commentUi.i18n.texts.genericError);
             }
         });
     };
 
+    // the 'Submit comment' button is pressed
     self.ui.on('postComment', function () {
-        commentUtilities.logger.debug('postComment', self.ui.getCurrentComment());
+        commentUtilities.logger.debug('postComment', 'comment: "'+ self.ui.getCurrentComment() +'"');
 
         var commentBody = self.ui.getCurrentComment();
+        if (!commentBody) {
+            self.ui.setEditorError(i18n.errors.emptyComment);
+            return;
+        }
 
         oCommentData.api.getAuth(function (err, authData) {
             if (!authData || !authData.token) {
@@ -319,7 +306,7 @@ var Widget = function () {
                     messageQueue.save(self.collectionId, commentBody);
                     commentUtilities.logger.log('authPageReload set, save comment to the storage');
 
-                    loginRequired({
+                    auth.loginRequired({
                         success: function () {
 
                         },
@@ -328,7 +315,7 @@ var Widget = function () {
                         }
                     });
                 } else {
-                    loginRequired({
+                    auth.loginRequired({
                         success: function () {
                             postComment();
                         },

@@ -8,6 +8,8 @@
     }
 
     .comment-editor-container {
+        font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+
         .comment-editor-header {
             margin-bottom: 4px;
 
@@ -23,6 +25,7 @@
             padding: 5px 10px;
             background: oColorsGetPaletteColor(white);
             cursor: text;
+            position: relative;
 
             textarea {
                 width: 100%;
@@ -35,6 +38,18 @@
                 color: oColorsGetPaletteColor(grey-tint5);
                 font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
                 font-size: 12px;
+            }
+
+            .comment-editor-error {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                max-width: 50%;
+                padding: 5px 10px;
+                background: oColorsGetPaletteColor(red);
+                color: oColorsGetPaletteColor(white);
+                line-height: 15px;
+                display: none;
             }
         }
 

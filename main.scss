@@ -2,5 +2,9 @@
 
 @import './src/stylesheets/colors';
 
+.o-comment-client {
+    font-size: 12px;
+}
+
 @import './src/stylesheets/comments';
 @import './src/stylesheets/editor';
