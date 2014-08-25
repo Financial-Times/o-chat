@@ -138,18 +138,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
 
             commentEditorInputContainer.className += " disabled";
             sizzle('textarea', commentEditorInputContainer)[0].setAttribute('disabled', 'disabled');
-        }
-    };
-
-    /**
-     * Inserts message when authentication is not available.
-     */
-    this.addAuthNotAvailableMessage = function () {
-        var authContainer = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authContainer.length) {
-            authContainer[0].innerHTML = "";
-            authContainer[0].appendChild(commentUi.utils.toDOM(commentUi.templates.unavailableTemplate.render()));
+            sizzle('.comment-editor-submit', widgetContainer)[0].setAttribute('disabled', 'disabled');
         }
     };
 

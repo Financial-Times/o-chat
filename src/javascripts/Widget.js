@@ -157,7 +157,6 @@ var Widget = function () {
                         } else if (authData.serviceUp === false) {
                             self.ui.makeReadOnly();
                             self.ui.hideSignInLink();
-                            self.ui.addAuthNotAvailableMessage();
                         }
                     }
                 });
