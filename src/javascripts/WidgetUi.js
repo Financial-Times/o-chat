@@ -147,6 +147,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
         var commentContainer = sizzle('.comment-container', widgetContainer)[0];
 
         var rightNow = timestamp ? false : true;
+        var scrolledToLast;
 
         // normalize timestamp if one provided or use current time
         timestamp = timestamp ? utils.date.toTimestamp(timestamp) : new Date();
@@ -171,6 +172,8 @@ function WidgetUi (widgetContainer, datetimeFormat) {
         var inserted = false;
 
         if (this.orderType === "normal") {
+            scrolledToLast = (commentContainer.scrollTop === 0);
+
             for (i = 0; i < comments.length; i++) {
                 if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
                     commentContainer.insertBefore(commentDom, comments[i]);
@@ -183,10 +186,12 @@ function WidgetUi (widgetContainer, datetimeFormat) {
                 commentContainer.appendChild(commentDom);
             }
 
-            if (rightNow) {
+            if (rightNow || scrolledToLast) {
                 commentContainer.scrollTop = 0;
             }
         } else if (this.orderType === "inverted") {
+            scrolledToLast = (commentContainer.scrollTop === (commentContainer.scrollHeight - commentContainer.clientHeight));
+
             for (i = comments.length-1; i >= 0; i--) {
                 if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
                     if (i === comments.length-1) {
@@ -203,8 +208,8 @@ function WidgetUi (widgetContainer, datetimeFormat) {
                 commentContainer.insertBefore(commentDom, commentContainer.firstChild);
             }
 
-            if (rightNow) {
-                commentContainer.scrollTop = 99999;
+            if (rightNow || scrolledToLast) {
+                commentContainer.scrollTop = commentContainer.scrollHeight - commentContainer.clientHeight;
             }
         }
 
