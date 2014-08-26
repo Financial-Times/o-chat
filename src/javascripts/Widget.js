@@ -25,7 +25,6 @@ var i18n = require('./i18n.js');
  *  - title: Title of the page
  *     
  * ##### Optional fields:
- *  - authPageReload: if authentication needs a page reload. By default it's false.
  * 
  * @param {object} config Configuration object. See in the description the fields that are mandatory.
  */
@@ -99,7 +98,7 @@ var Widget = function () {
 
                 // determine if there are messages to post before being logged in.
                 // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
-                if (self.config.authPageReload === true && messageQueue.hasMessage(self.collectionId)) {
+                if (messageQueue.hasMessage(self.collectionId)) {
                     commentUtilities.logger.log("Force flag set.");
 
                     self.forceMode = true;
@@ -127,11 +126,6 @@ var Widget = function () {
                     }
 
                     self.trigger('loaded.auth', authData);
-
-                    // determine if the user will need a page reload to post a comment
-                    if (self.config.authPageReload === true && (!authData || (!authData.token && authData.pseudonym !== false))) {
-                        self.authPageReload = true;
-                    }
 
                     if (authData) {
                         if (authData.token) {
@@ -271,6 +265,8 @@ var Widget = function () {
             if (postCommentResult) {
                 if (postCommentResult.success === true) {
                     triggerCommentPostedEvent(commentBody, authorPseudonym);
+                } else if (postCommentResult.invalidSession === true) {
+                    loginRequiredToPostComment();
                 } else {
                     self.ui.removeComment(id);
                     self.ui.repopulateCommentArea(commentBody);
@@ -289,6 +285,24 @@ var Widget = function () {
         });
     };
 
+
+    function loginRequiredToPostComment () {
+        var commentBody = self.ui.getCurrentComment();
+
+        messageQueue.save(self.collectionId, commentBody);
+            commentUtilities.logger.log('user not actively logged in, save comment to the storage');
+
+            auth.loginRequired({
+                success: function () {
+                    messageQueue.clear(self.collectionId);
+                    postComment();
+                },
+                failure: function () {
+                    messageQueue.clear(self.collectionId);
+                }
+            });
+    }
+
     // the 'Submit comment' button is pressed
     self.ui.on('postComment', function () {
         commentUtilities.logger.debug('postComment', 'comment: "'+ self.ui.getCurrentComment() +'"');
@@ -301,27 +315,7 @@ var Widget = function () {
 
         oCommentData.api.getAuth(function (err, authData) {
             if (!authData || !authData.token) {
-                if (self.authPageReload === true) {
-                    messageQueue.save(self.collectionId, commentBody);
-                    commentUtilities.logger.log('authPageReload set, save comment to the storage');
-
-                    auth.loginRequired({
-                        success: function () {
-
-                        },
-                        failure: function () {
-                            messageQueue.clear(self.collectionId);
-                        }
-                    });
-                } else {
-                    auth.loginRequired({
-                        success: function () {
-                            postComment();
-                        },
-                        failure: function () {
-                        }
-                    });
-                }
+                loginRequiredToPostComment();
             } else {
                 postComment();
             }

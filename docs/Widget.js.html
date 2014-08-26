@@ -130,11 +130,7 @@
 <li>title: Title of the page</li>
 </ul>
 
-<h5>Optional fields:</h5>
-
-<ul>
-<li>authPageReload: if authentication needs a page reload. By default it's false.</li>
-</ul> </div>
+<h5>Optional fields:</h5> </div>
           <pre><code class="language-javascript">var Widget = function () {
     &quot;use strict&quot;;
 
@@ -205,7 +201,7 @@
 
                 // determine if there are messages to post before being logged in.
                 // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
-                if (self.config.authPageReload === true &amp;&amp; messageQueue.hasMessage(self.collectionId)) {
+                if (messageQueue.hasMessage(self.collectionId)) {
                     commentUtilities.logger.log(&quot;Force flag set.&quot;);
 
                     self.forceMode = true;
@@ -234,11 +230,6 @@
 
                     self.trigger('loaded.auth', authData);
 
-                    // determine if the user will need a page reload to post a comment
-                    if (self.config.authPageReload === true &amp;&amp; (!authData || (!authData.token &amp;&amp; authData.pseudonym !== false))) {
-                        self.authPageReload = true;
-                    }
-
                     if (authData) {
                         if (authData.token) {
                             // user has a token, login
@@ -263,7 +254,6 @@
                         } else if (authData.serviceUp === false) {
                             self.ui.makeReadOnly();
                             self.ui.hideSignInLink();
-                            self.ui.addAuthNotAvailableMessage();
                         }
                     }
                 });
@@ -378,6 +368,8 @@
             if (postCommentResult) {
                 if (postCommentResult.success === true) {
                     triggerCommentPostedEvent(commentBody, authorPseudonym);
+                } else if (postCommentResult.invalidSession === true) {
+                    loginRequiredToPostComment();
                 } else {
                     self.ui.removeComment(id);
                     self.ui.repopulateCommentArea(commentBody);
@@ -396,6 +388,24 @@
         });
     };
 
+
+    function loginRequiredToPostComment () {
+        var commentBody = self.ui.getCurrentComment();
+
+        messageQueue.save(self.collectionId, commentBody);
+            commentUtilities.logger.log('user not actively logged in, save comment to the storage');
+
+            auth.loginRequired({
+                success: function () {
+                    messageQueue.clear(self.collectionId);
+                    postComment();
+                },
+                failure: function () {
+                    messageQueue.clear(self.collectionId);
+                }
+            });
+    }
+
     // the 'Submit comment' button is pressed
     self.ui.on('postComment', function () {
         commentUtilities.logger.debug('postComment', 'comment: &quot;'+ self.ui.getCurrentComment() +'&quot;');
@@ -408,27 +418,7 @@
 
         oCommentData.api.getAuth(function (err, authData) {
             if (!authData || !authData.token) {
-                if (self.authPageReload === true) {
-                    messageQueue.save(self.collectionId, commentBody);
-                    commentUtilities.logger.log('authPageReload set, save comment to the storage');
-
-                    auth.loginRequired({
-                        success: function () {
-
-                        },
-                        failure: function () {
-                            messageQueue.clear(self.collectionId);
-                        }
-                    });
-                } else {
-                    auth.loginRequired({
-                        success: function () {
-                            postComment();
-                        },
-                        failure: function () {
-                        }
-                    });
-                }
+                loginRequiredToPostComment();
             } else {
                 postComment();
             }
