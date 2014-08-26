@@ -115,7 +115,7 @@ var Widget = function () {
                 }
 
                 // render the widget in the DOM
-                self.ui.render(commentsData.comments, self.config.order);
+                self.ui.render(commentsData.comments, self.config.order, self.config.maxHeight);
 
                 // all fine, no errors with the rendering
                 callback();

@@ -20,7 +20,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
 
     this.orderType = "normal";
 
-    this.render = function (commentsData, orderType) {
+    this.render = function (commentsData, orderType, maxHeight) {
         this.orderType = orderType;
 
         var addEditor = function () {
@@ -46,16 +46,28 @@ function WidgetUi (widgetContainer, datetimeFormat) {
             );
         };
 
+        var commentContainer;
         if (orderType === 'inverted') {
             commentsData.reverse();
             addComments();
             addEditor();
 
-            var commentContainer = sizzle('.comment-container', widgetContainer)[0];
-            commentContainer.scrollTop = 99999;
+            commentContainer = sizzle('.comment-container', widgetContainer)[0];
+            if (maxHeight) {
+                commentContainer.style.maxHeight = maxHeight + "px";
+                commentContainer.style.overflow = "auto";
+                commentContainer.scrollTop = commentContainer.scrollHeight - commentContainer.clientHeight;
+            }
         } else {
             addEditor();
             addComments();
+
+            commentContainer = sizzle('.comment-container', widgetContainer)[0];
+            if (maxHeight) {
+                commentContainer.style.maxHeight = maxHeight + "px";
+                commentContainer.style.overflow = "auto";
+                commentContainer.scrollTop = 0;
+            }
         }
 
         try { oDate.init(); } catch(e) {}

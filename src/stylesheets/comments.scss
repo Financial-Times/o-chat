@@ -1,11 +1,4 @@
 .o-comment-client {
-    &.comment-layout-side {
-        .comment-container {
-            overflow: auto;
-            max-height: 400px;
-        }
-    }
-
     .comment-container {
         .comment-wrapper {
             color: oColorsGetPaletteColor(grey-tint5);
