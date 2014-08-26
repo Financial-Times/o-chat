@@ -149,7 +149,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
         var rightNow = timestamp ? false : true;
 
         // normalize timestamp if one provided or use current time
-        timestamp = timestamp ? this.toTimestamp(timestamp) : new Date();
+        timestamp = timestamp ? utils.date.toTimestamp(timestamp) : new Date();
 
         var commentDom = commentUi.utils.toDOM(
             templates.comment.render({
