@@ -1,0 +1,9 @@
+{
+    "description": "Comment widget built on top of Livefyre API's and FT comment services.",
+    "origamiType": "module",
+    "origamiVersion": 1,
+    "support": "hyperion@ft.com",
+    "supportStatus": "not implemented",
+    "ci": {},
+    "browserFeatures": {}
+}
