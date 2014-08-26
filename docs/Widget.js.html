@@ -340,7 +340,7 @@
           <div class="description"><p>Post a comment.<br />Known fact is that the user is logged in and the comment body is not blank.</p>
 
 <p>Insert the comment in the DOM instantly, and try to post the comment with the API.<br />If successful, leave the comment in the DOM and change the ID with the real comment ID.<br />If unsuccessful, remove the comment from the DOM, repopulate the comment area with the comment and show the error message.</p> </div>
-          <pre><code class="language-javascript">var postComment = function () {
+          <pre><code class="language-javascript">var postComment = function (secondStepOfTryingToPost) {
         var id = 'commentId-' + (Math.random() + 1).toString(36).substring(7);
 
         var commentBody = self.ui.getCurrentComment();
@@ -368,8 +368,11 @@
             if (postCommentResult) {
                 if (postCommentResult.success === true) {
                     triggerCommentPostedEvent(commentBody, authorPseudonym);
-                } else if (postCommentResult.invalidSession === true) {
-                    loginRequiredToPostComment();
+                } else if (postCommentResult.invalidSession === true &amp;&amp; secondStepOfTryingToPost !== true) {
+                    self.ui.removeComment(id);
+                    self.ui.repopulateCommentArea(commentBody);
+                    
+                    loginRequiredToPostComment(true);
                 } else {
                     self.ui.removeComment(id);
                     self.ui.repopulateCommentArea(commentBody);
@@ -389,7 +392,7 @@
     };
 
 
-    function loginRequiredToPostComment () {
+    function loginRequiredToPostComment (secondStepOfTryingToPost) {
         var commentBody = self.ui.getCurrentComment();
 
         messageQueue.save(self.collectionId, commentBody);
@@ -398,7 +401,7 @@
             auth.loginRequired({
                 success: function () {
                     messageQueue.clear(self.collectionId);
-                    postComment();
+                    postComment(secondStepOfTryingToPost);
                 },
                 failure: function () {
                     messageQueue.clear(self.collectionId);

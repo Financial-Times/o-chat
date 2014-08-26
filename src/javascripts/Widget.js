@@ -237,7 +237,7 @@ var Widget = function () {
      * If unsuccessful, remove the comment from the DOM, repopulate the comment area with the comment and show the error message.
      * @return {[type]} [description]
      */
-    var postComment = function () {
+    var postComment = function (secondStepOfTryingToPost) {
         var id = 'commentId-' + (Math.random() + 1).toString(36).substring(7);
 
         var commentBody = self.ui.getCurrentComment();
@@ -265,8 +265,11 @@ var Widget = function () {
             if (postCommentResult) {
                 if (postCommentResult.success === true) {
                     triggerCommentPostedEvent(commentBody, authorPseudonym);
-                } else if (postCommentResult.invalidSession === true) {
-                    loginRequiredToPostComment();
+                } else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
+                    self.ui.removeComment(id);
+                    self.ui.repopulateCommentArea(commentBody);
+                    
+                    loginRequiredToPostComment(true);
                 } else {
                     self.ui.removeComment(id);
                     self.ui.repopulateCommentArea(commentBody);
@@ -286,7 +289,7 @@ var Widget = function () {
     };
 
 
-    function loginRequiredToPostComment () {
+    function loginRequiredToPostComment (secondStepOfTryingToPost) {
         var commentBody = self.ui.getCurrentComment();
 
         messageQueue.save(self.collectionId, commentBody);
@@ -295,7 +298,7 @@ var Widget = function () {
             auth.loginRequired({
                 success: function () {
                     messageQueue.clear(self.collectionId);
-                    postComment();
+                    postComment(secondStepOfTryingToPost);
                 },
                 failure: function () {
                     messageQueue.clear(self.collectionId);
