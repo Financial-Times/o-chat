@@ -106,6 +106,10 @@ function Auth () {
                         }
                     }
                 });
+            } else {
+                if (delegate && delegate.success) {
+                    delegate.success();
+                }
             }
         });
     };
