@@ -210,13 +210,9 @@ function WidgetUi (widgetContainer, datetimeFormat) {
 
         if (this.isRelativeTime(timestamp || new Date())) {
             commentDom = sizzle('#commentid-' + id, widgetContainer)[0];
-            try { oDate.init(commentDom); } catch(e) {}
-            if (!timestamp) {
-                var commentTimestampTime = sizzle('.comment-timestamp time', commentDom);
-                if (commentTimestampTime && commentTimestampTime.length) {
-                    commentTimestampTime[0].innerHTML = "just now";
-                }
-            }
+            setTimeout(function () {
+                try { oDate.init(commentDom); } catch(e) {}
+            }, 10000);
         }
     };
 
