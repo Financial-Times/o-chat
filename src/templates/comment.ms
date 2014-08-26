@@ -1,4 +1,4 @@
-<div class="comment-wrapper" {{#commentId}}id="commentid-{{commentId}}"{{/commentId}}>
+<div class="comment-wrapper" {{#commentId}}id="commentid-{{commentId}}"{{/commentId}} data-timestamp="{{timestamp}}">
     <span class="comment-timestamp">
         <time class="{{#relativeTime}}o-date{{/relativeTime}}" datetime="{{datetime}}">
             {{dateToShow}}

@@ -85,7 +85,7 @@ var Widget = function () {
             } else if (data.hasOwnProperty('comment')) {
                 // comment received through streaming
 
-                self.ui.addComment(data.comment.content, data.comment.author.displayName, data.comment.commentId, data.comment.timestamp);
+                newCommentReceived(data.comment);
             }
         });
     };
@@ -111,6 +111,7 @@ var Widget = function () {
                     if (self.ui.isRelativeTime(commentsData.comments[index].timestamp)) {
                         commentsData.comments[index].relativeTime = true;
                     }
+                    commentsData.comments[index].timestamp = utils.date.toTimestamp(commentsData.comments[index].timestamp);
                 }
 
                 // render the widget in the DOM
@@ -161,6 +162,11 @@ var Widget = function () {
             }
         }
     };
+
+
+    function newCommentReceived (commentData) {
+        self.ui.addComment(commentData.content, commentData.author.displayName, commentData.commentId, commentData.timestamp);
+    }
 
 
     function login () {
@@ -268,7 +274,7 @@ var Widget = function () {
                 } else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
                     self.ui.removeComment(id);
                     self.ui.repopulateCommentArea(commentBody);
-                    
+
                     loginRequiredToPostComment(true);
                 } else {
                     self.ui.removeComment(id);

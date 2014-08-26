@@ -246,25 +246,66 @@ function WidgetUi (widgetContainer, datetimeFormat) {
     this.addComment = function (content, pseudonym, id, timestamp) {
         var commentContainer = sizzle('.comment-container', widgetContainer)[0];
 
+        var rightNow = timestamp ? false : true;
+
+        // normalize timestamp if one provided or use current time
+        timestamp = timestamp ? this.toTimestamp(timestamp) : new Date();
+
         var commentDom = commentUi.utils.toDOM(
             templates.comment.render({
                 commentId: id,
                 content: content,
-                dateToShow: this.formatTimestamp(timestamp || new Date()),
-                datetime: utils.date.toISOString(timestamp || new Date()),
-                relativeTime: this.isRelativeTime(timestamp || new Date()),
+                dateToShow: this.formatTimestamp(timestamp),
+                datetime: utils.date.toISOString(timestamp),
+                timestamp: utils.date.toTimestamp(timestamp),
+                relativeTime: this.isRelativeTime(timestamp),
                 author: {
                     displayName: pseudonym
                 }
             })
         );
 
+
+        var comments = sizzle('.comment-wrapper', commentContainer);
+        var i;
+        var inserted = false;
+
         if (this.orderType === &quot;normal&quot;) {
-            commentContainer.scrollTop = 0;
-            commentContainer.insertBefore(commentDom, commentContainer.firstChild);
+            for (i = 0; i &lt; comments.length; i++) {
+                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) &lt; timestamp) {
+                    commentContainer.insertBefore(commentDom, comments[i]);
+                    inserted = true;
+                    break;
+                }
+            }
+
+            if (!inserted) {
+                commentContainer.appendChild(commentDom);
+            }
+
+            if (rightNow) {
+                commentContainer.scrollTop = 0;
+            }
         } else if (this.orderType === &quot;inverted&quot;) {
-            commentContainer.appendChild(commentDom);
-            commentContainer.scrollTop = 99999;
+            for (i = comments.length-1; i &gt;= 0; i--) {
+                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) &lt; timestamp) {
+                    if (i === comments.length-1) {
+                        commentContainer.appendChild(commentDom);
+                    } else {
+                        commentContainer.insertBefore(commentDom, comments[i+1]);
+                    }
+                    inserted = true;
+                    break;
+                }
+            }
+
+            if (!inserted) {
+                commentContainer.insertBefore(commentDom, commentContainer.firstChild);
+            }
+
+            if (rightNow) {
+                commentContainer.scrollTop = 99999;
+            }
         }
 
         if (this.isRelativeTime(timestamp || new Date())) {
