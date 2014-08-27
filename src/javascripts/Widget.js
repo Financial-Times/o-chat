@@ -154,7 +154,7 @@ var Widget = function () {
                             self.ui.hideSignInLink();
                         }
                     } else if (self.forceMode === true) {
-                        var messageInTheQueue = messageQueue.getComment();
+                        var messageInTheQueue = messageQueue.getComment(self.collectionId);
                         self.ui.repopulateCommentArea(messageInTheQueue);
                     }
                 });
