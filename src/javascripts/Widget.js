@@ -96,14 +96,6 @@ var Widget = function () {
                 self.collectionId = commentsData.collectionId;
                 self.trigger('ready.widget');
 
-                // determine if there are messages to post before being logged in.
-                // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
-                if (messageQueue.hasMessage(self.collectionId)) {
-                    commentUtilities.logger.log("Force flag set.");
-
-                    self.forceMode = true;
-                }
-
                 // normalize the comments data
                 for (var index = 0; index < commentsData.comments.length; index++) {
                     commentsData.comments[index].dateToShow = self.ui.formatTimestamp(commentsData.comments[index].timestamp);
@@ -116,6 +108,14 @@ var Widget = function () {
 
                 // render the widget in the DOM
                 self.ui.render(commentsData.comments, self.config.order, self.config.maxHeight);
+
+                // determine if there are messages to post before being logged in.
+                // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
+                if (messageQueue.hasComment(self.collectionId)) {
+                    commentUtilities.logger.log("Force flag set.");
+
+                    self.forceMode = true;
+                }
 
                 // all fine, no errors with the rendering
                 callback();
@@ -153,6 +153,9 @@ var Widget = function () {
                             self.ui.makeReadOnly();
                             self.ui.hideSignInLink();
                         }
+                    } else if (self.forceMode === true) {
+                        var messageInTheQueue = messageQueue.getComment();
+                        self.ui.repopulateCommentArea(messageInTheQueue);
                     }
                 });
             } else {
@@ -210,7 +213,7 @@ var Widget = function () {
 
         // after login, post the comments from the message queue
         if (self.forceMode) {
-            messageQueue.postComments(self.collectionId, function (commentBody) {
+            messageQueue.postComment(self.collectionId, function (commentBody) {
                 triggerCommentPostedEvent(commentBody, pseudonym);
             });
         }

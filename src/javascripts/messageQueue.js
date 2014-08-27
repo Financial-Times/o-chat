@@ -1,23 +1,15 @@
 var commentUtilities = require('comment-utilities');
 var oCommentData = require('o-comment-data');
 
-var storageBaseName = "o-comment-client-message-queue-";
-var messageId = "msgQueue-" + (Math.random() + 1).toString(36).substring(7);
+var storageBaseName = "o-comment-client-comment-queue-";
 
 exports.save = function (collectionId, commentBody) {
     "use strict";
 
-    var queueObject = {};
-    if (exports.hasMessage(collectionId)) {
-        queueObject = commentUtilities.storageWrapper.sessionStorage.getItem(storageBaseName + collectionId);
-    }
-
-    queueObject[messageId] = commentBody;
-
-    commentUtilities.storageWrapper.sessionStorage.setItem(storageBaseName + collectionId, queueObject);
+    commentUtilities.storageWrapper.sessionStorage.setItem(storageBaseName + collectionId, commentBody);
 };
 
-exports.hasMessage = function (collectionId) {
+exports.hasComment = function (collectionId) {
     "use strict";
 
     if (collectionId) {
@@ -29,20 +21,28 @@ exports.hasMessage = function (collectionId) {
     return false;
 };
 
-var postCommentsInProgress = {};
-exports.postComments = function (collectionId, callbackMessagePosted) {
+exports.getComment = function (collectionId) {
     "use strict";
 
-    if (postCommentsInProgress[collectionId]) {
+    if (collectionId) {
+        if (exports.hasComment(collectionId)) {
+            return commentUtilities.storageWrapper.sessionStorage.getItem(storageBaseName + collectionId);
+        }
+    }
+
+    return undefined;
+};
+
+var commentsQueuedPosted = {};
+exports.postComment = function (collectionId, callbackCommentPosted) {
+    "use strict";
+
+    if (commentsQueuedPosted[collectionId]) {
         return;
     }
 
-    postCommentsInProgress[collectionId] = true;
+    commentsQueuedPosted[collectionId] = true;
 
-    var queueObject = {};
-    if (exports.hasMessage(collectionId)) {
-        queueObject = commentUtilities.storageWrapper.sessionStorage.getItem(storageBaseName + collectionId);
-    }
 
     var postCommentToCcs = function (commentBody) {
         oCommentData.api.postComment({
@@ -54,18 +54,16 @@ exports.postComments = function (collectionId, callbackMessagePosted) {
             }
 
             if (postCommentResult && postCommentResult.success === true) {
-                if (typeof callbackMessagePosted === 'function') {
-                    callbackMessagePosted();
+                if (typeof callbackCommentPosted === 'function') {
+                    callbackCommentPosted();
                 }
             }
         });
     };
 
-    var id;
-    for (id in queueObject) {
-        if (queueObject.hasOwnProperty(id)) {
-            postCommentToCcs(queueObject[id]);
-        }
+    if (exports.hasComment(collectionId)) {
+        var comment = exports.getComment(collectionId);
+        postCommentToCcs(comment);
     }
 
     exports.clear(collectionId);

@@ -101,23 +101,15 @@
           <pre><code class="language-javascript">var commentUtilities = require('comment-utilities');
 var oCommentData = require('o-comment-data');
 
-var storageBaseName = &quot;o-comment-client-message-queue-&quot;;
-var messageId = &quot;msgQueue-&quot; + (Math.random() + 1).toString(36).substring(7);
+var storageBaseName = &quot;o-comment-client-comment-queue-&quot;;
 
 exports.save = function (collectionId, commentBody) {
     &quot;use strict&quot;;
 
-    var queueObject = {};
-    if (exports.hasMessage(collectionId)) {
-        queueObject = commentUtilities.storageWrapper.sessionStorage.getItem(storageBaseName + collectionId);
-    }
-
-    queueObject[messageId] = commentBody;
-
-    commentUtilities.storageWrapper.sessionStorage.setItem(storageBaseName + collectionId, queueObject);
+    commentUtilities.storageWrapper.sessionStorage.setItem(storageBaseName + collectionId, commentBody);
 };
 
-exports.hasMessage = function (collectionId) {
+exports.hasComment = function (collectionId) {
     &quot;use strict&quot;;
 
     if (collectionId) {
@@ -129,20 +121,28 @@ exports.hasMessage = function (collectionId) {
     return false;
 };
 
-var postCommentsInProgress = {};
-exports.postComments = function (collectionId, callbackMessagePosted) {
+exports.getComment = function (collectionId) {
     &quot;use strict&quot;;
 
-    if (postCommentsInProgress[collectionId]) {
+    if (collectionId) {
+        if (exports.hasComment(collectionId)) {
+            return commentUtilities.storageWrapper.sessionStorage.getItem(storageBaseName + collectionId);
+        }
+    }
+
+    return undefined;
+};
+
+var commentsQueuedPosted = {};
+exports.postComment = function (collectionId, callbackCommentPosted) {
+    &quot;use strict&quot;;
+
+    if (commentsQueuedPosted[collectionId]) {
         return;
     }
 
-    postCommentsInProgress[collectionId] = true;
+    commentsQueuedPosted[collectionId] = true;
 
-    var queueObject = {};
-    if (exports.hasMessage(collectionId)) {
-        queueObject = commentUtilities.storageWrapper.sessionStorage.getItem(storageBaseName + collectionId);
-    }
 
     var postCommentToCcs = function (commentBody) {
         oCommentData.api.postComment({
@@ -154,18 +154,16 @@ exports.postComments = function (collectionId, callbackMessagePosted) {
             }
 
             if (postCommentResult &amp;&amp; postCommentResult.success === true) {
-                if (typeof callbackMessagePosted === 'function') {
-                    callbackMessagePosted();
+                if (typeof callbackCommentPosted === 'function') {
+                    callbackCommentPosted();
                 }
             }
         });
     };
 
-    var id;
-    for (id in queueObject) {
-        if (queueObject.hasOwnProperty(id)) {
-            postCommentToCcs(queueObject[id]);
-        }
+    if (exports.hasComment(collectionId)) {
+        var comment = exports.getComment(collectionId);
+        postCommentToCcs(comment);
     }
 
     exports.clear(collectionId);
