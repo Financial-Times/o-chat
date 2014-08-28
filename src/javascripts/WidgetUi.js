@@ -91,7 +91,7 @@ function WidgetUi (widgetContainer, config) {
 
 
         commentContainer.style.overflow = "auto";
-        commentContainer.style.maxHeight = (height - editorHeight) + "px";
+        commentContainer.style.height = (height - editorHeight) + "px";
         if (config.orderType === 'inverted') {
             commentContainer.scrollTop = commentContainer.scrollHeight - commentContainer.clientHeight;
         } else {
