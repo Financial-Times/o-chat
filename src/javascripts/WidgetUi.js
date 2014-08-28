@@ -6,10 +6,12 @@ var oDate = require('o-date');
 var templates = require('./templates.js');
 var utils = require('./utils.js');
 
-function WidgetUi (widgetContainer, datetimeFormat) {
+function WidgetUi (widgetContainer, config) {
     "use strict";
 
     commentUi.WidgetUi.apply(this, arguments);
+
+    config.orderType = config.orderType || "normal";
 
     var self = this;
 
@@ -18,11 +20,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
     this.on = events.on;
     this.off = events.off;
 
-    this.orderType = "normal";
-
-    this.render = function (commentsData, orderType, maxHeight) {
-        this.orderType = orderType;
-
+    this.render = function (commentsData) {
         var addEditor = function () {
             widgetContainer.appendChild(
                 commentUi.utils.toDOM(
@@ -40,34 +38,19 @@ function WidgetUi (widgetContainer, datetimeFormat) {
                 commentUi.utils.toDOM(
                     templates.comments.render({
                         comments: commentsData,
-                        orderType: orderType
+                        orderType: config.orderType
                     })
                 )
             );
         };
 
-        var commentContainer;
-        if (orderType === 'inverted') {
+        if (config.orderType === 'inverted') {
             commentsData.reverse();
             addComments();
             addEditor();
-
-            commentContainer = sizzle('.comment-container', widgetContainer)[0];
-            if (maxHeight) {
-                commentContainer.style.maxHeight = maxHeight + "px";
-                commentContainer.style.overflow = "auto";
-                commentContainer.scrollTop = commentContainer.scrollHeight - commentContainer.clientHeight;
-            }
         } else {
             addEditor();
             addComments();
-
-            commentContainer = sizzle('.comment-container', widgetContainer)[0];
-            if (maxHeight) {
-                commentContainer.style.maxHeight = maxHeight + "px";
-                commentContainer.style.overflow = "auto";
-                commentContainer.scrollTop = 0;
-            }
         }
 
         try { oDate.init(); } catch(e) {}
@@ -96,6 +79,24 @@ function WidgetUi (widgetContainer, datetimeFormat) {
                 event.returnValue = false;
             }
         });
+    };
+
+    this.adaptToHeight = function (height) {
+        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+        var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
+        var editorComputedStyle = commentUi.utils.getComputedStyle(editorContainer);
+        var editorHeight = editorContainer.clientHeight +
+                            parseInt(editorComputedStyle.getPropertyValue('margin-top').replace('px', ''), 10) +
+                            parseInt(editorComputedStyle.getPropertyValue('margin-bottom').replace('px', ''), 10);
+
+
+        commentContainer.style.overflow = "auto";
+        commentContainer.style.maxHeight = (height - editorHeight) + "px";
+        if (config.orderType === 'inverted') {
+            commentContainer.scrollTop = commentContainer.scrollHeight - commentContainer.clientHeight;
+        } else {
+            commentContainer.scrollTop = 0;
+        }
     };
 
     this.login = function (pseudonym) {
@@ -156,7 +157,7 @@ function WidgetUi (widgetContainer, datetimeFormat) {
 
 
     this.addComment = function (content, pseudonym, id, timestamp) {
-        var commentContainer = sizzle('.comment-container', widgetContainer)[0];
+        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
 
         var rightNow = timestamp ? false : true;
         var scrolledToLast;
@@ -325,15 +326,15 @@ function WidgetUi (widgetContainer, datetimeFormat) {
             }
         } else {
             // absolute time
-            return oDate.format(timestamp, datetimeFormat.absoluteFormat);
+            return oDate.format(timestamp, config.datetimeFormat.absoluteFormat);
         }
     };
 
     this.isRelativeTime = function (timestampOrDate) {
         var timestamp = utils.date.toTimestamp(timestampOrDate);
 
-        if (datetimeFormat.absoluteFormat === -1 ||
-            new Date().getTime() - timestamp > datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
+        if (config.datetimeFormat.absoluteFormat === -1 ||
+            new Date().getTime() - timestamp > config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
 
             return false;
         } else {

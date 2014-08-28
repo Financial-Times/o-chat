@@ -1,4 +1,4 @@
-<div class="comment-container">
+<div class="comment-comments-container">
     {{#comments}}
         <div class="comment-wrapper" {{#commentId}}id="commentid-{{commentId}}"{{/commentId}} data-timestamp="{{timestamp}}">
             <span class="comment-timestamp">

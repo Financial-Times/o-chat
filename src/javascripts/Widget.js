@@ -59,7 +59,11 @@ var Widget = function () {
         }
     }
 
-    this.ui = new WidgetUi(this.getWidgetEl(), this.datetimeFormat);
+    this.ui = new WidgetUi(this.getWidgetEl(), {
+        datetimeFormat: this.datetimeFormat,
+        fluidLayout: self.config.fluidLayout,
+        orderType: self.config.order
+    });
     
 
     this.loadResources = function (callback) {
@@ -107,7 +111,9 @@ var Widget = function () {
                 }
 
                 // render the widget in the DOM
-                self.ui.render(commentsData.comments, self.config.order, self.config.maxHeight);
+                self.ui.render(commentsData.comments, self.config.order, self.config.fluidLayout);
+
+                self.trigger('renderComplete.widget');
 
                 // determine if there are messages to post before being logged in.
                 // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
@@ -163,6 +169,12 @@ var Widget = function () {
                     unclassifiedArticle: true
                 });
             }
+        }
+    };
+
+    this.adaptToHeight = function (height) {
+        if (height) {
+            self.ui.adaptToHeight(height);
         }
     };
 
