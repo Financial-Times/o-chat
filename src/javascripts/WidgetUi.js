@@ -85,10 +85,24 @@ function WidgetUi (widgetContainer, config) {
         var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
         var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
         var editorComputedStyle = commentUi.utils.getComputedStyle(editorContainer);
-        var editorHeight = editorContainer.clientHeight +
-                            parseInt(editorComputedStyle.getPropertyValue('margin-top').replace('px', ''), 10) +
-                            parseInt(editorComputedStyle.getPropertyValue('margin-bottom').replace('px', ''), 10);
 
+        var editorContainerMarginTopValue;
+        var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
+        if (editorContainerMarginTop.indexOf('px') !== -1) {
+            editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
+        } else {
+            editorContainerMarginTopValue = 0;
+        }
+
+        var editorContainerMarginBottomValue;
+        var editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
+        if (editorContainerMarginBottom.indexOf('px') !== -1) {
+            editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
+        } else {
+            editorContainerMarginBottomValue = 0;
+        }
+
+        var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
 
         commentContainer.style.overflow = "auto";
         commentContainer.style.height = (height - editorHeight) + "px";
