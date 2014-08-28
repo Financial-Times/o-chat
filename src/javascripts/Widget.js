@@ -111,8 +111,10 @@ var Widget = function () {
                 }
 
                 // render the widget in the DOM
-                self.ui.render(commentsData.comments, self.config.order, self.config.fluidLayout);
+                self.ui.render(commentsData.comments);
 
+                // all fine, no errors with the rendering
+                callback();
                 self.trigger('renderComplete.widget');
 
                 // determine if there are messages to post before being logged in.
@@ -122,9 +124,6 @@ var Widget = function () {
 
                     self.forceMode = true;
                 }
-
-                // all fine, no errors with the rendering
-                callback();
 
 
                 oCommentData.api.getAuth(function (err, authData) {
