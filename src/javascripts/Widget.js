@@ -208,17 +208,21 @@ var Widget = function () {
         self.ui.login(pseudonym);
         self.ui.addSettingsLink({
             onClick: function () {
-                oCommentData.api.getAuth(function (err, currentAuthData) {
-                    var showSettingsDialog = function () {
-                        userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
-                            success: function (newAuthData) {
-                                if (newAuthData && newAuthData.token) {
-                                    self.ui.changePseudonym(newAuthData.displayName);
+                var showSettingsDialog = function () {
+                    oCommentData.api.getAuth(function (err, currentAuthData) {
+                        if (!err && currentAuthData) {
+                            userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
+                                success: function (newAuthData) {
+                                    if (newAuthData && newAuthData.token) {
+                                        self.ui.changePseudonym(newAuthData.displayName);
+                                    }
                                 }
-                            }
-                        });
-                    };
+                            });
+                        }
+                    });
+                };
 
+                oCommentData.api.getAuth(function (err, currentAuthData) {
                     if (err || !currentAuthData) {
                         auth.loginRequired({
                             success: function () {
@@ -348,9 +352,10 @@ var Widget = function () {
 
     // the 'Submit comment' button is pressed
     self.ui.on('postComment', function () {
-        commentUtilities.logger.debug('postComment', 'comment: "'+ self.ui.getCurrentComment() +'"');
-
         var commentBody = self.ui.getCurrentComment();
+
+        commentUtilities.logger.debug('postComment', 'comment: "'+ commentBody +'"');
+        
         if (!commentBody) {
             self.ui.setEditorError(i18n.errors.emptyComment);
             return;

@@ -269,6 +269,8 @@
                     }
                 });
             } else {
+                self.login(authData.token, authData.displayName);
+                
                 if (delegate &amp;&amp; delegate.success) {
                     delegate.success();
                 }

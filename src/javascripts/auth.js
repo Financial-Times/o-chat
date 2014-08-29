@@ -107,6 +107,8 @@ function Auth () {
                     }
                 });
             } else {
+                self.login(authData.token, authData.displayName);
+                
                 if (delegate && delegate.success) {
                     delegate.success();
                 }
