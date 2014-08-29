@@ -198,7 +198,7 @@ function WidgetUi (widgetContainer, config) {
         var i;
         var inserted = false;
 
-        if (this.orderType === "normal") {
+        if (config.orderType === "normal") {
             scrolledToLast = (commentContainer.scrollTop === 0);
 
             for (i = 0; i < comments.length; i++) {
@@ -216,7 +216,7 @@ function WidgetUi (widgetContainer, config) {
             if (rightNow || scrolledToLast) {
                 commentContainer.scrollTop = 0;
             }
-        } else if (this.orderType === "inverted") {
+        } else if (config.orderType === "inverted") {
             scrolledToLast = (commentContainer.scrollTop === (commentContainer.scrollHeight - commentContainer.clientHeight));
 
             for (i = comments.length-1; i >= 0; i--) {
