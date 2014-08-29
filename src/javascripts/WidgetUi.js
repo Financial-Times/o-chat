@@ -255,6 +255,13 @@ function WidgetUi (widgetContainer, config) {
         }
     };
 
+    this.changeCommentId = function (oldId, newId) {
+        var comment = document.getElementById('commentid-' + oldId);
+        if (comment) {
+            comment.id = 'commentid-' + newId;
+        }
+    };
+
     this.getCurrentComment = function () {
         var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
 

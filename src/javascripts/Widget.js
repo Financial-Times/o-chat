@@ -44,6 +44,23 @@ var Widget = function () {
         absoluteFormat: 'date'
     };
 
+
+    var loginStatus = false;
+
+    var commentIds = [];
+    var hasCommentId = function (id) {
+        if (Array.prototype.indexOf) {
+            return commentIds.indexOf(id) !== -1 ? true : false;
+        } else {
+             for (var i = 0; i < commentIds.length; i++) {
+                if (commentIds[i] === id) {
+                    return true;
+                }
+             }
+             return false;
+        }
+    };
+
     // merge user date preferences with the default preferences
     if (this.config.datetimeFormat) {
         if (typeof this.config.datetimeFormat === 'string') {
@@ -179,11 +196,16 @@ var Widget = function () {
 
 
     function newCommentReceived (commentData) {
-        self.ui.addComment(commentData.content, commentData.author.displayName, commentData.commentId, commentData.timestamp);
+        if (!hasCommentId(commentData.commentId)) {
+            self.ui.addComment(commentData.content, commentData.author.displayName, commentData.commentId, commentData.timestamp);
+        }
     }
 
 
-    function login () {
+    function login (token, pseudonym) {
+        loginStatus = true;
+
+        self.ui.login(pseudonym);
         self.ui.addSettingsLink({
             onClick: function () {
                 oCommentData.api.getAuth(function (err, currentAuthData) {
@@ -210,17 +232,7 @@ var Widget = function () {
                 });
             }
         });
-    }
 
-    function logout () {
-        self.ui.logout();
-        self.ui.removeSettingsLink();
-    }
-
-
-    auth.on('login.auth', function (token, pseudonym) {
-        self.ui.login(pseudonym);
-        login();
 
         // after login, post the comments from the message queue
         if (self.forceMode) {
@@ -228,11 +240,17 @@ var Widget = function () {
                 triggerCommentPostedEvent(commentBody, pseudonym);
             });
         }
-    });
+    }
+    auth.on('login.auth', login);
 
-    auth.on('logout.auth', function () {
-        logout();
-    });
+    function logout () {
+        loginStatus = false;
+        self.ui.logout();
+        self.ui.removeSettingsLink();
+    }
+    auth.on('logout.auth', logout);
+
+
 
     // sign in button pressed
     self.ui.on('signIn', function () {
@@ -284,6 +302,8 @@ var Widget = function () {
 
             if (postCommentResult) {
                 if (postCommentResult.success === true) {
+                    self.ui.changeCommentId(id, postCommentResult.commentId);
+                    commentIds.push(postCommentResult.commentId);
                     triggerCommentPostedEvent(commentBody, authorPseudonym);
                 } else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
                     self.ui.removeComment(id);
@@ -340,6 +360,9 @@ var Widget = function () {
             if (!authData || !authData.token) {
                 loginRequiredToPostComment();
             } else {
+                if (!loginStatus) {
+                    auth.login(authData.token, authData.displayName);
+                }
                 postComment();
             }
         });
