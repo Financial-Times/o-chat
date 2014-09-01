@@ -296,6 +296,8 @@ var Widget = function () {
             commentBody: commentBody
         }, function (err, postCommentResult) {
             if (err) {
+                self.ui.makeEditable();
+
                 commentUtilities.logger.debug('postComment error:', err);
 
                 self.ui.setEditorError(commentUi.i18n.texts.genericError);
@@ -307,6 +309,7 @@ var Widget = function () {
 
             if (postCommentResult) {
                 if (postCommentResult.success === true) {
+                    self.ui.emptyCommentArea();
                     if (!hasCommentId(postCommentResult.commentId)) {
                         commentIds.push(postCommentResult.commentId);
                         triggerCommentPostedEvent({
@@ -329,6 +332,8 @@ var Widget = function () {
             } else {
                 self.ui.setEditorError(commentUi.i18n.texts.genericError);
             }
+
+            self.ui.makeEditable();
         });
     };
 
@@ -361,8 +366,11 @@ var Widget = function () {
             return;
         }
 
+        self.ui.makeReadOnly();
+
         oCommentData.api.getAuth(function (err, authData) {
             if (!authData || !authData.token) {
+                self.ui.makeEditable();
                 loginRequiredToPostComment();
             } else {
                 if (!loginStatus) {

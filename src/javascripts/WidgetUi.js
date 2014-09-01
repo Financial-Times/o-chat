@@ -169,6 +169,18 @@ function WidgetUi (widgetContainer, config) {
         }
     };
 
+    this.makeEditable = function () {
+        var commentEditorInputContainer = sizzle('.comment-editor-input', widgetContainer);
+
+        if (commentEditorInputContainer && commentEditorInputContainer.length) {
+            commentEditorInputContainer = commentEditorInputContainer[0];
+
+            commentEditorInputContainer.className = commentEditorInputContainer.className.replace('disabled', '');
+            sizzle('textarea', commentEditorInputContainer)[0].removeAttribute('disabled');
+            sizzle('.comment-editor-submit button', widgetContainer)[0].removeAttribute('disabled');
+        }
+    };
+
 
     this.addComment = function (content, pseudonym, id, timestamp) {
         var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
