@@ -317,6 +317,7 @@ var Widget = function () {
                             commentBody: postCommentResult.commentBody,
                             author: authorPseudonym
                         });
+                        self.ui.addComment(postCommentResult.commentBody, authorPseudonym, postCommentResult.commentId, postCommentResult.createdAt);
                     }
                 } else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
                     loginRequiredToPostComment(true);
