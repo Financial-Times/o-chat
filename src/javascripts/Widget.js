@@ -295,9 +295,9 @@ var Widget = function () {
             collectionId: self.collectionId,
             commentBody: commentBody
         }, function (err, postCommentResult) {
-            if (err) {
-                self.ui.makeEditable();
+            self.ui.makeEditable();
 
+            if (err) {
                 commentUtilities.logger.debug('postComment error:', err);
 
                 self.ui.setEditorError(commentUi.i18n.texts.genericError);
@@ -332,8 +332,6 @@ var Widget = function () {
             } else {
                 self.ui.setEditorError(commentUi.i18n.texts.genericError);
             }
-
-            self.ui.makeEditable();
         });
     };
 
