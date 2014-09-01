@@ -314,10 +314,10 @@ var Widget = function () {
                         commentIds.push(postCommentResult.commentId);
                         triggerCommentPostedEvent({
                             commentId: postCommentResult.commentId,
-                            commentBody: postCommentResult.commentBody,
+                            commentBody: postCommentResult.bodyHtml,
                             author: authorPseudonym
                         });
-                        self.ui.addComment(postCommentResult.commentBody, authorPseudonym, postCommentResult.commentId, postCommentResult.createdAt);
+                        self.ui.addComment(postCommentResult.bodyHtml, authorPseudonym, postCommentResult.commentId, postCommentResult.createdAt);
                     }
                 } else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
                     loginRequiredToPostComment(true);
