@@ -300,6 +300,7 @@
 
     function newCommentReceived (commentData) {
         if (!hasCommentId(commentData.commentId)) {
+            commentIds.push(commentData.commentId);
             self.ui.addComment(commentData.content, commentData.author.displayName, commentData.commentId, commentData.timestamp);
         }
     }
@@ -311,17 +312,21 @@
         self.ui.login(pseudonym);
         self.ui.addSettingsLink({
             onClick: function () {
-                oCommentData.api.getAuth(function (err, currentAuthData) {
-                    var showSettingsDialog = function () {
-                        userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
-                            success: function (newAuthData) {
-                                if (newAuthData &amp;&amp; newAuthData.token) {
-                                    self.ui.changePseudonym(newAuthData.displayName);
+                var showSettingsDialog = function () {
+                    oCommentData.api.getAuth(function (err, currentAuthData) {
+                        if (!err &amp;&amp; currentAuthData) {
+                            userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
+                                success: function (newAuthData) {
+                                    if (newAuthData &amp;&amp; newAuthData.token) {
+                                        self.ui.changePseudonym(newAuthData.displayName);
+                                    }
                                 }
-                            }
-                        });
-                    };
+                            });
+                        }
+                    });
+                };
 
+                oCommentData.api.getAuth(function (err, currentAuthData) {
                     if (err || !currentAuthData) {
                         auth.loginRequired({
                             success: function () {
@@ -339,8 +344,14 @@
 
         // after login, post the comments from the message queue
         if (self.forceMode) {
-            messageQueue.postComment(self.collectionId, function (commentBody) {
-                triggerCommentPostedEvent(commentBody, pseudonym);
+            messageQueue.postComment(self.collectionId, function (commentInfo) {
+                commentIds.push(commentInfo.commentId);
+
+                triggerCommentPostedEvent({
+                    commentId: commentInfo.commentId,
+                    commentBody: commentInfo.commentBody,
+                    author: pseudonym
+                });
             });
         }
     }
@@ -360,11 +371,12 @@
         auth.loginRequired();
     });
 
-    function triggerCommentPostedEvent (commentBody, authorPseudonym) {
+    function triggerCommentPostedEvent (commentInfo) {
         self.trigger('commentPosted.tracking', [self.collectionId, {
-            bodyHtml: commentBody,
+            bodyHtml: commentInfo.commentBody,
+            id: commentInfo.commentId,
             author: {
-                displayName: authorPseudonym
+                displayName: commentInfo.author
             }
         }]);
     }</code></pre>
@@ -379,13 +391,8 @@
 
 <p>Insert the comment in the DOM instantly, and try to post the comment with the API.<br />If successful, leave the comment in the DOM and change the ID with the real comment ID.<br />If unsuccessful, remove the comment from the DOM, repopulate the comment area with the comment and show the error message.</p> </div>
           <pre><code class="language-javascript">var postComment = function (secondStepOfTryingToPost) {
-        var id = 'commentId-' + (Math.random() + 1).toString(36).substring(7);
-
         var commentBody = self.ui.getCurrentComment();
         var authorPseudonym = self.ui.getCurrentPseudonym();
-
-        self.ui.addComment(commentBody, authorPseudonym, id);
-        self.ui.emptyCommentArea();
 
         oCommentData.api.postComment({
             collectionId: self.collectionId,
@@ -393,8 +400,6 @@
         }, function (err, postCommentResult) {
             if (err) {
                 commentUtilities.logger.debug('postComment error:', err);
-                self.ui.removeComment(id);
-                self.ui.repopulateCommentArea(commentBody);
 
                 self.ui.setEditorError(commentUi.i18n.texts.genericError);
 
@@ -405,18 +410,17 @@
 
             if (postCommentResult) {
                 if (postCommentResult.success === true) {
-                    self.ui.changeCommentId(id, postCommentResult.commentId);
-                    commentIds.push(postCommentResult.commentId);
-                    triggerCommentPostedEvent(commentBody, authorPseudonym);
+                    if (!hasCommentId(postCommentResult.commentId)) {
+                        commentIds.push(postCommentResult.commentId);
+                        triggerCommentPostedEvent({
+                            commentId: postCommentResult.commentId,
+                            commentBody: postCommentResult.commentBody,
+                            author: authorPseudonym
+                        });
+                    }
                 } else if (postCommentResult.invalidSession === true &amp;&amp; secondStepOfTryingToPost !== true) {
-                    self.ui.removeComment(id);
-                    self.ui.repopulateCommentArea(commentBody);
-
                     loginRequiredToPostComment(true);
                 } else {
-                    self.ui.removeComment(id);
-                    self.ui.repopulateCommentArea(commentBody);
-
                     if (postCommentResult.errorMessage) {
                         self.ui.setEditorError(postCommentResult.errorMessage);
                     } else {
@@ -451,9 +455,10 @@
 
     // the 'Submit comment' button is pressed
     self.ui.on('postComment', function () {
-        commentUtilities.logger.debug('postComment', 'comment: &quot;'+ self.ui.getCurrentComment() +'&quot;');
-
         var commentBody = self.ui.getCurrentComment();
+
+        commentUtilities.logger.debug('postComment', 'comment: &quot;'+ commentBody +'&quot;');
+        
         if (!commentBody) {
             self.ui.setEditorError(i18n.errors.emptyComment);
             return;

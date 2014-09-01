@@ -197,6 +197,7 @@ var Widget = function () {
 
     function newCommentReceived (commentData) {
         if (!hasCommentId(commentData.commentId)) {
+            commentIds.push(commentData.commentId);
             self.ui.addComment(commentData.content, commentData.author.displayName, commentData.commentId, commentData.timestamp);
         }
     }
@@ -240,8 +241,14 @@ var Widget = function () {
 
         // after login, post the comments from the message queue
         if (self.forceMode) {
-            messageQueue.postComment(self.collectionId, function (commentBody) {
-                triggerCommentPostedEvent(commentBody, pseudonym);
+            messageQueue.postComment(self.collectionId, function (commentInfo) {
+                commentIds.push(commentInfo.commentId);
+
+                triggerCommentPostedEvent({
+                    commentId: commentInfo.commentId,
+                    commentBody: commentInfo.commentBody,
+                    author: pseudonym
+                });
             });
         }
     }
@@ -261,11 +268,12 @@ var Widget = function () {
         auth.loginRequired();
     });
 
-    function triggerCommentPostedEvent (commentBody, authorPseudonym) {
+    function triggerCommentPostedEvent (commentInfo) {
         self.trigger('commentPosted.tracking', [self.collectionId, {
-            bodyHtml: commentBody,
+            bodyHtml: commentInfo.commentBody,
+            id: commentInfo.commentId,
             author: {
-                displayName: authorPseudonym
+                displayName: commentInfo.author
             }
         }]);
     }
@@ -280,13 +288,8 @@ var Widget = function () {
      * @return {[type]} [description]
      */
     var postComment = function (secondStepOfTryingToPost) {
-        var id = 'commentId-' + (Math.random() + 1).toString(36).substring(7);
-
         var commentBody = self.ui.getCurrentComment();
         var authorPseudonym = self.ui.getCurrentPseudonym();
-
-        self.ui.addComment(commentBody, authorPseudonym, id);
-        self.ui.emptyCommentArea();
 
         oCommentData.api.postComment({
             collectionId: self.collectionId,
@@ -294,8 +297,6 @@ var Widget = function () {
         }, function (err, postCommentResult) {
             if (err) {
                 commentUtilities.logger.debug('postComment error:', err);
-                self.ui.removeComment(id);
-                self.ui.repopulateCommentArea(commentBody);
 
                 self.ui.setEditorError(commentUi.i18n.texts.genericError);
 
@@ -306,18 +307,17 @@ var Widget = function () {
 
             if (postCommentResult) {
                 if (postCommentResult.success === true) {
-                    self.ui.changeCommentId(id, postCommentResult.commentId);
-                    commentIds.push(postCommentResult.commentId);
-                    triggerCommentPostedEvent(commentBody, authorPseudonym);
+                    if (!hasCommentId(postCommentResult.commentId)) {
+                        commentIds.push(postCommentResult.commentId);
+                        triggerCommentPostedEvent({
+                            commentId: postCommentResult.commentId,
+                            commentBody: postCommentResult.commentBody,
+                            author: authorPseudonym
+                        });
+                    }
                 } else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
-                    self.ui.removeComment(id);
-                    self.ui.repopulateCommentArea(commentBody);
-
                     loginRequiredToPostComment(true);
                 } else {
-                    self.ui.removeComment(id);
-                    self.ui.repopulateCommentArea(commentBody);
-
                     if (postCommentResult.errorMessage) {
                         self.ui.setEditorError(postCommentResult.errorMessage);
                     } else {

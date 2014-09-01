@@ -55,7 +55,11 @@ exports.postComment = function (collectionId, callbackCommentPosted) {
 
             if (postCommentResult && postCommentResult.success === true) {
                 if (typeof callbackCommentPosted === 'function') {
-                    callbackCommentPosted();
+                    callbackCommentPosted({
+                        commentBody: postCommentResult.bodyHtml,
+                        commentId: postCommentResult.commentId,
+                        createdAt: postCommentResult.createdAt
+                    });
                 }
             }
         });
