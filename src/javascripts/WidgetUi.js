@@ -93,7 +93,7 @@ function WidgetUi (widgetContainer, config) {
                 sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'block';
             }
 
-            commentUi.utils.addEventListener('click', sizzle('.comment-show-more span', widgetContainer)[0], function () {
+            commentUi.utils.addEventListener('click', sizzle('.comment-show-more span', widgetContainer), function () {
                 events.trigger('nextPage');
             });
         }
