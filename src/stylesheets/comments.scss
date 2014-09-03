@@ -1,29 +1,35 @@
 .o-comment-client {
-    .comment-comments-container {
-        .comment-wrapper {
-            color: oColorsGetPaletteColor(grey-tint5);
-            font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
-            border-bottom: 1px solid $borderColor;
-            padding: 10px 0;
+    .comment-comments-area {
+        .comment-show-more {
+            display: none;
+        }
 
-            &:last-child {
-                border-bottom: 0;
-            }
+        .comment-comments-container {
+            .comment-wrapper {
+                color: oColorsGetPaletteColor(grey-tint5);
+                font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+                border-bottom: 1px solid $borderColor;
+                padding: 10px 0;
 
-            .comment-timestamp {
-                display: inline;
-            }
+                &:last-child {
+                    border-bottom: 0;
+                }
 
-            .comment-author {
-                display: inline;
-                font-weight: bold;
-            }
-
-            .comment-content {
-                display: inline;
-
-                p {
+                .comment-timestamp {
                     display: inline;
+                }
+
+                .comment-author {
+                    display: inline;
+                    font-weight: bold;
+                }
+
+                .comment-content {
+                    display: inline;
+
+                    p {
+                        display: inline;
+                    }
                 }
             }
         }

@@ -17,6 +17,8 @@ function WidgetUi (widgetContainer, config) {
 
     var events = new commentUtilities.Events();
 
+    var isPagination = false;
+
     this.on = events.on;
     this.off = events.off;
 
@@ -43,6 +45,10 @@ function WidgetUi (widgetContainer, config) {
                 )
             );
         };
+
+        if (commentsData.length === 50) {
+            isPagination = true;
+        }
 
         if (config.orderType === 'inverted') {
             commentsData.reverse();
@@ -79,10 +85,22 @@ function WidgetUi (widgetContainer, config) {
                 event.returnValue = false;
             }
         });
+
+        if (isPagination) {
+            if (config.orderType === 'inverted') {
+                sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'block';
+            } else {
+                sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'block';
+            }
+
+            commentUi.utils.addEventListener('click', sizzle('.comment-show-more span', widgetContainer)[0], function () {
+                events.trigger('nextPage');
+            });
+        }
     };
 
     this.adaptToHeight = function (height) {
-        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
         var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
         var editorComputedStyle = commentUi.utils.getComputedStyle(editorContainer);
 
@@ -104,14 +122,47 @@ function WidgetUi (widgetContainer, config) {
 
         var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
 
-        commentContainer.style.overflow = "auto";
-        commentContainer.style.height = (height - editorHeight) + "px";
+        commentArea.style.overflow = "auto";
+        commentArea.style.height = (height - editorHeight) + "px";
         if (config.orderType === 'inverted') {
-            commentContainer.scrollTop = commentContainer.scrollHeight - commentContainer.clientHeight;
+            commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
         } else {
-            commentContainer.scrollTop = 0;
+            commentArea.scrollTop = 0;
+        }
+
+
+        if (isPagination) {
+            sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'none';
+            sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'none';
+
+            initScrollPagination();
         }
     };
+
+    function initScrollPagination () {
+        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+
+        var throttleTime = 200;
+        var lastTime = new Date().getTime();
+
+        var paginationScrollHandler = function () {
+            if (new Date().getTime() - lastTime > throttleTime) {
+                lastTime = new Date().getTime();
+
+                if (config.orderType === 'inverted') {
+                    if (commentArea.scrollTop < 0.1 * commentArea.scrollHeight) {
+                        events.trigger('nextPage');
+                    }
+                } else {
+                    if (commentArea.scrollTop + commentArea.clientHeight > 0.9 * commentArea.scrollHeight) {
+                        events.trigger('nextPage');
+                    }
+                }
+            }
+        };
+
+        commentUi.utils.addEventListener('scroll', commentArea, paginationScrollHandler);
+    }
 
     this.login = function (pseudonym) {
         var authEl = sizzle('.comment-editor-auth', widgetContainer);
@@ -181,26 +232,27 @@ function WidgetUi (widgetContainer, config) {
         }
     };
 
-
-    this.addComment = function (content, pseudonym, id, timestamp) {
+    // content, pseudonym, id, timestamp
+    this.addComment = function (commentData, scrollToLast) {
+        scrollToLast = typeof scrollToLast === 'boolean' ? scrollToLast : true;
         var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
 
-        var rightNow = timestamp ? false : true;
+        var rightNow = commentData.timestamp ? false : true;
         var scrolledToLast;
 
         // normalize timestamp if one provided or use current time
-        timestamp = timestamp ? utils.date.toTimestamp(timestamp) : new Date();
+        commentData.timestamp = commentData.timestamp ? utils.date.toTimestamp(commentData.timestamp) : new Date();
 
         var commentDom = commentUi.utils.toDOM(
             templates.comment.render({
-                commentId: id,
-                content: content,
-                dateToShow: this.formatTimestamp(timestamp),
-                datetime: utils.date.toISOString(timestamp),
-                timestamp: utils.date.toTimestamp(timestamp),
-                relativeTime: this.isRelativeTime(timestamp),
+                commentId: commentData.id,
+                content: commentData.content,
+                dateToShow: this.formatTimestamp(commentData.timestamp),
+                datetime: utils.date.toISOString(commentData.timestamp),
+                timestamp: utils.date.toTimestamp(commentData.timestamp),
+                relativeTime: this.isRelativeTime(commentData.timestamp),
                 author: {
-                    displayName: pseudonym
+                    displayName: commentData.displayName
                 }
             })
         );
@@ -210,29 +262,11 @@ function WidgetUi (widgetContainer, config) {
         var i;
         var inserted = false;
 
-        if (config.orderType === "normal") {
-            scrolledToLast = (commentContainer.scrollTop === 0);
-
-            for (i = 0; i < comments.length; i++) {
-                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
-                    commentContainer.insertBefore(commentDom, comments[i]);
-                    inserted = true;
-                    break;
-                }
-            }
-
-            if (!inserted) {
-                commentContainer.appendChild(commentDom);
-            }
-
-            if (rightNow || scrolledToLast) {
-                commentContainer.scrollTop = 0;
-            }
-        } else if (config.orderType === "inverted") {
+        if (config.orderType === "inverted") {
             scrolledToLast = (commentContainer.scrollTop === (commentContainer.scrollHeight - commentContainer.clientHeight));
 
             for (i = comments.length-1; i >= 0; i--) {
-                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
+                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < commentData.timestamp) {
                     if (i === comments.length-1) {
                         commentContainer.appendChild(commentDom);
                     } else {
@@ -247,16 +281,71 @@ function WidgetUi (widgetContainer, config) {
                 commentContainer.insertBefore(commentDom, commentContainer.firstChild);
             }
 
-            if (rightNow || scrolledToLast) {
+            if (scrollToLast && (rightNow || scrolledToLast)) {
                 commentContainer.scrollTop = commentContainer.scrollHeight - commentContainer.clientHeight;
+            }
+        } else {
+            scrolledToLast = (commentContainer.scrollTop === 0);
+
+            for (i = 0; i < comments.length; i++) {
+                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < commentData.timestamp) {
+                    commentContainer.insertBefore(commentDom, comments[i]);
+                    inserted = true;
+                    break;
+                }
+            }
+
+            if (!inserted) {
+                commentContainer.appendChild(commentDom);
+            }
+
+            if (scrollToLast && (rightNow || scrolledToLast)) {
+                commentContainer.scrollTop = 0;
             }
         }
 
-        if (this.isRelativeTime(timestamp || new Date())) {
-            commentDom = sizzle('#commentid-' + id, widgetContainer)[0];
+        if (this.isRelativeTime(commentData.timestamp || new Date())) {
+            commentDom = sizzle('#commentid-' + commentData.id, widgetContainer)[0];
             setTimeout(function () {
                 try { oDate.init(commentDom); } catch(e) {}
             }, 10000);
+        }
+    };
+
+    this.addNextPageComments = function (comments) {
+        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+
+        var commentData;
+        var commentDom;
+
+        if (config.orderType === "inverted") {
+            comments.reverse();
+        }
+
+        for (var index = 0; index < comments.length; index++) {
+            commentData = comments[index];
+
+            commentDom = commentUi.utils.toDOM(
+                templates.comment.render({
+                    commentId: commentData.commentId,
+                    content: commentData.content,
+                    dateToShow: this.formatTimestamp(commentData.timestamp),
+                    datetime: utils.date.toISOString(commentData.timestamp),
+                    timestamp: utils.date.toTimestamp(commentData.timestamp),
+                    relativeTime: this.isRelativeTime(commentData.timestamp),
+                    author: commentData.author
+                })
+            );
+
+            var previousScrollHeight = commentArea.scrollHeight;
+            if (config.orderType === "inverted") {
+                commentContainer.insertBefore(commentDom, commentContainer.firstChild);
+
+                commentArea.scrollTop += commentArea.scrollHeight - previousScrollHeight;
+            } else {
+                commentContainer.appendChild(commentDom);
+            }
         }
     };
 

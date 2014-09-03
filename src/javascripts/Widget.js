@@ -1,4 +1,3 @@
-//var ccsClient = require('o-ccs-client');
 var auth = require('./auth.js');
 var utils = require('./utils.js');
 var messageQueue = require('./messageQueue.js');
@@ -44,6 +43,10 @@ var Widget = function () {
         absoluteFormat: 'date'
     };
 
+    var currentPageNumber = 0;
+    var isMorePageAvailable = true;
+    var nextPageFetchInProgress = false;
+
 
     var loginStatus = false;
 
@@ -78,7 +81,6 @@ var Widget = function () {
 
     this.ui = new WidgetUi(this.getWidgetEl(), {
         datetimeFormat: this.datetimeFormat,
-        fluidLayout: self.config.fluidLayout,
         orderType: self.config.order
     });
     
@@ -118,14 +120,7 @@ var Widget = function () {
                 self.trigger('ready.widget');
 
                 // normalize the comments data
-                for (var index = 0; index < commentsData.comments.length; index++) {
-                    commentsData.comments[index].dateToShow = self.ui.formatTimestamp(commentsData.comments[index].timestamp);
-                    commentsData.comments[index].datetime = utils.date.toISOString(commentsData.comments[index].timestamp);
-                    if (self.ui.isRelativeTime(commentsData.comments[index].timestamp)) {
-                        commentsData.comments[index].relativeTime = true;
-                    }
-                    commentsData.comments[index].timestamp = utils.date.toTimestamp(commentsData.comments[index].timestamp);
-                }
+                commentsData.comments = preprocessCommentData(commentsData.comments);
 
                 // render the widget in the DOM
                 self.ui.render(commentsData.comments);
@@ -195,10 +190,38 @@ var Widget = function () {
     };
 
 
+    function processOneComment (aComment) {
+        aComment.dateToShow = self.ui.formatTimestamp(aComment.timestamp);
+        aComment.datetime = utils.date.toISOString(aComment.timestamp);
+        if (self.ui.isRelativeTime(aComment.timestamp)) {
+            aComment.relativeTime = true;
+        }
+        aComment.timestamp = utils.date.toTimestamp(aComment.timestamp);
+
+        return aComment;
+    }
+    function preprocessCommentData (comments) {
+        if (comments.length) {
+            for (var index = 0; index < comments.length; index++) {
+                comments[index] = processOneComment(comments[index]);
+            }
+
+            return comments;
+        } else {
+            return processOneComment(comments);
+        }
+    }
+
+
     function newCommentReceived (commentData) {
         if (!hasCommentId(commentData.commentId)) {
             commentIds.push(commentData.commentId);
-            self.ui.addComment(commentData.content, commentData.author.displayName, commentData.commentId, commentData.timestamp);
+            self.ui.addComment({
+                id: commentData.commentId,
+                content: commentData.content,
+                timestamp: commentData.timestamp,
+                displayName: commentData.author.displayName
+            });
         }
     }
 
@@ -268,6 +291,35 @@ var Widget = function () {
         auth.loginRequired();
     });
 
+    self.ui.on('nextPage', function () {
+        if (isMorePageAvailable && !nextPageFetchInProgress) {
+            // fetch next page
+            commentUtilities.logger.log('fetch next page');
+
+            currentPageNumber++;
+
+            nextPageFetchInProgress = true;
+            oCommentData.api.getComments({
+                articleId: self.config.articleId,
+                url: self.config.url,
+                title: self.config.title,
+                page: currentPageNumber
+            }, function (err, comments) {
+                if (err) {
+                    isMorePageAvailable = false;
+                    return;
+                }
+
+                self.ui.addNextPageComments(preprocessCommentData(comments));
+
+                // wait until the DOM rendering has finished
+                setTimeout(function () {
+                    nextPageFetchInProgress = false;
+                }, 200);
+            });
+        }
+    });
+
     function triggerCommentPostedEvent (commentInfo) {
         self.trigger('commentPosted.tracking', [self.collectionId, {
             bodyHtml: commentInfo.commentBody,
@@ -317,7 +369,12 @@ var Widget = function () {
                             commentBody: postCommentResult.bodyHtml,
                             author: authorPseudonym
                         });
-                        self.ui.addComment(postCommentResult.bodyHtml, authorPseudonym, postCommentResult.commentId, postCommentResult.createdAt);
+                        self.ui.addComment({
+                            id: postCommentResult.commentId,
+                            content: postCommentResult.bodyHtml,
+                            timestamp: postCommentResult.createdAt,
+                            displayName: authorPseudonym
+                        });
                     }
                 } else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
                     loginRequiredToPostComment(true);
