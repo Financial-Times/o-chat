@@ -221,7 +221,7 @@ var Widget = function () {
                 content: commentData.content,
                 timestamp: commentData.timestamp,
                 displayName: commentData.author.displayName
-            });
+            }, (commentData.author.displayName === self.ui.getCurrentPseudonym()));
         }
     }
 
@@ -374,7 +374,7 @@ var Widget = function () {
                             content: postCommentResult.bodyHtml,
                             timestamp: postCommentResult.createdAt,
                             displayName: authorPseudonym
-                        });
+                        }, true);
                     }
                 } else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
                     loginRequiredToPostComment(true);

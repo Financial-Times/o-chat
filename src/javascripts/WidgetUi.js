@@ -233,25 +233,25 @@ function WidgetUi (widgetContainer, config) {
     };
 
     // content, pseudonym, id, timestamp
-    this.addComment = function (commentData, scrollToLast) {
-        scrollToLast = typeof scrollToLast === 'boolean' ? scrollToLast : true;
-        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
-        var commentArea = sizzle('.comment-comments-container', widgetContainer)[0];
+    this.addComment = function (commentData, ownComment) {
+        ownComment = typeof ownComment === 'boolean' ? ownComment : false;
 
-        var rightNow = commentData.timestamp ? false : true;
-        var scrolledToLast;
+        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
 
         // normalize timestamp if one provided or use current time
-        commentData.timestamp = commentData.timestamp ? utils.date.toTimestamp(commentData.timestamp) : new Date();
+        var timestamp = commentData.timestamp ? utils.date.toTimestamp(commentData.timestamp) : new Date();
+
+        var scrolledToLast;
 
         var commentDom = commentUi.utils.toDOM(
             templates.comment.render({
                 commentId: commentData.id,
                 content: commentData.content,
-                dateToShow: this.formatTimestamp(commentData.timestamp),
-                datetime: utils.date.toISOString(commentData.timestamp),
-                timestamp: utils.date.toTimestamp(commentData.timestamp),
-                relativeTime: this.isRelativeTime(commentData.timestamp),
+                dateToShow: this.formatTimestamp(timestamp),
+                datetime: utils.date.toISOString(timestamp),
+                timestamp: utils.date.toTimestamp(timestamp),
+                relativeTime: this.isRelativeTime(timestamp),
                 author: {
                     displayName: commentData.displayName
                 }
@@ -264,10 +264,10 @@ function WidgetUi (widgetContainer, config) {
         var inserted = false;
 
         if (config.orderType === "inverted") {
-            scrolledToLast = (commentContainer.scrollTop === (commentContainer.scrollHeight - commentContainer.clientHeight));
+            scrolledToLast = (commentArea.scrollTop === (commentArea.scrollHeight - commentArea.clientHeight));
 
             for (i = comments.length-1; i >= 0; i--) {
-                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < commentData.timestamp) {
+                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
                     if (i === comments.length-1) {
                         commentContainer.appendChild(commentDom);
                     } else {
@@ -282,14 +282,14 @@ function WidgetUi (widgetContainer, config) {
                 commentContainer.insertBefore(commentDom, commentContainer.firstChild);
             }
 
-            if (scrollToLast && (rightNow || scrolledToLast)) {
+            if (ownComment || scrolledToLast) {
                 commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
             }
         } else {
             scrolledToLast = (commentContainer.scrollTop === 0);
 
             for (i = 0; i < comments.length; i++) {
-                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < commentData.timestamp) {
+                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
                     commentContainer.insertBefore(commentDom, comments[i]);
                     inserted = true;
                     break;
@@ -300,12 +300,12 @@ function WidgetUi (widgetContainer, config) {
                 commentContainer.appendChild(commentDom);
             }
 
-            if (scrollToLast && (rightNow || scrolledToLast)) {
+            if (ownComment || scrolledToLast) {
                 commentArea.scrollTop = 0;
             }
         }
 
-        if (this.isRelativeTime(commentData.timestamp || new Date())) {
+        if (this.isRelativeTime(timestamp || new Date())) {
             commentDom = sizzle('#commentid-' + commentData.id, widgetContainer)[0];
             setTimeout(function () {
                 try { oDate.init(commentDom); } catch(e) {}
