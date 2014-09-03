@@ -236,6 +236,7 @@ function WidgetUi (widgetContainer, config) {
     this.addComment = function (commentData, scrollToLast) {
         scrollToLast = typeof scrollToLast === 'boolean' ? scrollToLast : true;
         var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+        var commentArea = sizzle('.comment-comments-container', widgetContainer)[0];
 
         var rightNow = commentData.timestamp ? false : true;
         var scrolledToLast;
@@ -282,7 +283,7 @@ function WidgetUi (widgetContainer, config) {
             }
 
             if (scrollToLast && (rightNow || scrolledToLast)) {
-                commentContainer.scrollTop = commentContainer.scrollHeight - commentContainer.clientHeight;
+                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
             }
         } else {
             scrolledToLast = (commentContainer.scrollTop === 0);
@@ -300,7 +301,7 @@ function WidgetUi (widgetContainer, config) {
             }
 
             if (scrollToLast && (rightNow || scrolledToLast)) {
-                commentContainer.scrollTop = 0;
+                commentArea.scrollTop = 0;
             }
         }
 
