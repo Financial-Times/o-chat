@@ -7,8 +7,6 @@
             text-align: center;
             position: relative;
 
-            cursor: pointer;
-
             .comment-show-more-line {
                 position: absolute;
                 top: 50%;
@@ -26,6 +24,7 @@
                 -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#549ccf, endColorstr=#4782ab)";
                 padding: 2px 5px;
                 border-radius: 3px;
+                cursor: pointer;
             }
 
             .comment-show-more-label:active {
