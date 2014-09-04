@@ -394,6 +394,7 @@ function WidgetUi (widgetContainer, config) {
         var loginBarContainer = sizzle('.comment-editor-auth', widgetContainer);
         if (loginBarContainer && loginBarContainer.length) {
             loginBarContainer[0].appendChild(commentUi.utils.toDOM(commentUi.templates.commentingSettingsLink.render({
+                label: "Edit pseudonym",
                 withoutSeparator: true
             })));
         } else {
