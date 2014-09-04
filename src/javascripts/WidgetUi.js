@@ -93,7 +93,7 @@ function WidgetUi (widgetContainer, config) {
                 sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'block';
             }
 
-            commentUi.utils.addEventListener('click', sizzle('.comment-show-more span', widgetContainer), function () {
+            commentUi.utils.addEventListener('click', sizzle('.comment-show-more .comment-show-more-label', widgetContainer), function () {
                 events.trigger('nextPage');
             });
         }
@@ -132,8 +132,7 @@ function WidgetUi (widgetContainer, config) {
 
 
         if (isPagination) {
-            sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'none';
-            sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'none';
+            self.disableButtonPagination();
 
             initScrollPagination();
         }
@@ -163,6 +162,11 @@ function WidgetUi (widgetContainer, config) {
 
         commentUi.utils.addEventListener('scroll', commentArea, paginationScrollHandler);
     }
+
+    this.disableButtonPagination = function () {
+        sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'none';
+        sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'none';
+    };
 
     this.login = function (pseudonym) {
         var authEl = sizzle('.comment-editor-auth', widgetContainer);

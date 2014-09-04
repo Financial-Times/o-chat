@@ -2,6 +2,35 @@
     .comment-comments-area {
         .comment-show-more {
             display: none;
+
+            color: white;
+            text-align: center;
+            position: relative;
+
+            cursor: pointer;
+
+            .comment-show-more-line {
+                position: absolute;
+                top: 50%;
+                width: 100%;
+                border-top: 1px solid $borderColor;
+            }
+
+            .comment-show-more-label {
+                display: inline-block;
+                position: relative;
+                background: #4e8fbd;
+                background: -webkit-gradient(linear, left top, left bottom, from(#549ccf), to(#4782ab));
+                background: -moz-linear-gradient(#549ccf, #4782ab);
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#549ccf,endColorstr=#4782ab);
+                -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#549ccf, endColorstr=#4782ab)";
+                padding: 2px 5px;
+                border-radius: 3px;
+            }
+
+            .comment-show-more-label:active {
+                background: oColorsGetPaletteColor(pink-tint4);
+            }
         }
 
         .comment-comments-container {

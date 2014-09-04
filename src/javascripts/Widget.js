@@ -307,7 +307,13 @@ var Widget = function () {
             }, function (err, comments) {
                 if (err) {
                     isMorePageAvailable = false;
+                    self.ui.disableButtonPagination();
                     return;
+                }
+
+                if (comments.length < 50) {
+                    isMorePageAvailable = false;
+                    self.ui.disableButtonPagination();
                 }
 
                 self.ui.addNextPageComments(preprocessCommentData(comments));

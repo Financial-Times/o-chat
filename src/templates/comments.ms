@@ -1,6 +1,7 @@
 <div class="comment-comments-area">
     <div class="comment-show-more comment-show-more-before">
-        <span>Show more comments</span>
+        <div class="comment-show-more-line"></div>
+        <span class="comment-show-more-label">Show more comments</span>
     </div>
     <div class="comment-comments-container">
         {{#comments}}
@@ -23,6 +24,7 @@
         {{/comments}}
     </div>
     <div class="comment-show-more comment-show-more-after">
-        <span>Show more comments</span>
+        <div class="comment-show-more-line"></div>
+        <span class="comment-show-more-label">Show more comments</span>
     </div>
 </div>
