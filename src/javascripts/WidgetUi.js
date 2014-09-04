@@ -372,7 +372,7 @@ function WidgetUi (widgetContainer, config) {
         var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
 
         if (commentArea && commentArea.length) {
-            return commentArea[0].value.replace(/(?:\r\n|\r|\n)/g, '<br />');
+            return utils.strings.trim(commentArea[0].value).replace(/(?:\r\n|\r|\n)/g, '<br />');
         }
 
         return "";

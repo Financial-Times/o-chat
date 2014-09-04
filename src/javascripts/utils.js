@@ -56,3 +56,17 @@ var date = {
     }
 };
 exports.date = date;
+
+
+var strings = {
+    trim: function (string) {
+        "use strict";
+        
+        if (String.prototype.trim) {
+            return string.trim();
+        } else {
+            return string.replace(/^\s+|\s+$/g, '');
+        }
+    }
+};
+exports.strings = strings;
