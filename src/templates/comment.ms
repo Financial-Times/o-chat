@@ -12,5 +12,10 @@
     <div class="comment-content">
         {{{content}}}
     </div>
+
+    {{#adminMode}}
+        <a href="#" class="comment-delete">Delete</a>
+    {{/adminMode}}
+    
     <div class="comment-clear"></div>
 </div>

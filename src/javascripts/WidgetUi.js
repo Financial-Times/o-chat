@@ -23,7 +23,7 @@ function WidgetUi (widgetContainer, config) {
     this.on = events.on;
     this.off = events.off;
 
-    this.render = function (commentsData) {
+    this.render = function (commentsData, adminMode) {
         var addEditor = function () {
             widgetContainer.appendChild(
                 commentUi.utils.toDOM(
@@ -41,7 +41,8 @@ function WidgetUi (widgetContainer, config) {
                 commentUi.utils.toDOM(
                     templates.comments.render({
                         comments: commentsData,
-                        orderType: config.orderType
+                        orderType: config.orderType,
+                        adminMode: adminMode
                     })
                 )
             );
@@ -96,6 +97,18 @@ function WidgetUi (widgetContainer, config) {
 
             commentUi.utils.addEventListener('click', sizzle('.comment-show-more .comment-show-more-label', widgetContainer), function () {
                 events.trigger('nextPage');
+            });
+        }
+
+        if (adminMode) {
+            commentUi.utils.addEventListener('click', sizzle('.comment-delete', widgetContainer), function (event) {
+                events.trigger('deleteComment');
+
+                if (event.preventDefault) {
+                    event.preventDefault();
+                } else {
+                    event.returnValue = false;
+                }
             });
         }
     };
@@ -246,7 +259,7 @@ function WidgetUi (widgetContainer, config) {
     };
 
     // content, pseudonym, id, timestamp
-    this.addComment = function (commentData, ownComment) {
+    this.addComment = function (commentData, ownComment, adminMode) {
         ownComment = typeof ownComment === 'boolean' ? ownComment : false;
 
         var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
@@ -267,7 +280,8 @@ function WidgetUi (widgetContainer, config) {
                 relativeTime: this.isRelativeTime(timestamp),
                 author: {
                     displayName: commentData.displayName
-                }
+                },
+                adminMode: adminMode
             })
         );
 
@@ -329,6 +343,18 @@ function WidgetUi (widgetContainer, config) {
             setTimeout(function () {
                 try { oDate.init(commentDom); } catch(e) {}
             }, timeoutToStart);
+        }
+
+        if (adminMode) {
+            commentUi.utils.addEventListener('click', sizzle('#commentid-'+ commentData.id +' .comment-delete', widgetContainer)[0], function (event) {
+                events.trigger('deleteComment', commentData.id);
+
+                if (event.preventDefault) {
+                    event.preventDefault();
+                } else {
+                    event.returnValue = false;
+                }
+            });
         }
     };
 

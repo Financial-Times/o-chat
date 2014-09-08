@@ -51,6 +51,8 @@ var Widget = function () {
 
     var loginStatus = false;
 
+    var userIsAdmin = false;
+
     var commentIds = [];
     var hasCommentId = function (id) {
         if (Array.prototype.indexOf) {
@@ -133,31 +135,36 @@ var Widget = function () {
                 self.collectionId = commentsData.collectionId;
                 self.trigger('ready.widget');
 
-                // normalize the comments data
-                commentsData.comments = preprocessCommentData(commentsData.comments);
-
-                // render the widget in the DOM
-                self.ui.render(commentsData.comments);
-
-                // all fine, no errors with the rendering
-                callback();
-                self.trigger('renderComplete.widget');
-
-                // determine if there are messages to post before being logged in.
-                // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
-                if (messageQueue.hasComment(self.collectionId)) {
-                    commentUtilities.logger.log("Force flag set.");
-
-                    self.forceMode = true;
-                }
-
-
                 oCommentData.api.getAuth(function (err, authData) {
                     if (err) {
                         authData = null;
                     }
 
                     self.trigger('loaded.auth', authData);
+
+                    if (authData) {
+                        if (authData.isAdmin || authData.isModerator) {
+                            userIsAdmin = true;
+                        }
+                    }
+
+                    // normalize the comments data
+                    commentsData.comments = preprocessCommentData(commentsData.comments);
+
+                    // render the widget in the DOM
+                    self.ui.render(commentsData.comments, userIsAdmin);
+
+                    // all fine, no errors with the rendering
+                    callback();
+                    self.trigger('renderComplete.widget');
+
+                    // determine if there are messages to post before being logged in.
+                    // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
+                    if (messageQueue.hasComment(self.collectionId)) {
+                        commentUtilities.logger.log("Force flag set.");
+
+                        self.forceMode = true;
+                    }
 
                     if (authData) {
                         if (authData.token) {
@@ -235,7 +242,7 @@ var Widget = function () {
                 content: commentData.content,
                 timestamp: commentData.timestamp,
                 displayName: commentData.author.displayName
-            }, (commentData.author.displayName === self.ui.getCurrentPseudonym()));
+            }, (commentData.author.displayName === self.ui.getCurrentPseudonym()), userIsAdmin);
         }
     }
 
@@ -402,7 +409,7 @@ var Widget = function () {
                             content: postCommentResult.bodyHtml,
                             timestamp: postCommentResult.createdAt,
                             displayName: authorPseudonym
-                        }, true);
+                        }, true, userIsAdmin);
                     }
                 } else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
                     loginRequiredToPostComment(true);
