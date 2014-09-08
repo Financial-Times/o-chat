@@ -43,8 +43,9 @@ var Widget = function () {
         absoluteFormat: 'date'
     };
 
-    var currentPageNumber = 0;
-    var isMorePageAvailable = true;
+    var currentPageNumber;
+    var nextPageNumber;
+    var isMorePageAvailable = false;
     var nextPageFetchInProgress = false;
 
 
@@ -103,6 +104,19 @@ var Widget = function () {
 
             if (data.hasOwnProperty('collection')) {
                 // initial collection info
+                
+                if (data.collection.pageInfo) {
+                    if (typeof data.collection.pageInfo.currentPage === 'number') {
+                        currentPageNumber = data.collection.pageInfo.currentPage;
+                    }
+
+                    if (typeof data.collection.pageInfo.nextPage === 'number') {
+                        nextPageNumber = data.collection.pageInfo.nextPage;
+                        isMorePageAvailable = true;
+                    } else {
+                        isMorePageAvailable = false;
+                    }
+                }
                 
                 callback(null, data.collection);
             } else if (data.hasOwnProperty('comment')) {
@@ -226,10 +240,10 @@ var Widget = function () {
     }
 
 
-    function login (token, pseudonym) {
+    function login (token, pseudonym, isAdmin) {
         loginStatus = true;
 
-        self.ui.login(pseudonym);
+        self.ui.login(token, pseudonym, isAdmin);
         self.ui.addSettingsLink({
             onClick: function () {
                 var showSettingsDialog = function () {
@@ -238,7 +252,7 @@ var Widget = function () {
                             userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
                                 success: function (newAuthData) {
                                     if (newAuthData && newAuthData.token) {
-                                        self.ui.changePseudonym(newAuthData.displayName);
+                                        self.ui.changeUserDetails(newAuthData.token, newAuthData.displayName);
                                     }
                                 }
                             });
@@ -296,27 +310,33 @@ var Widget = function () {
             // fetch next page
             commentUtilities.logger.log('fetch next page');
 
-            currentPageNumber++;
-
             nextPageFetchInProgress = true;
             oCommentData.api.getComments({
                 articleId: self.config.articleId,
                 url: self.config.url,
                 title: self.config.title,
-                page: currentPageNumber
-            }, function (err, comments) {
+                page: nextPageNumber
+            }, function (err, data) {
                 if (err) {
                     isMorePageAvailable = false;
                     self.ui.disableButtonPagination();
                     return;
                 }
 
-                if (comments.length < 50) {
-                    isMorePageAvailable = false;
-                    self.ui.disableButtonPagination();
+                if (data.collection.pageInfo) {
+                    if (typeof data.collection.pageInfo.currentPage === 'number') {
+                        currentPageNumber = data.collection.pageInfo.currentPage;
+                    }
+
+                    if (typeof data.collection.pageInfo.nextPage === 'number') {
+                        nextPageNumber = data.collection.pageInfo.nextPage;
+                    } else {
+                        isMorePageAvailable = false;
+                        self.ui.disableButtonPagination();
+                    }
                 }
 
-                self.ui.addNextPageComments(preprocessCommentData(comments));
+                self.ui.addNextPageComments(preprocessCommentData(data.collection.comments));
 
                 // wait until the DOM rendering has finished
                 setTimeout(function () {
@@ -368,13 +388,15 @@ var Widget = function () {
             if (postCommentResult) {
                 if (postCommentResult.success === true) {
                     self.ui.emptyCommentArea();
+
+                    triggerCommentPostedEvent({
+                        commentId: postCommentResult.commentId,
+                        commentBody: postCommentResult.bodyHtml,
+                        author: authorPseudonym
+                    });
+
                     if (!hasCommentId(postCommentResult.commentId)) {
                         commentIds.push(postCommentResult.commentId);
-                        triggerCommentPostedEvent({
-                            commentId: postCommentResult.commentId,
-                            commentBody: postCommentResult.bodyHtml,
-                            author: authorPseudonym
-                        });
                         self.ui.addComment({
                             id: postCommentResult.commentId,
                             content: postCommentResult.bodyHtml,

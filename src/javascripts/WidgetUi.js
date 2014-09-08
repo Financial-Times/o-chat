@@ -5,6 +5,7 @@ var oDate = require('o-date');
 
 var templates = require('./templates.js');
 var utils = require('./utils.js');
+var envConfig = require('./config.js');
 
 function WidgetUi (widgetContainer, config) {
     "use strict";
@@ -168,13 +169,16 @@ function WidgetUi (widgetContainer, config) {
         sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'none';
     };
 
-    this.login = function (pseudonym) {
+    this.login = function (token, pseudonym, isAdmin) {
         var authEl = sizzle('.comment-editor-auth', widgetContainer);
 
         if (authEl && authEl.length) {
-            var pseudonymPlaceholder = commentUi.utils.toDOM('<span class="comment-pseudonym">' + pseudonym + '</span>');
-            authEl[0].innerHTML = "";
-            authEl[0].appendChild(pseudonymPlaceholder);
+            authEl[0].innerHTML = templates.loggedIn.render({
+                token: token,
+                pseudonym: pseudonym,
+                livefyreNetwork: envConfig.get().livefyre.network,
+                isAdmin: isAdmin
+            });
         }
     };
 
@@ -186,11 +190,16 @@ function WidgetUi (widgetContainer, config) {
         }
     };
 
-    this.changePseudonym = function (pseudonym) {
-        var pseudonymPlaceholder = sizzle('.comment-pseudonym', widgetContainer);
+    this.changeUserDetails = function (token, pseudonym, isAdmin) {
+        var authEl = sizzle('.comment-editor-auth', widgetContainer);
 
-        if (pseudonymPlaceholder && pseudonymPlaceholder.length) {
-            pseudonymPlaceholder[0].innerHTML = pseudonym;
+        if (authEl && authEl.length) {
+            authEl[0].innerHTML = templates.loggedIn.render({
+                token: token,
+                pseudonym: pseudonym,
+                livefyreNetwork: envConfig.get().livefyre.network,
+                isAdmin: isAdmin
+            });
         }
     };
 
@@ -309,7 +318,7 @@ function WidgetUi (widgetContainer, config) {
             }
         }
 
-        if (this.isRelativeTime(timestamp || new Date())) {
+        if (this.isRelativeTime(timestamp)) {
             commentDom = sizzle('#commentid-' + commentData.id, widgetContainer)[0];
             setTimeout(function () {
                 try { oDate.init(commentDom); } catch(e) {}

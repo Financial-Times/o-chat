@@ -27,8 +27,8 @@ function Auth () {
     /**
      * Broadcasts a login request.
      */
-    this.login = function (token, pseudonym) {
-        event.trigger('login.auth', [token, pseudonym]);
+    this.login = function (token, pseudonym, isAdmin) {
+        event.trigger('login.auth', [token, pseudonym, isAdmin]);
     };
 
     /**
@@ -49,7 +49,7 @@ function Auth () {
         userDialogs.showSetPseudonymDialog({
             success: function (authData) {
                 if (authData && authData.token) {
-                    self.login(authData.token, authData.displayName);
+                    self.login(authData.token, authData.displayName, authData.isAdmin || authData.isModerator);
                 }
 
                 if (delegate && delegate.success) {
@@ -109,7 +109,7 @@ function Auth () {
                     }
                 });
             } else {
-                self.login(authData.token, authData.displayName);
+                self.login(authData.token, authData.displayName, authData.isAdmin || authData.isModerator);
                 
                 if (delegate && delegate.success) {
                     delegate.success();
