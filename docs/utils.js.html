@@ -155,7 +155,21 @@ var date = {
         }
     }
 };
-exports.date = date;</code></pre>
+exports.date = date;
+
+
+var strings = {
+    trim: function (string) {
+        &quot;use strict&quot;;
+        
+        if (String.prototype.trim) {
+            return string.trim();
+        } else {
+            return string.replace(/^\s+|\s+$/g, '');
+        }
+    }
+};
+exports.strings = strings;</code></pre>
         </div>
       </div>
     </div>

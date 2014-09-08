@@ -320,9 +320,15 @@ function WidgetUi (widgetContainer, config) {
 
         if (this.isRelativeTime(timestamp)) {
             commentDom = sizzle('#commentid-' + commentData.id, widgetContainer)[0];
+
+            var timeoutToStart = 10000;
+            if (new Date().getTime() - timestamp < 0) {
+                timeoutToStart += Math.abs(new Date().getTime() - timestamp);
+            }
+
             setTimeout(function () {
                 try { oDate.init(commentDom); } catch(e) {}
-            }, 10000);
+            }, timeoutToStart);
         }
     };
 
@@ -456,7 +462,13 @@ function WidgetUi (widgetContainer, config) {
         if (isRelative) {
             // relative time
             var timeAgo = oDate.timeAgo(timestamp);
-            if (timeAgo === "0 seconds ago") {
+            var match = timeAgo.match(/([0-9]+) ([^ ]+) ago/);
+            var timeAgoInt;
+            if (match && match[1]) {
+                timeAgoInt = match[1];
+            }
+
+            if (timeAgoInt <= 0) {
                 return "just now";
             } else {
                 return timeAgo;

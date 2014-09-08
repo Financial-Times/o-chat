@@ -105,6 +105,7 @@ var oDate = require('o-date');
 
 var templates = require('./templates.js');
 var utils = require('./utils.js');
+var envConfig = require('./config.js');
 
 function WidgetUi (widgetContainer, config) {
     &quot;use strict&quot;;
@@ -268,13 +269,16 @@ function WidgetUi (widgetContainer, config) {
         sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'none';
     };
 
-    this.login = function (pseudonym) {
+    this.login = function (token, pseudonym, isAdmin) {
         var authEl = sizzle('.comment-editor-auth', widgetContainer);
 
         if (authEl &amp;&amp; authEl.length) {
-            var pseudonymPlaceholder = commentUi.utils.toDOM('&lt;span class=&quot;comment-pseudonym&quot;&gt;' + pseudonym + '&lt;/span&gt;');
-            authEl[0].innerHTML = &quot;&quot;;
-            authEl[0].appendChild(pseudonymPlaceholder);
+            authEl[0].innerHTML = templates.loggedIn.render({
+                token: token,
+                pseudonym: pseudonym,
+                livefyreNetwork: envConfig.get().livefyre.network,
+                isAdmin: isAdmin
+            });
         }
     };
 
@@ -286,11 +290,16 @@ function WidgetUi (widgetContainer, config) {
         }
     };
 
-    this.changePseudonym = function (pseudonym) {
-        var pseudonymPlaceholder = sizzle('.comment-pseudonym', widgetContainer);
+    this.changeUserDetails = function (token, pseudonym, isAdmin) {
+        var authEl = sizzle('.comment-editor-auth', widgetContainer);
 
-        if (pseudonymPlaceholder &amp;&amp; pseudonymPlaceholder.length) {
-            pseudonymPlaceholder[0].innerHTML = pseudonym;
+        if (authEl &amp;&amp; authEl.length) {
+            authEl[0].innerHTML = templates.loggedIn.render({
+                token: token,
+                pseudonym: pseudonym,
+                livefyreNetwork: envConfig.get().livefyre.network,
+                isAdmin: isAdmin
+            });
         }
     };
 
@@ -409,11 +418,17 @@ function WidgetUi (widgetContainer, config) {
             }
         }
 
-        if (this.isRelativeTime(timestamp || new Date())) {
+        if (this.isRelativeTime(timestamp)) {
             commentDom = sizzle('#commentid-' + commentData.id, widgetContainer)[0];
+
+            var timeoutToStart = 10000;
+            if (new Date().getTime() - timestamp &lt; 0) {
+                timeoutToStart += Math.abs(new Date().getTime() - timestamp);
+            }
+
             setTimeout(function () {
                 try { oDate.init(commentDom); } catch(e) {}
-            }, 10000);
+            }, timeoutToStart);
         }
     };
 
@@ -472,7 +487,7 @@ function WidgetUi (widgetContainer, config) {
         var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
 
         if (commentArea &amp;&amp; commentArea.length) {
-            return commentArea[0].value.replace(/(?:\r\n|\r|\n)/g, '&lt;br /&gt;');
+            return utils.strings.trim(commentArea[0].value).replace(/(?:\r\n|\r|\n)/g, '&lt;br /&gt;');
         }
 
         return &quot;&quot;;
@@ -547,7 +562,13 @@ function WidgetUi (widgetContainer, config) {
         if (isRelative) {
             // relative time
             var timeAgo = oDate.timeAgo(timestamp);
-            if (timeAgo === &quot;0 seconds ago&quot;) {
+            var match = timeAgo.match(/([0-9]+) ([^ ]+) ago/);
+            var timeAgoInt;
+            if (match &amp;&amp; match[1]) {
+                timeAgoInt = match[1];
+            }
+
+            if (timeAgoInt &lt;= 0) {
                 return &quot;just now&quot;;
             } else {
                 return timeAgo;
