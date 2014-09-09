@@ -487,7 +487,7 @@ function WidgetUi (widgetContainer, config) {
 
         if (isRelative) {
             // relative time
-            if (timestamp >= new Date().getTime()) {
+            if (timestamp >= new Date().getTime() - 1500) {
                 return "just now";
             } else {
                 return oDate.timeAgo(timestamp);
