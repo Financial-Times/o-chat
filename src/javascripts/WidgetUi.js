@@ -501,7 +501,7 @@ function WidgetUi (widgetContainer, config) {
     this.isRelativeTime = function (timestampOrDate) {
         var timestamp = utils.date.toTimestamp(timestampOrDate);
 
-        if (config.datetimeFormat.absoluteFormat === -1 ||
+        if (config.datetimeFormat.minutesUntilAbsoluteTime === -1 ||
             new Date().getTime() - timestamp > config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
 
             return false;
