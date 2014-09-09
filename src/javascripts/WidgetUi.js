@@ -487,17 +487,10 @@ function WidgetUi (widgetContainer, config) {
 
         if (isRelative) {
             // relative time
-            var timeAgo = oDate.timeAgo(timestamp);
-            var match = timeAgo.match(/([0-9]+) ([^ ]+) ago/);
-            var timeAgoInt;
-            if (match && match[1]) {
-                timeAgoInt = match[1];
-            }
-
-            if (timeAgoInt <= 0) {
+            if (timestamp >= new Date().getTime()) {
                 return "just now";
             } else {
-                return timeAgo;
+                return oDate.timeAgo(timestamp);
             }
         } else {
             // absolute time
