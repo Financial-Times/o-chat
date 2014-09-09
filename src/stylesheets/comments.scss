@@ -38,6 +38,8 @@
                 font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
                 border-bottom: 1px solid $borderColor;
                 padding: 10px 0;
+                list-style-type: none;
+                list-style-position: outside;
 
                 &:last-child {
                     border-bottom: 0;
@@ -45,6 +47,9 @@
 
                 .comment-timestamp {
                     display: inline;
+                    font-size: 10px;
+                    color: oColorsGetPaletteColor(grey-tint3);
+                    font-style: italic;
                 }
 
                 .comment-author {

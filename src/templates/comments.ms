@@ -3,12 +3,12 @@
         <div class="comment-show-more-line"></div>
         <span class="comment-show-more-label">Show more comments</span>
     </div>
-    <div class="comment-comments-container">
+    <ul class="comment-comments-container">
         {{#comments}}
-            <div class="comment-wrapper" {{#commentId}}id="commentid-{{commentId}}"{{/commentId}} data-timestamp="{{timestamp}}">
+            <li class="comment-wrapper" {{#commentId}}id="commentid-{{commentId}}"{{/commentId}} data-timestamp="{{timestamp}}">
                 <span class="comment-timestamp">
                     <time class="{{#relativeTime}}o-date{{/relativeTime}}" datetime="{{datetime}}">
-                        {{dateToShow}}
+                        {{dateToShow}}&nbsp;
                     </time>
                 </span>
 
@@ -25,9 +25,9 @@
                 {{/adminMode}}
 
                 <div class="comment-clear"></div>
-            </div>
+            </li>
         {{/comments}}
-    </div>
+    </ul>
     <div class="comment-show-more comment-show-more-after">
         <div class="comment-show-more-line"></div>
         <span class="comment-show-more-label">Show more comments</span>
