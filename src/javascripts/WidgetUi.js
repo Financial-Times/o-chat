@@ -188,7 +188,7 @@ function WidgetUi (widgetContainer, config) {
         if (authEl && authEl.length) {
             authEl[0].innerHTML = templates.loggedIn.render({
                 token: token,
-                pseudonym: pseudonym,
+                pseudonym: pseudonym.substring(0, 50),
                 livefyreNetwork: envConfig.get().livefyre.network,
                 isAdmin: isAdmin
             });
@@ -209,7 +209,7 @@ function WidgetUi (widgetContainer, config) {
         if (authEl && authEl.length) {
             authEl[0].innerHTML = templates.loggedIn.render({
                 token: token,
-                pseudonym: pseudonym,
+                pseudonym: pseudonym.substring(0, 50),
                 livefyreNetwork: envConfig.get().livefyre.network,
                 isAdmin: isAdmin
             });
@@ -279,7 +279,7 @@ function WidgetUi (widgetContainer, config) {
                 timestamp: utils.date.toTimestamp(timestamp),
                 relativeTime: this.isRelativeTime(timestamp),
                 author: {
-                    displayName: commentData.displayName
+                    displayName: commentData.displayName.substring(0, 50)
                 },
                 adminMode: adminMode
             })
@@ -380,7 +380,9 @@ function WidgetUi (widgetContainer, config) {
                     datetime: utils.date.toISOString(commentData.timestamp),
                     timestamp: utils.date.toTimestamp(commentData.timestamp),
                     relativeTime: this.isRelativeTime(commentData.timestamp),
-                    author: commentData.author
+                    author: {
+                        displayName: commentData.author.displayName.substring(0, 50)
+                    }
                 })
             );
 

@@ -218,6 +218,7 @@ var Widget = function () {
             aComment.relativeTime = true;
         }
         aComment.timestamp = utils.date.toTimestamp(aComment.timestamp);
+        aComment.author.displayName = aComment.author.displayName.substring(0, 50);
 
         return aComment;
     }
@@ -242,7 +243,7 @@ var Widget = function () {
                 content: commentData.content,
                 timestamp: commentData.timestamp,
                 displayName: commentData.author.displayName
-            }, (commentData.author.displayName === self.ui.getCurrentPseudonym()), userIsAdmin);
+            }, (commentData.author.displayName.substring(0, 50) === self.ui.getCurrentPseudonym()), userIsAdmin);
         }
     }
 
@@ -375,7 +376,6 @@ var Widget = function () {
      */
     var postComment = function (secondStepOfTryingToPost) {
         var commentBody = self.ui.getCurrentComment();
-        var authorPseudonym = self.ui.getCurrentPseudonym();
 
         oCommentData.api.postComment({
             collectionId: self.collectionId,
@@ -397,23 +397,27 @@ var Widget = function () {
                 if (postCommentResult.success === true) {
                     self.ui.emptyCommentArea();
 
-                    triggerCommentPostedEvent({
-                        commentId: postCommentResult.commentId,
-                        commentBody: postCommentResult.bodyHtml,
-                        author: authorPseudonym
-                    });
+                    oCommentData.api.getAuth(function (err, authData) {
+                        if (authData) {
+                            triggerCommentPostedEvent({
+                                commentId: postCommentResult.commentId,
+                                commentBody: postCommentResult.bodyHtml,
+                                author: authData.displayName
+                            });
 
-                    if (!hasCommentId(postCommentResult.commentId)) {
-                        commentIds.push(postCommentResult.commentId);
-                        self.ui.addComment({
-                            id: postCommentResult.commentId,
-                            content: postCommentResult.bodyHtml,
-                            timestamp: postCommentResult.createdAt,
-                            displayName: authorPseudonym
-                        }, true, userIsAdmin);
-                    }
+                            if (!hasCommentId(postCommentResult.commentId)) {
+                                commentIds.push(postCommentResult.commentId);
+                                self.ui.addComment({
+                                    id: postCommentResult.commentId,
+                                    content: postCommentResult.bodyHtml,
+                                    timestamp: postCommentResult.createdAt,
+                                    displayName: authData.displayName
+                                }, true, userIsAdmin);
+                            }
+                        }
+                    });
                 } else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
-                    loginRequiredToPostComment(true);
+                    loginRequiredToPostComment(commentBody, true);
                 } else {
                     if (postCommentResult.errorMessage) {
                         self.ui.setEditorError(postCommentResult.errorMessage);
@@ -430,21 +434,26 @@ var Widget = function () {
     };
 
 
-    function loginRequiredToPostComment (secondStepOfTryingToPost) {
-        var commentBody = self.ui.getCurrentComment();
-
+    function loginRequiredToPostComment (commentBody, secondStepOfTryingToPost) {
         messageQueue.save(self.collectionId, commentBody);
-            commentUtilities.logger.log('user not actively logged in, save comment to the storage');
+        commentUtilities.logger.log('user not actively logged in, save comment to the storage');
 
-            auth.loginRequired({
-                success: function () {
-                    messageQueue.clear(self.collectionId);
-                    postComment(secondStepOfTryingToPost);
-                },
-                failure: function () {
-                    messageQueue.clear(self.collectionId);
-                }
-            });
+        var options = {
+            force: false
+        };
+        if (secondStepOfTryingToPost) {
+            options.force = true;
+        }
+
+        auth.loginRequired(options, {
+            success: function () {
+                messageQueue.clear(self.collectionId);
+                postComment(commentBody, secondStepOfTryingToPost);
+            },
+            failure: function () {
+                messageQueue.clear(self.collectionId);
+            }
+        });
     }
 
     // the 'Submit comment' button is pressed
@@ -463,12 +472,12 @@ var Widget = function () {
         oCommentData.api.getAuth(function (err, authData) {
             if (!authData || !authData.token) {
                 self.ui.makeEditable();
-                loginRequiredToPostComment();
+                loginRequiredToPostComment(commentBody);
             } else {
                 if (!loginStatus) {
                     auth.login(authData.token, authData.displayName);
                 }
-                postComment();
+                postComment(commentBody);
             }
         });
     });

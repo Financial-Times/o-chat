@@ -93,8 +93,10 @@ function Auth () {
      * @param  {[type]} delegate [description]
      * @return {[type]}          [description]
      */
-    this.loginRequired = function (delegate) {
-        oCommentData.api.getAuth(function (err, authData) {
+    this.loginRequired = function (delegate, force) {
+        oCommentData.api.getAuth({
+            force: force
+        }, function (err, authData) {
             if (authData && authData.pseudonym === false) {
                 loginRequiredPseudonymMissing(delegate);
             } else if (!authData || !authData.token) {
