@@ -259,7 +259,8 @@ var Widget = function () {
                             userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
                                 success: function (newAuthData) {
                                     if (newAuthData && newAuthData.token) {
-                                        self.ui.changeUserDetails(newAuthData.token, newAuthData.displayName);
+                                        logout();
+                                        login(newAuthData.token, newAuthData.displayName, newAuthData.isAdmin || newAuthData.isModerator);
                                     }
                                 }
                             });
