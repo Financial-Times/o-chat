@@ -223,15 +223,19 @@ var Widget = function () {
         return aComment;
     }
     function preprocessCommentData (comments) {
-        if (comments.length) {
-            for (var index = 0; index < comments.length; index++) {
-                comments[index] = processOneComment(comments[index]);
-            }
+        if (comments) {
+            if (typeof comments.length === 'number') {
+                for (var index = 0; index < comments.length; index++) {
+                    comments[index] = processOneComment(comments[index]);
+                }
 
-            return comments;
-        } else {
-            return processOneComment(comments);
+                return comments;
+            } else {
+                return processOneComment(comments);
+            }
         }
+
+        return comments;
     }
 
 
