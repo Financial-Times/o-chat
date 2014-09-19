@@ -121,42 +121,52 @@ function WidgetUi (widgetContainer, config) {
     };
 
     this.adaptToHeight = function (height) {
-        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-        var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
-        var editorComputedStyle = commentUi.utils.getComputedStyle(editorContainer);
+        var adapt = function () {
+            var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+            var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
+            var editorComputedStyle = commentUi.utils.getComputedStyle(editorContainer);
 
-        var editorContainerMarginTopValue;
-        var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
-        if (editorContainerMarginTop.indexOf('px') !== -1) {
-            editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
-        } else {
-            editorContainerMarginTopValue = 0;
-        }
+            var editorContainerMarginTopValue;
+            var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
+            if (editorContainerMarginTop.indexOf('px') !== -1) {
+                editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
+            } else {
+                editorContainerMarginTopValue = 0;
+            }
 
-        var editorContainerMarginBottomValue;
-        var editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
-        if (editorContainerMarginBottom.indexOf('px') !== -1) {
-            editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
-        } else {
-            editorContainerMarginBottomValue = 0;
-        }
+            var editorContainerMarginBottomValue;
+            var editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
+            if (editorContainerMarginBottom.indexOf('px') !== -1) {
+                editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
+            } else {
+                editorContainerMarginBottomValue = 0;
+            }
 
-        var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
+            var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
 
-        commentArea.style.overflow = "auto";
-        commentArea.style.height = (height - editorHeight) + "px";
-        if (config.orderType === 'inverted') {
-            commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
-        } else {
-            commentArea.scrollTop = 0;
-        }
+            commentArea.style.overflow = "auto";
+            commentArea.style.height = (height - editorHeight) + "px";
+            if (config.orderType === 'inverted') {
+                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
+            } else {
+                commentArea.scrollTop = 0;
+            }
 
 
-        if (isPagination) {
-            self.disableButtonPagination();
+            if (isPagination) {
+                self.disableButtonPagination();
 
-            initScrollPagination();
-        }
+                initScrollPagination();
+            }
+        };
+
+        // poll for the existence of container
+        var pollForContainer = setInterval(function () {
+            if (sizzle('.comment-editor-container', widgetContainer).length > 0) {
+                clearInterval(pollForContainer);
+                adapt();
+            }
+        }, 200);
     };
 
     function initScrollPagination () {
