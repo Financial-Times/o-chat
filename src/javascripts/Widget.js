@@ -143,7 +143,7 @@ var Widget = function () {
                     self.trigger('loaded.auth', authData);
 
                     if (authData) {
-                        if (authData.isAdmin || authData.isModerator) {
+                        if (authData.admin || authData.moderator) {
                             userIsAdmin = true;
                         }
                     }
@@ -265,7 +265,7 @@ var Widget = function () {
                                 success: function (newAuthData) {
                                     if (newAuthData && newAuthData.token) {
                                         auth.logout();
-                                        auth.login(newAuthData.token, newAuthData.displayName, newAuthData.isAdmin || newAuthData.isModerator);
+                                        auth.login(newAuthData.token, newAuthData.displayName, newAuthData.admin || newAuthData.moderator);
                                     }
                                 }
                             });
