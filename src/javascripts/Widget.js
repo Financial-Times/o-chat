@@ -169,7 +169,7 @@ var Widget = function () {
                     if (authData) {
                         if (authData.token) {
                             // user has a token, login
-                            auth.login(authData.token, authData.displayName);
+                            auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
                         } else if (authData.pseudonym === false) {
                             // the user doesn't have pseudonym
 
@@ -479,7 +479,7 @@ var Widget = function () {
                 loginRequiredToPostComment(commentBody);
             } else {
                 if (!loginStatus) {
-                    auth.login(authData.token, authData.displayName);
+                    auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
                 }
                 postComment(commentBody);
             }
