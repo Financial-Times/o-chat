@@ -24,6 +24,8 @@ function WidgetUi (widgetContainer, config) {
     this.off = events.off;
 
     this.render = function (commentsData, adminMode) {
+        widgetContainer.innerHTML = "";
+
         var addEditor = function () {
             widgetContainer.appendChild(
                 commentUi.utils.toDOM(
