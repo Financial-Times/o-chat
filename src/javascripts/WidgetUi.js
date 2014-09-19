@@ -101,13 +101,20 @@ function WidgetUi (widgetContainer, config) {
         }
 
         if (adminMode) {
-            commentUi.utils.addEventListener('click', sizzle('.comment-delete', widgetContainer), function (event) {
-                events.trigger('deleteComment');
+            var commentContainer = sizzle('.comment-comments-container', widgetContainer);
+            commentUi.utils.addEventListener('click', commentContainer, function (event) {
+                if (event.target.className === 'comment-delete') {
+                    try {
+                        var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
 
-                if (event.preventDefault) {
-                    event.preventDefault();
-                } else {
-                    event.returnValue = false;
+                        events.trigger('deleteComment', commentId);
+                    } catch (e) {}
+
+                    if (event.preventDefault) {
+                        event.preventDefault();
+                    } else {
+                        event.returnValue = false;
+                    }
                 }
             });
         }
@@ -343,18 +350,6 @@ function WidgetUi (widgetContainer, config) {
             setTimeout(function () {
                 try { oDate.init(commentDom); } catch(e) {}
             }, timeoutToStart);
-        }
-
-        if (adminMode) {
-            commentUi.utils.addEventListener('click', sizzle('#commentid-'+ commentData.id +' .comment-delete', widgetContainer)[0], function (event) {
-                events.trigger('deleteComment', commentData.id);
-
-                if (event.preventDefault) {
-                    event.preventDefault();
-                } else {
-                    event.returnValue = false;
-                }
-            });
         }
     };
 

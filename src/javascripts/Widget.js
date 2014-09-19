@@ -442,14 +442,12 @@ var Widget = function () {
         messageQueue.save(self.collectionId, commentBody);
         commentUtilities.logger.log('user not actively logged in, save comment to the storage');
 
-        var options = {
-            force: false
-        };
+        var force = false;
         if (secondStepOfTryingToPost) {
-            options.force = true;
+            force = true;
         }
 
-        auth.loginRequired(options, {
+        auth.loginRequired({
             success: function () {
                 messageQueue.clear(self.collectionId);
                 postComment(commentBody, secondStepOfTryingToPost);
@@ -457,7 +455,7 @@ var Widget = function () {
             failure: function () {
                 messageQueue.clear(self.collectionId);
             }
-        });
+        }, force);
     }
 
     // the 'Submit comment' button is pressed
@@ -484,6 +482,10 @@ var Widget = function () {
                 postComment(commentBody);
             }
         });
+    });
+
+    self.ui.on('deleteComment', function (commentId) {
+        console.log('deleteComment', commentId);
     });
 };
 commentUi.Widget.__extend(Widget);
