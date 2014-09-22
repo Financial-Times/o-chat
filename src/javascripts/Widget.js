@@ -485,7 +485,15 @@ var Widget = function () {
     });
 
     self.ui.on('deleteComment', function (commentId) {
-        console.log('deleteComment', commentId);
+        oCommentData.api.deleteComment({
+            collectionId: self.collectionId,
+            commentId: commentId
+        }, function (err) {
+            if (err) {
+                // show error
+                commentUtilities.logger.log("error");
+            }
+        });
     });
 };
 commentUi.Widget.__extend(Widget);
