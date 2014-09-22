@@ -19,7 +19,7 @@ module.exports = {
      * For this you have to write the following:
      * ```
      * "dependencies": {
-     *       "o-ccs-client": {
+     *       "o-comment-data": {
      *           "baseUrl": "http://test.comment-creation-service.webservices.ft.com"
      *       }
      *   }
@@ -38,8 +38,8 @@ module.exports = {
                 oCommentData.init(keyOrObject, value);
             }
         } else if (typeof keyOrObject === 'object') {
-            if (keyOrObject.hasOwnProperty('dependencies') && keyOrObject.dependencies.hasOwnProperty('o-comments-data')) {
-                oCommentData.init(keyOrObject.dependencies['o-comments-data']);
+            if (keyOrObject.hasOwnProperty('dependencies') && keyOrObject.dependencies.hasOwnProperty('o-comment-data')) {
+                oCommentData.init(keyOrObject.dependencies['o-comment-data']);
 
                 delete keyOrObject.dependencies;
             }
