@@ -47,19 +47,37 @@ var Widget = function () {
     var nextPageNumber;
     var isMorePageAvailable = false;
     var nextPageFetchInProgress = false;
-
-
     var loginStatus = false;
-
     var userIsAdmin = false;
 
     var commentIds = [];
+
     var hasCommentId = function (id) {
         if (Array.prototype.indexOf) {
             return commentIds.indexOf(id) !== -1 ? true : false;
         } else {
              for (var i = 0; i < commentIds.length; i++) {
                 if (commentIds[i] === id) {
+                    return true;
+                }
+             }
+             return false;
+        }
+    };
+
+    var removeCommentId = function (id) {
+        var index;
+        if (Array.prototype.indexOf) {
+            index = commentIds.indexOf(id);
+            if (index !== -1) {
+                commentIds.splice(index, 1);
+                return true;
+            }
+            return false;
+        } else {
+             for (index = 0; index < commentIds.length; index++) {
+                if (commentIds[index] === id) {
+                    commentIds.splice(index, 1);
                     return true;
                 }
              }
@@ -122,9 +140,14 @@ var Widget = function () {
                 
                 callback(null, data.collection);
             } else if (data.hasOwnProperty('comment')) {
-                // comment received through streaming
-
-                newCommentReceived(data.comment);
+                // streaming info
+                if (data.comment.deleted === true) {
+                    // comment deleted
+                    commentDeleted(data.comment.commentId);
+                } else {
+                    // new comment
+                    newCommentReceived(data.comment);
+                }
             }
         });
     };
@@ -248,6 +271,12 @@ var Widget = function () {
                 timestamp: commentData.timestamp,
                 displayName: commentData.author.displayName
             }, (commentData.author.displayName.substring(0, 50) === self.ui.getCurrentPseudonym()), userIsAdmin);
+        }
+    }
+
+    function commentDeleted (commentId) {
+        if (removeCommentId(commentId)) {
+            self.ui.removeComment(commentId);
         }
     }
 
@@ -492,7 +521,10 @@ var Widget = function () {
             if (err) {
                 // show error
                 commentUtilities.logger.log("error");
+                return;
             }
+
+            self.ui.deleteComment(commentId);
         });
     });
 };

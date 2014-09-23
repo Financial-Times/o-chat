@@ -20,7 +20,9 @@ module.exports = {
      * ```
      * "dependencies": {
      *       "o-comment-data": {
-     *           "baseUrl": "http://test.comment-creation-service.webservices.ft.com"
+     *           "ccs": {
+     *               "baseUrl": "http://test.comment-creation-service.webservices.ft.com"
+     *           }
      *       }
      *   }
      * ```
