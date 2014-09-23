@@ -512,18 +512,78 @@ var Widget = function () {
         });
     });
 
-    self.ui.on('deleteComment', function (commentId) {
+
+
+
+
+    function deleteComment (commentId, secondStepOfTryingToDelete) {
         oCommentData.api.deleteComment({
             collectionId: self.collectionId,
             commentId: commentId
-        }, function (err) {
+        }, function (err, deleteCommentResult) {
             if (err) {
-                // show error
-                commentUtilities.logger.log("error");
+                userDialogs.showMessage(commentUi.i18n.texts.genericError);
+                commentUtilities.logger.log("delete comment call error: ", err);
                 return;
             }
 
-            self.ui.removeComment(commentId);
+            if (deleteCommentResult) {
+                if (deleteCommentResult.success === true) {
+                    self.ui.removeComment(commentId);
+                } else if (deleteCommentResult.invalidSession === true && secondStepOfTryingToDelete !== true) {
+                    loginRequiredToDeleteComment(commentId, true);
+                } else {
+                    if (deleteCommentResult.errorMessage) {
+                        var match;
+                        var errMsg = deleteCommentResult.errorMessage;
+
+                        for (var msgToOverride in commentUi.i18n.serviceMessageOverrides) {
+                            if (commentUi.i18n.serviceMessageOverrides.hasOwnProperty(msgToOverride)) {
+                                match = deleteCommentResult.errorMessage.match(new RegExp(msgToOverride));
+                                if (match && match.length) {
+                                    errMsg = commentUi.i18n.serviceMessageOverrides[msgToOverride];
+                                }
+                            }
+                        }
+                         
+                        userDialogs.showMessage(errMsg);
+                    } else {
+                        userDialogs.showMessage(commentUi.i18n.texts.genericError);
+                    }
+
+                    return;
+                }
+            } else {
+                userDialogs.showMessage(commentUi.i18n.texts.genericError);
+            }
+        });
+    }
+
+    function loginRequiredToDeleteComment (commentId, secondStepOfTryingToDelete) {
+        var force = false;
+        if (secondStepOfTryingToDelete) {
+            force = true;
+        }
+
+        auth.loginRequired({
+            success: function () {
+                deleteComment(commentId, secondStepOfTryingToDelete);
+            },
+            failure: function () {
+            }
+        }, force);
+    }
+
+    self.ui.on('deleteComment', function (commentId) {
+        oCommentData.api.getAuth(function (err, authData) {
+            if (!authData || !authData.token) {
+                loginRequiredToDeleteComment(commentId);
+            } else {
+                if (!loginStatus) {
+                    auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
+                }
+                deleteComment(commentId);
+            }
         });
     });
 };

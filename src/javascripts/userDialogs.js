@@ -108,3 +108,12 @@ exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
 
 
 exports.showInactivityMessage = commentUi.userDialogs.showInactivityMessage;
+
+exports.showMessage = function (message) {
+    "use strict";
+
+    var dialog = new commentUi.dialog.Dialog(message, {
+        modal: false
+    });
+    dialog.open();
+};
