@@ -275,9 +275,8 @@ var Widget = function () {
     }
 
     function commentDeleted (commentId) {
-        if (removeCommentId(commentId)) {
-            self.ui.removeComment(commentId);
-        }
+        removeCommentId(commentId);
+        self.ui.removeComment(commentId);
     }
 
 
