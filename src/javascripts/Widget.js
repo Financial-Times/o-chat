@@ -524,7 +524,7 @@ var Widget = function () {
                 return;
             }
 
-            self.ui.deleteComment(commentId);
+            self.ui.removeComment(commentId);
         });
     });
 };
