@@ -522,7 +522,7 @@ var Widget = function () {
             commentId: commentId
         }, function (err, deleteCommentResult) {
             if (err) {
-                userDialogs.showMessage(commentUi.i18n.texts.genericError);
+                userDialogs.showMessage("Delete comment", commentUi.i18n.texts.genericError);
                 commentUtilities.logger.log("delete comment call error: ", err);
                 return;
             }
@@ -546,15 +546,15 @@ var Widget = function () {
                             }
                         }
                          
-                        userDialogs.showMessage(errMsg);
+                        userDialogs.showMessage("Delete comment", errMsg);
                     } else {
-                        userDialogs.showMessage(commentUi.i18n.texts.genericError);
+                        userDialogs.showMessage("Delete comment", commentUi.i18n.texts.genericError);
                     }
 
                     return;
                 }
             } else {
-                userDialogs.showMessage(commentUi.i18n.texts.genericError);
+                userDialogs.showMessage("Delete comment", commentUi.i18n.texts.genericError);
             }
         });
     }
