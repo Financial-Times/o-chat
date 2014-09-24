@@ -255,8 +255,10 @@
             </tbody>
           </table>
           <div class="description"><p>Login is required.<br />If pseudonym is missing, ask for a pseudonym.<br />If there is no known method to login the user, generate a <code>loginRequired.authAction</code> event that can be handled at the integration level.<br />If successful, check if the user is logged in.</p> </div>
-          <pre><code class="language-javascript">this.loginRequired = function (delegate) {
-        oCommentData.api.getAuth(function (err, authData) {
+          <pre><code class="language-javascript">this.loginRequired = function (delegate, force) {
+        oCommentData.api.getAuth({
+            force: force
+        }, function (err, authData) {
             if (authData &amp;&amp; authData.pseudonym === false) {
                 loginRequiredPseudonymMissing(delegate);
             } else if (!authData || !authData.token) {

@@ -38,10 +38,25 @@ var Widget = function () {
     this.getWidgetEl().className += ' o-comment-client comment-order-' + this.config.order;
 
     this.collectionId = null;
-    this.datetimeFormat = {
+    var defaultDatetimeFormat = {
         minutesUntilAbsoluteTime: 20160,
         absoluteFormat: 'date'
     };
+    // merge user date preferences with the default preferences
+    if (this.config.datetimeFormat) {
+        if (typeof this.config.datetimeFormat === 'string') {
+            defaultDatetimeFormat.absoluteFormat = this.config.datetimeFormat;
+        } else if (typeof this.config.datetimeFormat === 'object') {
+            if (this.config.datetimeFormat.hasOwnProperty('minutesUntilAbsoluteTime')) {
+                defaultDatetimeFormat.minutesUntilAbsoluteTime = this.config.datetimeFormat.minutesUntilAbsoluteTime;
+            }
+
+            if (this.config.datetimeFormat.hasOwnProperty('absoluteFormat')) {
+                defaultDatetimeFormat.absoluteFormat = this.config.datetimeFormat.absoluteFormat;
+            }
+        }
+    }
+    this.config.datetimeFormat = defaultDatetimeFormat;
 
     var currentPageNumber;
     var nextPageNumber;
@@ -85,23 +100,8 @@ var Widget = function () {
         }
     };
 
-    // merge user date preferences with the default preferences
-    if (this.config.datetimeFormat) {
-        if (typeof this.config.datetimeFormat === 'string') {
-            this.datetimeFormat.absoluteFormat = this.config.datetimeFormat;
-        } else if (typeof this.config.datetimeFormat === 'object') {
-            if (this.config.datetimeFormat.hasOwnProperty('minutesUntilAbsoluteTime')) {
-                this.datetimeFormat.minutesUntilAbsoluteTime = this.config.datetimeFormat.minutesUntilAbsoluteTime;
-            }
-
-            if (this.config.datetimeFormat.hasOwnProperty('absoluteFormat')) {
-                this.datetimeFormat.absoluteFormat = this.config.datetimeFormat.absoluteFormat;
-            }
-        }
-    }
-
     this.ui = new WidgetUi(this.getWidgetEl(), {
-        datetimeFormat: this.datetimeFormat,
+        datetimeFormat: this.config.datetimeFormat,
         orderType: self.config.order
     });
     
@@ -530,9 +530,14 @@ var Widget = function () {
             if (deleteCommentResult) {
                 if (deleteCommentResult.success === true) {
                     self.ui.removeComment(commentId);
+                    self.trigger('commentDeleted.tracking', [self.collectionId, {
+                        id: commentId
+                    }]);
                 } else if (deleteCommentResult.invalidSession === true && secondStepOfTryingToDelete !== true) {
                     loginRequiredToDeleteComment(commentId, true);
                 } else {
+                    self.ui.markCommentAsDeleteInProgressEnded(commentId);
+
                     if (deleteCommentResult.errorMessage) {
                         var match;
                         var errMsg = deleteCommentResult.errorMessage;
@@ -554,6 +559,8 @@ var Widget = function () {
                     return;
                 }
             } else {
+                self.ui.markCommentAsDeleteInProgressEnded(commentId);
+                
                 userDialogs.showMessage("Delete comment", commentUi.i18n.texts.genericError);
             }
         });
@@ -570,11 +577,14 @@ var Widget = function () {
                 deleteComment(commentId, secondStepOfTryingToDelete);
             },
             failure: function () {
+                self.ui.markCommentAsDeleteInProgressEnded(commentId);
             }
         }, force);
     }
 
     self.ui.on('deleteComment', function (commentId) {
+        self.ui.markCommentAsDeleteInProgress(commentId);
+
         oCommentData.api.getAuth(function (err, authData) {
             if (!authData || !authData.token) {
                 loginRequiredToDeleteComment(commentId);

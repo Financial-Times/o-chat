@@ -41,6 +41,14 @@
                 list-style-type: none;
                 list-style-position: outside;
 
+                &.deleteInProgress {
+                    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+                    filter: alpha(opacity=50);
+                    -moz-opacity: 0.5;
+                    -khtml-opacity: 0.5;
+                    opacity: 0.5;
+                }
+
                 &:last-child {
                     border-bottom: 0;
                 }

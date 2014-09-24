@@ -89,20 +89,69 @@
         </div>
         <div class="span9">
           <section id="Main"><h1 id="o-comment-client">o-comment-client</h1>
+<p>Commenting widget built on top of data APIs provided by o-comment-data module. This Widget uses both SUDS (Session user data service) and CCS (Comment creation service).</p>
+<hr>
 <h2 id="how-to-use-it">How to use it</h2>
 <p>There are two ways of using this module:</p>
 <h3 id="standalone">Standalone</h3>
-<p>Run &#39;grunt&#39;, then insert the JS found in the dist folder:</p>
-<pre><code class="lang-javascript">&lt;script src=&quot;dist/javascripts/commentsCcsWidget.min.js&quot;&gt;&lt;/script&gt;</code></pre>
-<p>The module&#39;s API can be accessed using the &#39;commentsCcsWidget&#39; variable.</p>
+<p>Run <code>grunt</code>, then insert the JS found in the dist folder:</p>
+<pre><code class="lang-javascript">&lt;script src=&quot;dist/javascripts/oCommentClient.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+<p>The module&#39;s API can be accessed using <code>oCommentClient</code> in the global scope.</p>
 <h3 id="bower-and-browserify">Bower and browserify</h3>
-<p>With bower, the module&#39;s API can be accessed by &#39;o-comments-ccs-widget&#39;.</p>
-<pre><code class="lang-javascript">var commentsCcsWidget = require(&#39;o-comments-ccs-widget&#39;);</code></pre>
-<h2 id="api">API</h2>
-<p>The main fields that are exposed are the following:</p>
+<p>With bower, simply require the module:</p>
+<pre><code class="lang-javascript">var oCommentClient = require(&#39;o-comment-client&#39;);</code></pre>
+<p>The module should be built using <code>browserify</code> (with <code>debowerify</code> transform).</p>
+<hr>
+<h2 id="logging">Logging</h2>
+<p>Logging can be enabled for debugging purposes. It logs using the global &#39;console&#39; if available (if not, nothing happens and it degrades gracefully).<br>By default logging is disabled.</p>
+<h3 id="enablelogging">enableLogging</h3>
+<p>This method enables logging of the module.</p>
+<h3 id="disablelogging">disableLogging</h3>
+<p>This method disables logging of the module.</p>
+<h3 id="setlogginglevel">setLoggingLevel</h3>
+<p>This method sets the logging level. This could be a number from 0 to 4 (where 0 is debug, 4 is error), or a string from the available methods of &#39;console&#39; (debug, log, info, warn, error).<br>Default is 3 (warn).</p>
+<hr>
+<h2 id="configuration">Configuration</h2>
+<p><strong>The methods which are meant to configure the module are the following:</strong></p>
 <h3 id="init">init</h3>
-<p>This method is responsible for the configuration used by the module. Calling this method with an object will merge the default configuration with the object specified.</p>
+<p>This method is responsible for changing the default configuration used by this module. Calling this method with an object will merge the default configuration with the object specified (deep merge, primitive type values of the same key will be overwritten).</p>
+<p>In order to use this module with authentication enabled, you should specify the user&#39;s session ID:</p>
+<pre><code class="lang-javascript">oCommentClient.init({
+    sessionId: &#39;sessID&#39;
+});</code></pre>
+<h5 id="default-configuration">Default configuration</h5>
+<pre><code class="lang-javascript">{
+    &quot;livefyre&quot;: {
+        &quot;network&quot;: &quot;ft.fyre.co&quot;
+    }
+}</code></pre>
+<h5 id="change-the-environment">Change the environment</h5>
+<p>In order to change to the TEST environment, use the following code (o-comment-data should be switched to TEST env as well):</p>
+<pre><code class="lang-javascript">{
+    &quot;livefyre&quot;: {
+        &quot;network&quot;: &quot;ft-1.fyre.co&quot;
+    },
+    &quot;dependencies&quot;: {
+        &quot;o-comment-data&quot;: {
+            &quot;suds&quot;: {
+                &quot;baseUrl&quot;: &quot;http://test.session-user-data.webservices.ft.com&quot;
+            },
+            &quot;ccs&quot;: {
+                &quot;baseUrl&quot;: &quot;http://test.comment-creation.webservices.ft.com&quot;
+            },
+            &quot;cacheConfig&quot;: {
+                &quot;authBaseName&quot;: &quot;comments-test-auth-&quot;,
+                &quot;initBaseName&quot;: &quot;comments-test-init-&quot;
+            },
+            &quot;livefyre&quot;: {
+                &quot;networkName&quot;: &quot;ft-1&quot;
+            }
+        }
+    }
+}</code></pre>
+<h2 id="api">API</h2>
 <h3 id="widget">Widget</h3>
+<p>Widget incorporates all aspects of a commenting Widget: handling data and creating the UI.</p>
 <h5 id="configuration">Configuration</h5>
 <p>To create an instance, you need to provide a configuration object. This should have the following structure:</p>
 <h6 id="mandatory-fields-">Mandatory fields:</h6>
@@ -111,49 +160,154 @@
 <li>articleId: ID of the article, any string</li>
 <li>url: canonical URL of the page</li>
 <li>title: Title of the page</li>
-<li><strong>user</strong>: User object which has the following utilities:<ul>
-<li>isLoggedIn: function which returns true or false based on the user&#39;s logged in status</li>
-<li>getSession: function which returns the user&#39;s session if he&#39;s logged in</li>
-<li>getUserId: function</li>
-<li>getEmail: function</li>
-</ul>
-</li>
 </ul>
 <h6 id="optional-fields-">Optional fields:</h6>
 <ul>
-<li>stream_type: livecomments, livechat, liveblog</li>
+<li><p>order: This specifies how the widget is built. It can have two values:</p>
+<ul>
+<li>normal: the commenting box is placed on top of the comment stream, and the comments are ordered as newest on top.</li>
+<li><p>inverted: the commenting box is placed at the bottom of the comment stream, and the comments are ordered newest on bottom.</p>
+<p>Default value is &#39;normal&#39;.</p>
+</li>
+</ul>
+</li>
+<li><p>layout: Specifies the layout style of the widget. It can have two values:</p>
+<ul>
+<li>normal: When placed in the main area of the page.</li>
+<li><p>side: When placed in the side area of the page.</p>
+<p>Default value is &#39;normal&#39;.</p>
+</li>
+</ul>
+</li>
+<li>datetimeFormat: How to format the timestamps. This is an object and has two fields:<ul>
+<li>minutesUntilAbsoluteTime: specifies after how many minutes to switch from relative time to absolute. If -1 is specified, the timestamps will be in the absolute format immediately. By default it is set to 14 days.</li>
+<li>absoluteFormat: specifies the format with which the absolute timestamp is rendered. For more information about the possible values please visit: <a href="https://github.com/Financial-Times/o-date#o-dateformatdate-tpl">https://github.com/Financial-Times/o-date#o-dateformatdate-tpl</a></li>
+</ul>
+</li>
 </ul>
 <h5 id="methods">Methods</h5>
 <h6 id="load">load</h6>
-<p>The only method that can be called is &#39;load&#39;. This method will initiate loading Livefyre core resources, getting the necessary information from SUDS, and loading the widget on its place specified.</p>
+<p>This method initiates loading the necessary data to load the widget (e.g. comments, user authentication info), and using the data generates the UI elements within the page.</p>
 <p>This method can be called once (calling it multiple types will have no effect).</p>
-<h3 id="enablelogging">enableLogging</h3>
-<p>This method enables logging of the module. It logs using the global &#39;console&#39; if available (if not, nothing happens).</p>
-<h3 id="disablelogging">disableLogging</h3>
-<p>This method disables logging of the module.</p>
-<h3 id="setlogginglevel">setLoggingLevel</h3>
-<p>This method sets the logging level. This could be a number from 0 to 4 (where 0 is debug, 4 is error), or a string from the available methods of &#39;console&#39; (debug, log, info, warn, error).<br>Default is 3 (warn).</p>
-<h2 id="default-configuration">Default configuration</h2>
+<h6 id="adapttoheight">adaptToHeight</h6>
+<p>Calling this method with a height in pixels as parameter will adapt the UI to shrink within that height. If the current UI is smaller, it will fill the space to occupy the full height, or if the current UI is taller, a scroll will appear on the comments.</p>
+<h6 id="init">init</h6>
+<p><strong>This method is used internally, but its behavior can be overridden if desired.</strong> This method is responsible to get the initialization data (e.g. collection info, comments), and also to initialize streaming from Livefyre (e.g. a new comment added, comment deleted).<br>As a parameter it has a callback which should be called when the loading finished passing also the obtained data as parameter.</p>
+<pre><code class="lang-javascript">widget.init(callback) {
+    loadComments(function (comments) {
+        callback(comments);
+    });
+};</code></pre>
+<h6 id="loadresources">loadResources</h6>
+<p><strong>This method is used internally, but its behavior can be overridden if desired.</strong> This method is responsible to load any third party resources that are needed to load the widget. By default this method does nothing for o-comment-client widget.<br>A callback is passed as a parameter, which should be called when all resources are fully loaded.</p>
+<pre><code class="lang-javascript">widget.loadResources(callback) {
+    loadResource1();
+    loadResource2();
+    callback();
+};</code></pre>
+<h6 id="render">render</h6>
+<p><strong>This method is used internally, but its behavior can be overridden if desired.</strong> This method is responsible to render the UI using the comments available as a parameter. The second parameter is a callback, which should be called when the UI is rendered.</p>
+<pre><code class="lang-javascript">widget.render(comments, callback) {
+    renderUi(comments);
+    callback();
+}</code></pre>
+<h6 id="ontimeout">onTimeout</h6>
+<p>This method is called when the widget loading times out. The behavior can be overridden.</p>
+<h6 id="onerror">onError</h6>
+<p>This method is called when an error occurs while loading the widget. An error parameter is provided.</p>
+<h6 id="getwidgetel">getWidgetEl</h6>
+<p>Returns the DOM element of the widget container.</p>
+<h6 id="on">on</h6>
+<p>With this method you can listen to events generated by the widget instance.</p>
+<h6 id="off">off</h6>
+<p>With this method event handlers attached with <code>on</code> can be deleted.</p>
+<h6 id="trigger">trigger</h6>
+<p>This method should be used only <strong>internally</strong>. The method triggers events.</p>
+<h5 id="properties">Properties</h5>
+<p>Available on any instance of Widget.</p>
+<h6 id="config">config</h6>
+<p>This is the config object passed as a parameter populated with default configuration items where those are not provided.</p>
+<h6 id="ui">ui</h6>
+<p>Instance of WidgetUi, which is linked to the widget&#39;s DOM. Any call to this instance would affect only the widget&#39;s UI.</p>
+<h6 id="collectionid">collectionId</h6>
+<p>Livefyre&#39;s collection ID for the current article. <strong>Populated only after the widget is loaded (<code>load</code> function)!</strong></p>
+<h6 id="timeout">timeout</h6>
+<p>Seconds after a timeout is considered when loading the widget.</p>
+<h5 id="events">Events</h5>
+<p>Handling these events is available using the <code>on</code> function of a widget instance.</p>
+<p>e.g.:</p>
+<pre><code class="lang-javascript">widget.on(&#39;eventName&#39;, function (additionalParameters) {
+    // handle the event
+});</code></pre>
+<h6 id="timeout-widget">timeout.widget</h6>
+<p>Loading timed out.</p>
+<h6 id="error-resources">error.resources</h6>
+<p>Error while loading the resources.<br>Parameters: error object/message.</p>
+<h6 id="error-init">error.init</h6>
+<p>Error while loading the initialization data and the comments.<br>Parameters: error object/message.</p>
+<h6 id="error-widget">error.widget</h6>
+<p>Error for any reason.<br>Parameters: error object/message.</p>
+<h6 id="loaded-init">loaded.init</h6>
+<p>Loaded when the initialization is finished and the necessary data is obtained.<br>Parameters: initialization data in the following form:</p>
 <pre><code class="lang-javascript">{
-    &quot;livefyre&quot;: {
-        &quot;network&quot;: &quot;ft.fyre.co&quot;,
-        &quot;domain&quot;: &quot;ft.auth.fyre.co&quot;
+    &quot;collection&quot;: {
+        &quot;unclassified&quot;: false,
+        &quot;collectionId&quot;: &quot;91440735&quot;,
+        &quot;lastEvent&quot;: 1411541039265900,
+        &quot;comments&quot;: [{
+            &quot;parentId&quot;: &quot;&quot;,
+            &quot;author&quot;: {
+                &quot;displayName&quot;: &quot;roli main&quot;,
+                &quot;tags&quot;: [&quot;FT&quot;],
+                &quot;type&quot;: 1
+            },
+            &quot;content&quot;: &quot;&lt;p&gt;comment&lt;/p&gt;&quot;,
+            &quot;timestamp&quot;: 1411541039,
+            &quot;commentId&quot;: &quot;216743299&quot;,
+            &quot;visibility&quot;: 1
+        }],
+        &quot;totalPages&quot;: &quot;6&quot;
     }
 }</code></pre>
-<h2 id="change-the-environment">Change the environment</h2>
-<p>In order to change to the TEST environment, use this:</p>
-<pre><code class="lang-javascript">var commentsCcsWidget = require(&#39;o-comments-ccs-widget&#39;);
-commentsCcsWidget.init({
-    &quot;dependencies&quot;: {
-        &quot;o-ccs-client&quot;: {
-            &quot;baseUrl&quot;: &quot;http://test.comments-creation-service.webservices.ft.com&quot;
-        }
-    },
-    &quot;livefyre&quot;: {
-        &quot;network&quot;: &quot;ft-int-0.fyre.co&quot;,
-        &quot;domain&quot;: &quot;ft-int-0.auth.fyre.co&quot;
+<p>For more information please visit the o-comment-data module.</p>
+<h6 id="ready-widget">ready.widget</h6>
+<h6 id="loaded-auth">loaded.auth</h6>
+<h6 id="rendercomplete-widget">renderComplete.widget</h6>
+<h6 id="commentposted-tracking">commentPosted.tracking</h6>
+<h6 id="commentdeleted-tracking">commentDeleted.tracking</h6>
+<h5 id="extend">Extend</h5>
+<p>Widget is extendable, so some of the functionalities can be overriden. This can be done in the following way:</p>
+<pre><code class="lang-javascript">var NewWidget = function () {
+    Widget.apply(this, arguments);
+
+    var self = this;
+
+    this.newFunctionality = function () {
+        // use self instead of this
     }
-});</code></pre>
+
+    // obtain the original function if needed
+    var _super_loadResources = self.loadResources;
+
+    this.loadResources = function (callback) {
+        // override the method
+    }
+}
+Widget.__extend(NewWidget);</code></pre>
+<h3 id="widgetui">WidgetUi</h3>
+<p>Responsible for handling all UI specific actions of a widget. An instance of this is automatically created within the Widget class.</p>
+<h5 id="extend">Extend</h5>
+<p>WidgetUi is extendable, so some of the functionalities can be overriden. This can be done in the following way:</p>
+<pre><code class="lang-javascript">var NewWidgetUi = function () {
+    WidgetUi.apply(this, arguments);
+
+    var self = this;
+
+    this.newFunctionality = function () {
+        // use self instead of this
+    }
+}
+WidgetUi.__extend(NewWidgetUi);</code></pre>
 </section>
         </div>
       </div>

@@ -123,7 +123,9 @@ function WidgetUi (widgetContainer, config) {
     this.on = events.on;
     this.off = events.off;
 
-    this.render = function (commentsData) {
+    this.render = function (commentsData, adminMode) {
+        widgetContainer.innerHTML = &quot;&quot;;
+
         var addEditor = function () {
             widgetContainer.appendChild(
                 commentUi.utils.toDOM(
@@ -141,7 +143,8 @@ function WidgetUi (widgetContainer, config) {
                 commentUi.utils.toDOM(
                     templates.comments.render({
                         comments: commentsData,
-                        orderType: config.orderType
+                        orderType: config.orderType,
+                        adminMode: adminMode
                     })
                 )
             );
@@ -198,45 +201,74 @@ function WidgetUi (widgetContainer, config) {
                 events.trigger('nextPage');
             });
         }
+
+        if (adminMode) {
+            var commentContainer = sizzle('.comment-comments-container', widgetContainer);
+            commentUi.utils.addEventListener('click', commentContainer, function (event) {
+                if (event.target.className === 'comment-delete') {
+                    try {
+                        var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
+
+                        events.trigger('deleteComment', commentId);
+                    } catch (e) {}
+
+                    if (event.preventDefault) {
+                        event.preventDefault();
+                    } else {
+                        event.returnValue = false;
+                    }
+                }
+            });
+        }
     };
 
     this.adaptToHeight = function (height) {
-        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-        var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
-        var editorComputedStyle = commentUi.utils.getComputedStyle(editorContainer);
+        var adapt = function () {
+            var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+            var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
+            var editorComputedStyle = commentUi.utils.getComputedStyle(editorContainer);
 
-        var editorContainerMarginTopValue;
-        var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
-        if (editorContainerMarginTop.indexOf('px') !== -1) {
-            editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
-        } else {
-            editorContainerMarginTopValue = 0;
-        }
+            var editorContainerMarginTopValue;
+            var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
+            if (editorContainerMarginTop.indexOf('px') !== -1) {
+                editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
+            } else {
+                editorContainerMarginTopValue = 0;
+            }
 
-        var editorContainerMarginBottomValue;
-        var editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
-        if (editorContainerMarginBottom.indexOf('px') !== -1) {
-            editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
-        } else {
-            editorContainerMarginBottomValue = 0;
-        }
+            var editorContainerMarginBottomValue;
+            var editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
+            if (editorContainerMarginBottom.indexOf('px') !== -1) {
+                editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
+            } else {
+                editorContainerMarginBottomValue = 0;
+            }
 
-        var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
+            var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
 
-        commentArea.style.overflow = &quot;auto&quot;;
-        commentArea.style.height = (height - editorHeight) + &quot;px&quot;;
-        if (config.orderType === 'inverted') {
-            commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
-        } else {
-            commentArea.scrollTop = 0;
-        }
+            commentArea.style.overflow = &quot;auto&quot;;
+            commentArea.style.height = (height - editorHeight) + &quot;px&quot;;
+            if (config.orderType === 'inverted') {
+                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
+            } else {
+                commentArea.scrollTop = 0;
+            }
 
 
-        if (isPagination) {
-            self.disableButtonPagination();
+            if (isPagination) {
+                self.disableButtonPagination();
 
-            initScrollPagination();
-        }
+                initScrollPagination();
+            }
+        };
+
+        // poll for the existence of container
+        var pollForContainer = setInterval(function () {
+            if (sizzle('.comment-editor-container', widgetContainer).length &gt; 0) {
+                clearInterval(pollForContainer);
+                adapt();
+            }
+        }, 200);
     };
 
     function initScrollPagination () {
@@ -275,7 +307,7 @@ function WidgetUi (widgetContainer, config) {
         if (authEl &amp;&amp; authEl.length) {
             authEl[0].innerHTML = templates.loggedIn.render({
                 token: token,
-                pseudonym: pseudonym,
+                pseudonym: pseudonym.substring(0, 50),
                 livefyreNetwork: envConfig.get().livefyre.network,
                 isAdmin: isAdmin
             });
@@ -296,7 +328,7 @@ function WidgetUi (widgetContainer, config) {
         if (authEl &amp;&amp; authEl.length) {
             authEl[0].innerHTML = templates.loggedIn.render({
                 token: token,
-                pseudonym: pseudonym,
+                pseudonym: pseudonym.substring(0, 50),
                 livefyreNetwork: envConfig.get().livefyre.network,
                 isAdmin: isAdmin
             });
@@ -346,7 +378,7 @@ function WidgetUi (widgetContainer, config) {
     };
 
     // content, pseudonym, id, timestamp
-    this.addComment = function (commentData, ownComment) {
+    this.addComment = function (commentData, ownComment, adminMode) {
         ownComment = typeof ownComment === 'boolean' ? ownComment : false;
 
         var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
@@ -366,8 +398,9 @@ function WidgetUi (widgetContainer, config) {
                 timestamp: utils.date.toTimestamp(timestamp),
                 relativeTime: this.isRelativeTime(timestamp),
                 author: {
-                    displayName: commentData.displayName
-                }
+                    displayName: commentData.displayName.substring(0, 50)
+                },
+                adminMode: adminMode
             })
         );
 
@@ -454,7 +487,9 @@ function WidgetUi (widgetContainer, config) {
                     datetime: utils.date.toISOString(commentData.timestamp),
                     timestamp: utils.date.toTimestamp(commentData.timestamp),
                     relativeTime: this.isRelativeTime(commentData.timestamp),
-                    author: commentData.author
+                    author: {
+                        displayName: commentData.author.displayName.substring(0, 50)
+                    }
                 })
             );
 
@@ -473,6 +508,20 @@ function WidgetUi (widgetContainer, config) {
         var comment = sizzle('#commentid-'+id, widgetContainer);
         if (comment &amp;&amp; comment.length) {
             comment[0].parentNode.removeChild(comment[0]);
+        }
+    };
+
+    this.markCommentAsDeleteInProgress = function (id) {
+        var comment = sizzle('#commentid-'+id, widgetContainer);
+        if (comment &amp;&amp; comment.length) {
+            comment[0].className += &quot; deleteInProgress&quot;;
+        }
+    };
+
+    this.markCommentAsDeleteInProgressEnded = function (id) {
+        var comment = sizzle('#commentid-'+id, widgetContainer);
+        if (comment &amp;&amp; comment.length) {
+            comment[0].className = comment[0].className.replace(&quot;deleteInProgress&quot;, &quot;&quot;);
         }
     };
 
@@ -561,17 +610,10 @@ function WidgetUi (widgetContainer, config) {
 
         if (isRelative) {
             // relative time
-            var timeAgo = oDate.timeAgo(timestamp);
-            var match = timeAgo.match(/([0-9]+) ([^ ]+) ago/);
-            var timeAgoInt;
-            if (match &amp;&amp; match[1]) {
-                timeAgoInt = match[1];
-            }
-
-            if (timeAgoInt &lt;= 0) {
+            if (timestamp &gt;= new Date().getTime() - 1500) {
                 return &quot;just now&quot;;
             } else {
-                return timeAgo;
+                return oDate.timeAgo(timestamp);
             }
         } else {
             // absolute time
@@ -582,7 +624,7 @@ function WidgetUi (widgetContainer, config) {
     this.isRelativeTime = function (timestampOrDate) {
         var timestamp = utils.date.toTimestamp(timestampOrDate);
 
-        if (config.datetimeFormat.absoluteFormat === -1 ||
+        if (config.datetimeFormat.minutesUntilAbsoluteTime === -1 ||
             new Date().getTime() - timestamp &gt; config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
 
             return false;

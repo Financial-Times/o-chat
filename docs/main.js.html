@@ -118,8 +118,10 @@ module.exports = {</code></pre>
           <div class="description"><p>Adds or overrides configuration options. It also supports overriding or adding configs to dependencies.<br />For this you have to write the following:</p>
 
 <div class="highlight"><pre lang="">"dependencies": {
-      "o-ccs-client": {
-          "baseUrl": "<a href='http://test.comment-creation-service.webservices.ft.com'>http://test.comment-creation-service.webservices.ft.com</a>"
+      "o-comment-data": {
+          "ccs": {
+              "baseUrl": "<a href='http://test.comment-creation-service.webservices.ft.com'>http://test.comment-creation-service.webservices.ft.com</a>"
+          }
       }
   }
 </pre></div> </div>
@@ -133,8 +135,8 @@ module.exports = {</code></pre>
                 oCommentData.init(keyOrObject, value);
             }
         } else if (typeof keyOrObject === 'object') {
-            if (keyOrObject.hasOwnProperty('dependencies') &amp;&amp; keyOrObject.dependencies.hasOwnProperty('o-comments-data')) {
-                oCommentData.init(keyOrObject.dependencies['o-comments-data']);
+            if (keyOrObject.hasOwnProperty('dependencies') &amp;&amp; keyOrObject.dependencies.hasOwnProperty('o-comment-data')) {
+                oCommentData.init(keyOrObject.dependencies['o-comment-data']);
 
                 delete keyOrObject.dependencies;
             }

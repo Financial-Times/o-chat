@@ -142,20 +142,35 @@
     this.getWidgetEl().className += ' o-comment-client comment-order-' + this.config.order;
 
     this.collectionId = null;
-    this.datetimeFormat = {
+    var defaultDatetimeFormat = {
         minutesUntilAbsoluteTime: 20160,
         absoluteFormat: 'date'
     };
+    // merge user date preferences with the default preferences
+    if (this.config.datetimeFormat) {
+        if (typeof this.config.datetimeFormat === 'string') {
+            defaultDatetimeFormat.absoluteFormat = this.config.datetimeFormat;
+        } else if (typeof this.config.datetimeFormat === 'object') {
+            if (this.config.datetimeFormat.hasOwnProperty('minutesUntilAbsoluteTime')) {
+                defaultDatetimeFormat.minutesUntilAbsoluteTime = this.config.datetimeFormat.minutesUntilAbsoluteTime;
+            }
+
+            if (this.config.datetimeFormat.hasOwnProperty('absoluteFormat')) {
+                defaultDatetimeFormat.absoluteFormat = this.config.datetimeFormat.absoluteFormat;
+            }
+        }
+    }
+    this.config.datetimeFormat = defaultDatetimeFormat;
 
     var currentPageNumber;
     var nextPageNumber;
     var isMorePageAvailable = false;
     var nextPageFetchInProgress = false;
-
-
     var loginStatus = false;
+    var userIsAdmin = false;
 
     var commentIds = [];
+
     var hasCommentId = function (id) {
         if (Array.prototype.indexOf) {
             return commentIds.indexOf(id) !== -1 ? true : false;
@@ -169,23 +184,28 @@
         }
     };
 
-    // merge user date preferences with the default preferences
-    if (this.config.datetimeFormat) {
-        if (typeof this.config.datetimeFormat === 'string') {
-            this.datetimeFormat.absoluteFormat = this.config.datetimeFormat;
-        } else if (typeof this.config.datetimeFormat === 'object') {
-            if (this.config.datetimeFormat.hasOwnProperty('minutesUntilAbsoluteTime')) {
-                this.datetimeFormat.minutesUntilAbsoluteTime = this.config.datetimeFormat.minutesUntilAbsoluteTime;
+    var removeCommentId = function (id) {
+        var index;
+        if (Array.prototype.indexOf) {
+            index = commentIds.indexOf(id);
+            if (index !== -1) {
+                commentIds.splice(index, 1);
+                return true;
             }
-
-            if (this.config.datetimeFormat.hasOwnProperty('absoluteFormat')) {
-                this.datetimeFormat.absoluteFormat = this.config.datetimeFormat.absoluteFormat;
-            }
+            return false;
+        } else {
+             for (index = 0; index &lt; commentIds.length; index++) {
+                if (commentIds[index] === id) {
+                    commentIds.splice(index, 1);
+                    return true;
+                }
+             }
+             return false;
         }
-    }
+    };
 
     this.ui = new WidgetUi(this.getWidgetEl(), {
-        datetimeFormat: this.datetimeFormat,
+        datetimeFormat: this.config.datetimeFormat,
         orderType: self.config.order
     });
     
@@ -224,9 +244,14 @@
                 
                 callback(null, data.collection);
             } else if (data.hasOwnProperty('comment')) {
-                // comment received through streaming
-
-                newCommentReceived(data.comment);
+                // streaming info
+                if (data.comment.deleted === true) {
+                    // comment deleted
+                    commentDeleted(data.comment.commentId);
+                } else {
+                    // new comment
+                    newCommentReceived(data.comment);
+                }
             }
         });
     };
@@ -237,25 +262,6 @@
                 self.collectionId = commentsData.collectionId;
                 self.trigger('ready.widget');
 
-                // normalize the comments data
-                commentsData.comments = preprocessCommentData(commentsData.comments);
-
-                // render the widget in the DOM
-                self.ui.render(commentsData.comments);
-
-                // all fine, no errors with the rendering
-                callback();
-                self.trigger('renderComplete.widget');
-
-                // determine if there are messages to post before being logged in.
-                // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
-                if (messageQueue.hasComment(self.collectionId)) {
-                    commentUtilities.logger.log(&quot;Force flag set.&quot;);
-
-                    self.forceMode = true;
-                }
-
-
                 oCommentData.api.getAuth(function (err, authData) {
                     if (err) {
                         authData = null;
@@ -264,9 +270,33 @@
                     self.trigger('loaded.auth', authData);
 
                     if (authData) {
+                        if (authData.admin || authData.moderator) {
+                            userIsAdmin = true;
+                        }
+                    }
+
+                    // normalize the comments data
+                    commentsData.comments = preprocessCommentData(commentsData.comments);
+
+                    // render the widget in the DOM
+                    self.ui.render(commentsData.comments, userIsAdmin);
+
+                    // all fine, no errors with the rendering
+                    callback();
+                    self.trigger('renderComplete.widget');
+
+                    // determine if there are messages to post before being logged in.
+                    // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
+                    if (messageQueue.hasComment(self.collectionId)) {
+                        commentUtilities.logger.log(&quot;Force flag set.&quot;);
+
+                        self.forceMode = true;
+                    }
+
+                    if (authData) {
                         if (authData.token) {
                             // user has a token, login
-                            auth.login(authData.token, authData.displayName);
+                            auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
                         } else if (authData.pseudonym === false) {
                             // the user doesn't have pseudonym
 
@@ -315,19 +345,24 @@
             aComment.relativeTime = true;
         }
         aComment.timestamp = utils.date.toTimestamp(aComment.timestamp);
+        aComment.author.displayName = aComment.author.displayName.substring(0, 50);
 
         return aComment;
     }
     function preprocessCommentData (comments) {
-        if (comments.length) {
-            for (var index = 0; index &lt; comments.length; index++) {
-                comments[index] = processOneComment(comments[index]);
-            }
+        if (comments) {
+            if (typeof comments.length === 'number') {
+                for (var index = 0; index &lt; comments.length; index++) {
+                    comments[index] = processOneComment(comments[index]);
+                }
 
-            return comments;
-        } else {
-            return processOneComment(comments);
+                return comments;
+            } else {
+                return processOneComment(comments);
+            }
         }
+
+        return comments;
     }
 
 
@@ -339,8 +374,13 @@
                 content: commentData.content,
                 timestamp: commentData.timestamp,
                 displayName: commentData.author.displayName
-            }, (commentData.author.displayName === self.ui.getCurrentPseudonym()));
+            }, (commentData.author.displayName.substring(0, 50) === self.ui.getCurrentPseudonym()), userIsAdmin);
         }
+    }
+
+    function commentDeleted (commentId) {
+        removeCommentId(commentId);
+        self.ui.removeComment(commentId);
     }
 
 
@@ -356,7 +396,8 @@
                             userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
                                 success: function (newAuthData) {
                                     if (newAuthData &amp;&amp; newAuthData.token) {
-                                        self.ui.changeUserDetails(newAuthData.token, newAuthData.displayName);
+                                        auth.logout();
+                                        auth.login(newAuthData.token, newAuthData.displayName, newAuthData.admin || newAuthData.moderator);
                                     }
                                 }
                             });
@@ -471,7 +512,6 @@
 <p>Insert the comment in the DOM instantly, and try to post the comment with the API.<br />If successful, leave the comment in the DOM and change the ID with the real comment ID.<br />If unsuccessful, remove the comment from the DOM, repopulate the comment area with the comment and show the error message.</p> </div>
           <pre><code class="language-javascript">var postComment = function (secondStepOfTryingToPost) {
         var commentBody = self.ui.getCurrentComment();
-        var authorPseudonym = self.ui.getCurrentPseudonym();
 
         oCommentData.api.postComment({
             collectionId: self.collectionId,
@@ -493,23 +533,27 @@
                 if (postCommentResult.success === true) {
                     self.ui.emptyCommentArea();
 
-                    triggerCommentPostedEvent({
-                        commentId: postCommentResult.commentId,
-                        commentBody: postCommentResult.bodyHtml,
-                        author: authorPseudonym
-                    });
+                    oCommentData.api.getAuth(function (err, authData) {
+                        if (authData) {
+                            triggerCommentPostedEvent({
+                                commentId: postCommentResult.commentId,
+                                commentBody: postCommentResult.bodyHtml,
+                                author: authData.displayName
+                            });
 
-                    if (!hasCommentId(postCommentResult.commentId)) {
-                        commentIds.push(postCommentResult.commentId);
-                        self.ui.addComment({
-                            id: postCommentResult.commentId,
-                            content: postCommentResult.bodyHtml,
-                            timestamp: postCommentResult.createdAt,
-                            displayName: authorPseudonym
-                        }, true);
-                    }
+                            if (!hasCommentId(postCommentResult.commentId)) {
+                                commentIds.push(postCommentResult.commentId);
+                                self.ui.addComment({
+                                    id: postCommentResult.commentId,
+                                    content: postCommentResult.bodyHtml,
+                                    timestamp: postCommentResult.createdAt,
+                                    displayName: authData.displayName
+                                }, true, userIsAdmin);
+                            }
+                        }
+                    });
                 } else if (postCommentResult.invalidSession === true &amp;&amp; secondStepOfTryingToPost !== true) {
-                    loginRequiredToPostComment(true);
+                    loginRequiredToPostComment(commentBody, true);
                 } else {
                     if (postCommentResult.errorMessage) {
                         self.ui.setEditorError(postCommentResult.errorMessage);
@@ -526,21 +570,24 @@
     };
 
 
-    function loginRequiredToPostComment (secondStepOfTryingToPost) {
-        var commentBody = self.ui.getCurrentComment();
-
+    function loginRequiredToPostComment (commentBody, secondStepOfTryingToPost) {
         messageQueue.save(self.collectionId, commentBody);
-            commentUtilities.logger.log('user not actively logged in, save comment to the storage');
+        commentUtilities.logger.log('user not actively logged in, save comment to the storage');
 
-            auth.loginRequired({
-                success: function () {
-                    messageQueue.clear(self.collectionId);
-                    postComment(secondStepOfTryingToPost);
-                },
-                failure: function () {
-                    messageQueue.clear(self.collectionId);
-                }
-            });
+        var force = false;
+        if (secondStepOfTryingToPost) {
+            force = true;
+        }
+
+        auth.loginRequired({
+            success: function () {
+                messageQueue.clear(self.collectionId);
+                postComment(commentBody, secondStepOfTryingToPost);
+            },
+            failure: function () {
+                messageQueue.clear(self.collectionId);
+            }
+        }, force);
     }
 
     // the 'Submit comment' button is pressed
@@ -559,12 +606,97 @@
         oCommentData.api.getAuth(function (err, authData) {
             if (!authData || !authData.token) {
                 self.ui.makeEditable();
-                loginRequiredToPostComment();
+                loginRequiredToPostComment(commentBody);
             } else {
                 if (!loginStatus) {
-                    auth.login(authData.token, authData.displayName);
+                    auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
                 }
-                postComment();
+                postComment(commentBody);
+            }
+        });
+    });
+
+
+
+
+
+    function deleteComment (commentId, secondStepOfTryingToDelete) {
+        oCommentData.api.deleteComment({
+            collectionId: self.collectionId,
+            commentId: commentId
+        }, function (err, deleteCommentResult) {
+            if (err) {
+                userDialogs.showMessage(&quot;Delete comment&quot;, commentUi.i18n.texts.genericError);
+                commentUtilities.logger.log(&quot;delete comment call error: &quot;, err);
+                return;
+            }
+
+            if (deleteCommentResult) {
+                if (deleteCommentResult.success === true) {
+                    self.ui.removeComment(commentId);
+                    self.trigger('commentDeleted.tracking', [self.collectionId, {
+                        id: commentId
+                    }]);
+                } else if (deleteCommentResult.invalidSession === true &amp;&amp; secondStepOfTryingToDelete !== true) {
+                    loginRequiredToDeleteComment(commentId, true);
+                } else {
+                    self.ui.markCommentAsDeleteInProgressEnded(commentId);
+
+                    if (deleteCommentResult.errorMessage) {
+                        var match;
+                        var errMsg = deleteCommentResult.errorMessage;
+
+                        for (var msgToOverride in commentUi.i18n.serviceMessageOverrides) {
+                            if (commentUi.i18n.serviceMessageOverrides.hasOwnProperty(msgToOverride)) {
+                                match = deleteCommentResult.errorMessage.match(new RegExp(msgToOverride));
+                                if (match &amp;&amp; match.length) {
+                                    errMsg = commentUi.i18n.serviceMessageOverrides[msgToOverride];
+                                }
+                            }
+                        }
+                         
+                        userDialogs.showMessage(&quot;Delete comment&quot;, errMsg);
+                    } else {
+                        userDialogs.showMessage(&quot;Delete comment&quot;, commentUi.i18n.texts.genericError);
+                    }
+
+                    return;
+                }
+            } else {
+                self.ui.markCommentAsDeleteInProgressEnded(commentId);
+                
+                userDialogs.showMessage(&quot;Delete comment&quot;, commentUi.i18n.texts.genericError);
+            }
+        });
+    }
+
+    function loginRequiredToDeleteComment (commentId, secondStepOfTryingToDelete) {
+        var force = false;
+        if (secondStepOfTryingToDelete) {
+            force = true;
+        }
+
+        auth.loginRequired({
+            success: function () {
+                deleteComment(commentId, secondStepOfTryingToDelete);
+            },
+            failure: function () {
+                self.ui.markCommentAsDeleteInProgressEnded(commentId);
+            }
+        }, force);
+    }
+
+    self.ui.on('deleteComment', function (commentId) {
+        self.ui.markCommentAsDeleteInProgress(commentId);
+
+        oCommentData.api.getAuth(function (err, authData) {
+            if (!authData || !authData.token) {
+                loginRequiredToDeleteComment(commentId);
+            } else {
+                if (!loginStatus) {
+                    auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
+                }
+                deleteComment(commentId);
             }
         });
     });

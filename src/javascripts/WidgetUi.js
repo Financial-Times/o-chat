@@ -411,6 +411,20 @@ function WidgetUi (widgetContainer, config) {
         }
     };
 
+    this.markCommentAsDeleteInProgress = function (id) {
+        var comment = sizzle('#commentid-'+id, widgetContainer);
+        if (comment && comment.length) {
+            comment[0].className += " deleteInProgress";
+        }
+    };
+
+    this.markCommentAsDeleteInProgressEnded = function (id) {
+        var comment = sizzle('#commentid-'+id, widgetContainer);
+        if (comment && comment.length) {
+            comment[0].className = comment[0].className.replace("deleteInProgress", "");
+        }
+    };
+
     this.changeCommentId = function (oldId, newId) {
         var comment = document.getElementById('commentid-' + oldId);
         if (comment) {
