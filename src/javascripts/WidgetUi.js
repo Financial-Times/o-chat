@@ -372,10 +372,6 @@ function WidgetUi (widgetContainer, config) {
         var commentData;
         var commentDom;
 
-        if (config.orderType === "inverted") {
-            comments.reverse();
-        }
-
         for (var index = 0; index < comments.length; index++) {
             commentData = comments[index];
 
