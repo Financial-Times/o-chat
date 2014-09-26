@@ -265,6 +265,7 @@ This is the config object passed as a parameter populated with default configura
 ###### ui
 Instance of WidgetUi, which is linked to the widget's DOM. Any call to this instance would affect only the widget's UI.
 Methods available:
+
  - scrollToWidget: scrolls the page to the widget's position.
  - addNotAvailableMessage: adds a not available message into the container
  - clearContainer: clears the widget's container.
