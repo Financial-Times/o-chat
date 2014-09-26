@@ -162,7 +162,6 @@
     }
     this.config.datetimeFormat = defaultDatetimeFormat;
 
-    var currentPageNumber;
     var nextPageNumber;
     var isMorePageAvailable = false;
     var nextPageFetchInProgress = false;
@@ -229,17 +228,11 @@
             if (data.hasOwnProperty('collection')) {
                 // initial collection info
                 
-                if (data.collection.pageInfo) {
-                    if (typeof data.collection.pageInfo.currentPage === 'number') {
-                        currentPageNumber = data.collection.pageInfo.currentPage;
-                    }
-
-                    if (typeof data.collection.pageInfo.nextPage === 'number') {
-                        nextPageNumber = data.collection.pageInfo.nextPage;
-                        isMorePageAvailable = true;
-                    } else {
-                        isMorePageAvailable = false;
-                    }
+                if (typeof data.collection.nextPage === 'number') {
+                    nextPageNumber = data.collection.nextPage;
+                    isMorePageAvailable = true;
+                } else {
+                    isMorePageAvailable = false;
                 }
                 
                 callback(null, data.collection);
@@ -468,17 +461,11 @@
                     return;
                 }
 
-                if (data.collection.pageInfo) {
-                    if (typeof data.collection.pageInfo.currentPage === 'number') {
-                        currentPageNumber = data.collection.pageInfo.currentPage;
-                    }
-
-                    if (typeof data.collection.pageInfo.nextPage === 'number') {
-                        nextPageNumber = data.collection.pageInfo.nextPage;
-                    } else {
-                        isMorePageAvailable = false;
-                        self.ui.disableButtonPagination();
-                    }
+                if (typeof data.collection.nextPage === 'number') {
+                    nextPageNumber = data.collection.nextPage;
+                } else {
+                    isMorePageAvailable = false;
+                    self.ui.disableButtonPagination();
                 }
 
                 self.ui.addNextPageComments(preprocessCommentData(data.collection.comments));
@@ -664,7 +651,7 @@
                 }
             } else {
                 self.ui.markCommentAsDeleteInProgressEnded(commentId);
-                
+
                 userDialogs.showMessage(&quot;Delete comment&quot;, commentUi.i18n.texts.genericError);
             }
         });

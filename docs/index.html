@@ -149,7 +149,52 @@
         }
     }
 }</code></pre>
-<h2 id="api">API</h2>
+<h2 id="usual-integration-example">Usual integration example</h2>
+<p>This integration considers that you have included the script using one of the methods mentioned in the <code>How to use it</code> section.</p>
+<p>The following functions are used only for purpose of illustration, but they are not available as part of this module:</p>
+<ul>
+<li>readCookie</li>
+<li>login</li>
+</ul>
+<p>Read the user&#39;s session:</p>
+<pre><code class="lang-javascript">var userSession = readCookie(&#39;FTSession&#39;);</code></pre>
+<p>Set the user&#39;s session if one is available:</p>
+<pre><code class="lang-javascript">oCommentClient.init({
+    sessionId: userSession
+});</code></pre>
+<p>Listen on the &#39;login required&#39; event, and try to log in the user within the page:</p>
+<pre><code class="lang-javascript">oCommentClient.auth.on(&#39;loginRequired.authAction&#39;, function (delegate) {
+    // the user is not logged in, but an action was performed within the comment widget that requires the user to be logged in
+
+    login();
+    if (loggedIn) {
+        delegate.success();
+    } else if (loginRefused) {
+        delegate.failure();
+    } else if (loginFailure) {
+        delegate.failure();
+    }
+});</code></pre>
+<p><strong>Important: if the log in needs a page reload, don&#39;t call the failure function!</strong></p>
+<p>Listen the events the widget triggers (optional):</p>
+<pre><code class="lang-javascript">widgetInstance.on(commentPosted.tracking, function (siteId, eventData) {
+    // a comment is posted, do something, track it
+});</code></pre>
+<p>Create an instance of the Widget with the parameters that are available:</p>
+<pre><code class="lang-javascript">var widgetInstance = new oCommentClient.Widget({
+    elId: &#39;container-id&#39;,
+    title: document.title,
+    url: document.location.href,
+    articleId: &#39;ID-of-the-article&#39;,
+    order: &#39;inverted&#39;,
+    datetimeFormat: {
+        minutesUntilAbsoluteTime: -1,
+        absoluteFormat: &#39;MMM dd hh:mm a&#39;
+    }
+});</code></pre>
+<p>Load the widget:</p>
+<pre><code class="lang-javascript">widgetInstance.load();</code></pre>
+<h2 id="more-about-the-submodules">More about the submodules</h2>
 <h3 id="widget">Widget</h3>
 <p>Widget incorporates all aspects of a commenting Widget: handling data and creating the UI.</p>
 <h5 id="configuration">Configuration</h5>
@@ -222,7 +267,38 @@
 <h6 id="config">config</h6>
 <p>This is the config object passed as a parameter populated with default configuration items where those are not provided.</p>
 <h6 id="ui">ui</h6>
-<p>Instance of WidgetUi, which is linked to the widget&#39;s DOM. Any call to this instance would affect only the widget&#39;s UI.</p>
+<p>Instance of WidgetUi, which is linked to the widget&#39;s DOM. Any call to this instance would affect only the widget&#39;s UI.<br>Methods available:</p>
+<ul>
+<li>scrollToWidget: scrolls the page to the widget&#39;s position.</li>
+<li>addNotAvailableMessage: adds a not available message into the container</li>
+<li>clearContainer: clears the widget&#39;s container.</li>
+<li>render: renders the widget using the comments specified as a parameter. This method also registers the necessary event handlers.</li>
+<li>adaptToHeight: calling this method with a height in pixels as parameter will adapt the UI to shrink within that height. If the current UI is smaller, it will fill the space to occupy the full height, or if the current UI is taller, a scroll will appear on the comments.</li>
+<li>disableButtonPagination: hides the buttons for pagination.</li>
+<li>login: Changes the login button to the user&#39;s pseudonym. Parameters: token, pseudonym, isAdmin.</li>
+<li>logout: Changes the user&#39;s pseudonym with a login button.</li>
+<li>getCurrentPseudonym: Reads the current pseudonym from the UI. <strong>Important: this pseudonym is a truncated version (50 chars) of the original pseudonym.</strong></li>
+<li>hideSignInLink: hide the sign in link. It is useful when the user is logged in logically, but doesn&#39;t have a pseudonym.</li>
+<li>makeReadOnly: Makes the editor and submit button read only, useful when posting a commenting and waiting for the server&#39;s response.</li>
+<li>makeEditable: Changes the read only state of the editor to editable.</li>
+<li>addComment: Add new comment to the comment list. Parameters:<ul>
+<li>commentData:<ul>
+<li>id</li>
+<li>content</li>
+<li>timestamp</li>
+<li>displayName</li>
+</ul>
+</li>
+<li>ownComment: if it is the user&#39;s own comment and the comment area has scroll, the comment area is scrolled to this comment.</li>
+<li>adminMode: if true, delete button is added.</li>
+</ul>
+</li>
+<li>addNextPageComments: on pagination inserts a list of comments into the page.</li>
+<li>removeComment: removes a comment from the comment list.</li>
+<li>markCommentAsDeleteInProgress: fades out a comment while deleting is in progress.</li>
+<li>markCommentAsDeleteInProgressEnded: opposite of the action above, restores the normal look of the comment.</li>
+<li>getCurrentComment: returns the content of the editor.</li>
+</ul>
 <h6 id="collectionid">collectionId</h6>
 <p>Livefyre&#39;s collection ID for the current article. <strong>Populated only after the widget is loaded (<code>load</code> function)!</strong></p>
 <h6 id="timeout">timeout</h6>

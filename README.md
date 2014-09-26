@@ -44,7 +44,7 @@ Default is 3 (warn).
 ---
 
 ## Configuration
-<strong>The methods which are meant to configure the module are the following:</strong>
+**The methods which are meant to configure the module are the following:**
 
 ### init
 This method is responsible for changing the default configuration used by this module. Calling this method with an object will merge the default configuration with the object specified (deep merge, primitive type values of the same key will be overwritten).
@@ -96,7 +96,85 @@ In order to change to the TEST environment, use the following code (o-comment-da
 }
 ```
 
-## API
+## Usual integration example
+This integration considers that you have included the script using one of the methods mentioned in the `How to use it` section.
+
+The following functions are used only for purpose of illustration, but they are not available as part of this module:
+ - readCookie
+ - login
+
+
+Read the user's session:
+
+```javascript
+var userSession = readCookie('FTSession');
+```
+
+
+Set the user's session if one is available:
+
+```javascript
+oCommentClient.init({
+    sessionId: userSession
+});
+```
+
+
+Listen on the 'login required' event, and try to log in the user within the page:
+
+```javascript
+oCommentClient.auth.on('loginRequired.authAction', function (delegate) {
+    // the user is not logged in, but an action was performed within the comment widget that requires the user to be logged in
+
+    login();
+    if (loggedIn) {
+        delegate.success();
+    } else if (loginRefused) {
+        delegate.failure();
+    } else if (loginFailure) {
+        delegate.failure();
+    }
+});
+```
+
+**Important: if the log in needs a page reload, don't call the failure function!**
+
+
+
+Listen the events the widget triggers (optional):
+
+```javascript
+widgetInstance.on(commentPosted.tracking, function (siteId, eventData) {
+    // a comment is posted, do something, track it
+});
+```
+
+
+Create an instance of the Widget with the parameters that are available:
+
+```javascript
+var widgetInstance = new oCommentClient.Widget({
+    elId: 'container-id',
+    title: document.title,
+    url: document.location.href,
+    articleId: 'ID-of-the-article',
+    order: 'inverted',
+    datetimeFormat: {
+        minutesUntilAbsoluteTime: -1,
+        absoluteFormat: 'MMM dd hh:mm a'
+    }
+});
+```
+
+
+
+Load the widget:
+
+```javascript
+widgetInstance.load();
+```
+
+## More about the submodules
 
 ### Widget
 Widget incorporates all aspects of a commenting Widget: handling data and creating the UI.
@@ -135,7 +213,7 @@ This method can be called once (calling it multiple types will have no effect).
 Calling this method with a height in pixels as parameter will adapt the UI to shrink within that height. If the current UI is smaller, it will fill the space to occupy the full height, or if the current UI is taller, a scroll will appear on the comments.
 
 ###### init
-<strong>This method is used internally, but its behavior can be overridden if desired.</strong> This method is responsible to get the initialization data (e.g. collection info, comments), and also to initialize streaming from Livefyre (e.g. a new comment added, comment deleted).
+**This method is used internally, but its behavior can be overridden if desired.** This method is responsible to get the initialization data (e.g. collection info, comments), and also to initialize streaming from Livefyre (e.g. a new comment added, comment deleted).
 As a parameter it has a callback which should be called when the loading finished passing also the obtained data as parameter.
 
 ```javascript
@@ -147,7 +225,7 @@ widget.init(callback) {
 ```
 
 ###### loadResources
-<strong>This method is used internally, but its behavior can be overridden if desired.</strong> This method is responsible to load any third party resources that are needed to load the widget. By default this method does nothing for o-comment-client widget.
+**This method is used internally, but its behavior can be overridden if desired.** This method is responsible to load any third party resources that are needed to load the widget. By default this method does nothing for o-comment-client widget.
 A callback is passed as a parameter, which should be called when all resources are fully loaded.
 
 ```javascript
@@ -159,7 +237,7 @@ widget.loadResources(callback) {
 ```
 
 ###### render
-<strong>This method is used internally, but its behavior can be overridden if desired.</strong> This method is responsible to render the UI using the comments available as a parameter. The second parameter is a callback, which should be called when the UI is rendered.
+**This method is used internally, but its behavior can be overridden if desired.** This method is responsible to render the UI using the comments available as a parameter. The second parameter is a callback, which should be called when the UI is rendered.
 
 ```javascript
 widget.render(comments, callback) {
@@ -186,9 +264,35 @@ This is the config object passed as a parameter populated with default configura
 
 ###### ui
 Instance of WidgetUi, which is linked to the widget's DOM. Any call to this instance would affect only the widget's UI.
+Methods available:
+ - scrollToWidget: scrolls the page to the widget's position.
+ - addNotAvailableMessage: adds a not available message into the container
+ - clearContainer: clears the widget's container.
+ - render: renders the widget using the comments specified as a parameter. This method also registers the necessary event handlers.
+ - adaptToHeight: calling this method with a height in pixels as parameter will adapt the UI to shrink within that height. If the current UI is smaller, it will fill the space to occupy the full height, or if the current UI is taller, a scroll will appear on the comments.
+ - disableButtonPagination: hides the buttons for pagination.
+ - login: Changes the login button to the user's pseudonym. Parameters: token, pseudonym, isAdmin.
+ - logout: Changes the user's pseudonym with a login button.
+ - getCurrentPseudonym: Reads the current pseudonym from the UI. **Important: this pseudonym is a truncated version (50 chars) of the original pseudonym.**
+ - hideSignInLink: hide the sign in link. It is useful when the user is logged in logically, but doesn't have a pseudonym.
+ - makeReadOnly: Makes the editor and submit button read only, useful when posting a commenting and waiting for the server's response.
+ - makeEditable: Changes the read only state of the editor to editable.
+ - addComment: Add new comment to the comment list. Parameters:
+     + commentData:
+         * id
+         * content
+         * timestamp
+         * displayName
+     + ownComment: if it is the user's own comment and the comment area has scroll, the comment area is scrolled to this comment.
+     + adminMode: if true, delete button is added.
+ - addNextPageComments: on pagination inserts a list of comments into the page.
+ - removeComment: removes a comment from the comment list.
+ - markCommentAsDeleteInProgress: fades out a comment while deleting is in progress.
+ - markCommentAsDeleteInProgressEnded: opposite of the action above, restores the normal look of the comment.
+ - getCurrentComment: returns the content of the editor.
 
 ###### collectionId
-Livefyre's collection ID for the current article. <strong>Populated only after the widget is loaded (`load` function)!</strong>
+Livefyre's collection ID for the current article. **Populated only after the widget is loaded (`load` function)!**
 
 ###### timeout
 Seconds after a timeout is considered when loading the widget.

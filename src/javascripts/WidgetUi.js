@@ -222,19 +222,6 @@ function WidgetUi (widgetContainer, config) {
         }
     };
 
-    this.changeUserDetails = function (token, pseudonym, isAdmin) {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl && authEl.length) {
-            authEl[0].innerHTML = templates.loggedIn.render({
-                token: token,
-                pseudonym: pseudonym.substring(0, 50),
-                livefyreNetwork: envConfig.get().livefyre.network,
-                isAdmin: isAdmin
-            });
-        }
-    };
-
     this.getCurrentPseudonym = function () {
         var pseudonymArea = sizzle('.comment-editor-auth .comment-pseudonym', widgetContainer);
 
@@ -418,13 +405,6 @@ function WidgetUi (widgetContainer, config) {
         var comment = sizzle('#commentid-'+id, widgetContainer);
         if (comment && comment.length) {
             comment[0].className = comment[0].className.replace("deleteInProgress", "");
-        }
-    };
-
-    this.changeCommentId = function (oldId, newId) {
-        var comment = document.getElementById('commentid-' + oldId);
-        if (comment) {
-            comment.id = 'commentid-' + newId;
         }
     };
 
