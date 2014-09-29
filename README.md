@@ -7,41 +7,18 @@ Commenting widget built on top of data APIs provided by o-comment-data module. T
 ## How to use it
 There are two ways of using this module:
 
-### Standalone
-Run `grunt`, then insert the JS found in the dist folder:
+### Build tool
+Include the script provided by the build tool.
+The script exposes a global variable named `oCommentClient`.
 
-```javascript
-<script src="dist/javascripts/oCommentClient.min.js"></script>
-```
-
-The module's API can be accessed using `oCommentClient` in the global scope.
-
-### Bower and browserify
-With bower, simply require the module:
+### Bower
+As a bower dependency:
 
 ```javascript
 var oCommentClient = require('o-comment-client');
 ```
 
 The module should be built using `browserify` (with `debowerify` transform).
-
----
-
-## Logging
-Logging can be enabled for debugging purposes. It logs using the global 'console' if available (if not, nothing happens and it degrades gracefully).
-By default logging is disabled.
-
-### enableLogging
-This method enables logging of the module.
-
-### disableLogging
-This method disables logging of the module.
-
-### setLoggingLevel
-This method sets the logging level. This could be a number from 0 to 4 (where 0 is debug, 4 is error), or a string from the available methods of 'console' (debug, log, info, warn, error).
-Default is 3 (warn).
-
----
 
 ## Configuration
 **The methods which are meant to configure the module are the following:**
@@ -95,6 +72,8 @@ In order to change to the TEST environment, use the following code (o-comment-da
     }
 }
 ```
+
+---
 
 ## Usual integration example
 This integration considers that you have included the script using one of the methods mentioned in the `How to use it` section.
@@ -173,6 +152,8 @@ Load the widget:
 ```javascript
 widgetInstance.load();
 ```
+
+---
 
 ## More about the submodules
 
@@ -441,3 +422,19 @@ auth.on('loginRequired.authAction', function (delegate) {
     }
 });
 ```
+
+---
+
+## Logging
+Logging can be enabled for debugging purposes. It logs using the global 'console' if available (if not, nothing happens and it degrades gracefully).
+By default logging is disabled.
+
+### enableLogging
+This method enables logging of the module.
+
+### disableLogging
+This method disables logging of the module.
+
+### setLoggingLevel
+This method sets the logging level. This could be a number from 0 to 4 (where 0 is debug, 4 is error), or a string from the available methods of 'console' (debug, log, info, warn, error).
+Default is 3 (warn).

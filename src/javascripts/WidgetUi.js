@@ -352,7 +352,7 @@ function WidgetUi (widgetContainer, config) {
         }
     };
 
-    this.addNextPageComments = function (comments) {
+    this.addNextPageComments = function (comments, adminMode) {
         var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
         var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
 
@@ -372,7 +372,8 @@ function WidgetUi (widgetContainer, config) {
                     relativeTime: this.isRelativeTime(commentData.timestamp),
                     author: {
                         displayName: commentData.author.displayName.substring(0, 50)
-                    }
+                    },
+                    adminMode: adminMode
                 })
             );
 

@@ -145,6 +145,14 @@ var Widget = function () {
         });
     };
 
+    this.onError = function (err) {
+        self.ui.clearContainer();
+
+        if (typeof err !== 'object' || !err || err.unclassifiedArticle !== true) {
+            self.ui.addNotAvailableMessage();
+        }
+    };
+
     this.render = function (commentsData, callback) {
         if (commentsData) {
             if (commentsData.unclassifiedArticle !== true) {
@@ -364,7 +372,7 @@ var Widget = function () {
                     self.ui.disableButtonPagination();
                 }
 
-                self.ui.addNextPageComments(preprocessCommentData(data.collection.comments));
+                self.ui.addNextPageComments(preprocessCommentData(data.collection.comments), userIsAdmin);
 
                 // wait until the DOM rendering has finished
                 setTimeout(function () {
