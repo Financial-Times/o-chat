@@ -135,9 +135,30 @@
               <div class="label label-info radius ctx-type">method</div><span>this.login()</span>
             </p>
           </section>
-          <div class="description"><p>Broadcasts a login request.</p> </div>
-          <pre><code class="language-javascript">this.login = function (token, pseudonym, isAdmin) {
-        event.trigger('login.auth', [token, pseudonym, isAdmin]);
+          <div class="description"><p>Tries to obtain the user's login data. Calls a callback with the resulted status,<br />and also fires an event if the user can be logged in.</p> </div>
+          <pre><code class="language-javascript">this.login = function (callback) {
+        oCommentData.api.getAuth(function (err, authData) {
+            if (err) {
+                callback(false);
+                return;
+            }
+
+            if (authData) {
+                if (authData.token) {
+                    callback(true, authData);
+                    event.trigger('login.auth', authData);
+                } else if (authData.pseudonym === false) {
+                    // the user doesn't have pseudonym
+
+                    self.pseudonymMissing = true;
+                    callback(false, authData);
+                } else {
+                    callback(false, authData);
+                }
+            } else {
+                callback(false);
+            }
+        });
     };</code></pre>
           <section id="logout">
             <h1>logout</h1>
@@ -146,7 +167,7 @@
               <div class="label label-info radius ctx-type">method</div><span>this.logout()</span>
             </p>
           </section>
-          <div class="description"><p>Broadcasts a logout request.</p> </div>
+          <div class="description"><p>Broadcasts a logout event.</p> </div>
           <pre><code class="language-javascript">this.logout = function () {
         event.trigger('logout.auth');
     };</code></pre>

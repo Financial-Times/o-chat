@@ -249,14 +249,22 @@
         });
     };
 
+    this.onError = function (err) {
+        self.ui.clearContainer();
+
+        if (typeof err !== 'object' || !err || err.unclassifiedArticle !== true) {
+            self.ui.addNotAvailableMessage();
+        }
+    };
+
     this.render = function (commentsData, callback) {
         if (commentsData) {
             if (commentsData.unclassifiedArticle !== true) {
                 self.collectionId = commentsData.collectionId;
                 self.trigger('ready.widget');
 
-                oCommentData.api.getAuth(function (err, authData) {
-                    if (err) {
+                auth.login(function (status, authData) {
+                    if (!authData) {
                         authData = null;
                     }
 
@@ -286,34 +294,32 @@
                         self.forceMode = true;
                     }
 
-                    if (authData) {
-                        if (authData.token) {
-                            // user has a token, login
-                            auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
-                        } else if (authData.pseudonym === false) {
-                            // the user doesn't have pseudonym
+                    if (!status) {
+                        if (authData) {
+                            if (authData.pseudonym === false) {
+                                // the user is forced to finish the login process
+                                // ask to set a pseudonym instantly
+                                if (self.forceMode === true) {
+                                    auth.loginRequiredPseudonymMissing({
+                                        success: function () {},
+                                        failure: function () {
+                                            var messageInTheQueue = messageQueue.getComment(self.collectionId);
+                                            self.ui.repopulateCommentArea(messageInTheQueue);
+                                            messageQueue.clear(self.collectionId);
+                                        }
+                                    });
+                                }
 
-                            auth.pseudonymMissing = true;
-
-                            // the user is forced to finisht the login process
-                            // ask to set a pseudonym instantly
-                            if (self.forceMode === true) {
-                                auth.loginRequiredPseudonymMissing({
-                                    success: function () {},
-                                    failure: function () {
-                                        messageQueue.clear(self.collectionId);
-                                    }
-                                });
+                                self.ui.hideSignInLink();
+                            } else if (authData.serviceUp === false) {
+                                self.ui.makeReadOnly();
+                                self.ui.hideSignInLink();
                             }
-
-                            self.ui.hideSignInLink();
-                        } else if (authData.serviceUp === false) {
-                            self.ui.makeReadOnly();
-                            self.ui.hideSignInLink();
+                        } else if (self.forceMode === true) {
+                            var messageInTheQueue = messageQueue.getComment(self.collectionId);
+                            self.ui.repopulateCommentArea(messageInTheQueue);
+                            messageQueue.clear(self.collectionId);
                         }
-                    } else if (self.forceMode === true) {
-                        var messageInTheQueue = messageQueue.getComment(self.collectionId);
-                        self.ui.repopulateCommentArea(messageInTheQueue);
                     }
                 });
             } else {
@@ -377,10 +383,10 @@
     }
 
 
-    function login (token, pseudonym, isAdmin) {
+    function login (authData) {
         loginStatus = true;
 
-        self.ui.login(token, pseudonym, isAdmin);
+        self.ui.login(authData.token, authData.displayName, authData.admin || authData.moderator);
         self.ui.addSettingsLink({
             onClick: function () {
                 var showSettingsDialog = function () {
@@ -422,7 +428,9 @@
                 triggerCommentPostedEvent({
                     commentId: commentInfo.commentId,
                     commentBody: commentInfo.commentBody,
-                    author: pseudonym
+                    author: {
+                        displayName: authData.displayName
+                    }
                 });
             });
         }
@@ -468,7 +476,7 @@
                     self.ui.disableButtonPagination();
                 }
 
-                self.ui.addNextPageComments(preprocessCommentData(data.collection.comments));
+                self.ui.addNextPageComments(preprocessCommentData(data.collection.comments), userIsAdmin);
 
                 // wait until the DOM rendering has finished
                 setTimeout(function () {
@@ -483,7 +491,7 @@
             bodyHtml: commentInfo.commentBody,
             id: commentInfo.commentId,
             author: {
-                displayName: commentInfo.author
+                displayName: commentInfo.author.displayName
             }
         }]);
     }</code></pre>
@@ -525,7 +533,9 @@
                             triggerCommentPostedEvent({
                                 commentId: postCommentResult.commentId,
                                 commentBody: postCommentResult.bodyHtml,
-                                author: authData.displayName
+                                author: {
+                                    displayName: authData.displayName
+                                }
                             });
 
                             if (!hasCommentId(postCommentResult.commentId)) {

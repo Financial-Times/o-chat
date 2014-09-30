@@ -93,24 +93,12 @@
 <hr>
 <h2 id="how-to-use-it">How to use it</h2>
 <p>There are two ways of using this module:</p>
-<h3 id="standalone">Standalone</h3>
-<p>Run <code>grunt</code>, then insert the JS found in the dist folder:</p>
-<pre><code class="lang-javascript">&lt;script src=&quot;dist/javascripts/oCommentClient.min.js&quot;&gt;&lt;/script&gt;</code></pre>
-<p>The module&#39;s API can be accessed using <code>oCommentClient</code> in the global scope.</p>
-<h3 id="bower-and-browserify">Bower and browserify</h3>
-<p>With bower, simply require the module:</p>
+<h3 id="build-tool">Build tool</h3>
+<p>Include the script provided by the build tool.<br>The script exposes a global variable named <code>oCommentClient</code>.</p>
+<h3 id="bower">Bower</h3>
+<p>As a bower dependency:</p>
 <pre><code class="lang-javascript">var oCommentClient = require(&#39;o-comment-client&#39;);</code></pre>
 <p>The module should be built using <code>browserify</code> (with <code>debowerify</code> transform).</p>
-<hr>
-<h2 id="logging">Logging</h2>
-<p>Logging can be enabled for debugging purposes. It logs using the global &#39;console&#39; if available (if not, nothing happens and it degrades gracefully).<br>By default logging is disabled.</p>
-<h3 id="enablelogging">enableLogging</h3>
-<p>This method enables logging of the module.</p>
-<h3 id="disablelogging">disableLogging</h3>
-<p>This method disables logging of the module.</p>
-<h3 id="setlogginglevel">setLoggingLevel</h3>
-<p>This method sets the logging level. This could be a number from 0 to 4 (where 0 is debug, 4 is error), or a string from the available methods of &#39;console&#39; (debug, log, info, warn, error).<br>Default is 3 (warn).</p>
-<hr>
 <h2 id="configuration">Configuration</h2>
 <p><strong>The methods which are meant to configure the module are the following:</strong></p>
 <h3 id="init">init</h3>
@@ -149,6 +137,7 @@
         }
     }
 }</code></pre>
+<hr>
 <h2 id="usual-integration-example">Usual integration example</h2>
 <p>This integration considers that you have included the script using one of the methods mentioned in the <code>How to use it</code> section.</p>
 <p>The following functions are used only for purpose of illustration, but they are not available as part of this module:</p>
@@ -194,6 +183,7 @@
 });</code></pre>
 <p>Load the widget:</p>
 <pre><code class="lang-javascript">widgetInstance.load();</code></pre>
+<hr>
 <h2 id="more-about-the-submodules">More about the submodules</h2>
 <h3 id="widget">Widget</h3>
 <p>Widget incorporates all aspects of a commenting Widget: handling data and creating the UI.</p>
@@ -416,6 +406,15 @@
         delegate.failure();
     }
 });</code></pre>
+<hr>
+<h2 id="logging">Logging</h2>
+<p>Logging can be enabled for debugging purposes. It logs using the global &#39;console&#39; if available (if not, nothing happens and it degrades gracefully).<br>By default logging is disabled.</p>
+<h3 id="enablelogging">enableLogging</h3>
+<p>This method enables logging of the module.</p>
+<h3 id="disablelogging">disableLogging</h3>
+<p>This method disables logging of the module.</p>
+<h3 id="setlogginglevel">setLoggingLevel</h3>
+<p>This method sets the logging level. This could be a number from 0 to 4 (where 0 is debug, 4 is error), or a string from the available methods of &#39;console&#39; (debug, log, info, warn, error).<br>Default is 3 (warn).</p>
 </section>
         </div>
       </div>
