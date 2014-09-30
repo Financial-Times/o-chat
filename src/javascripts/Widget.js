@@ -1,6 +1,6 @@
 var auth = require('./auth.js');
 var utils = require('./utils.js');
-var messageQueue = require('./messageQueue.js');
+var MessageQueue = require('./MessageQueue.js');
 var WidgetUi = require('./WidgetUi.js');
 var commentUi = require('comment-ui');
 var oCommentData = require('o-comment-data');
@@ -38,6 +38,8 @@ var Widget = function () {
     this.getWidgetEl().className += ' o-comment-client comment-order-' + this.config.order;
 
     this.collectionId = null;
+    this.messageQueue = null;
+
     var defaultDatetimeFormat = {
         minutesUntilAbsoluteTime: 20160,
         absoluteFormat: 'date'
@@ -157,10 +159,11 @@ var Widget = function () {
         if (commentsData) {
             if (commentsData.unclassifiedArticle !== true) {
                 self.collectionId = commentsData.collectionId;
+                self.messageQueue = new MessageQueue(self.collectionId);
                 self.trigger('ready.widget');
 
-                oCommentData.api.getAuth(function (err, authData) {
-                    if (err) {
+                auth.login(function (status, authData) {
+                    if (!authData) {
                         authData = null;
                     }
 
@@ -184,40 +187,38 @@ var Widget = function () {
 
                     // determine if there are messages to post before being logged in.
                     // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
-                    if (messageQueue.hasComment(self.collectionId)) {
+                    if (self.messageQueue.hasComment()) {
                         commentUtilities.logger.log("Force flag set.");
 
                         self.forceMode = true;
                     }
 
-                    if (authData) {
-                        if (authData.token) {
-                            // user has a token, login
-                            auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
-                        } else if (authData.pseudonym === false) {
-                            // the user doesn't have pseudonym
+                    if (!status) {
+                        if (authData) {
+                            if (authData.pseudonym === false) {
+                                // the user is forced to finish the login process
+                                // ask to set a pseudonym instantly
+                                if (self.forceMode === true) {
+                                    auth.loginRequiredPseudonymMissing({
+                                        success: function () {},
+                                        failure: function () {
+                                            var messageInTheQueue = self.messageQueue.getComment();
+                                            self.ui.repopulateCommentArea(messageInTheQueue);
+                                            self.messageQueue.clear();
+                                        }
+                                    });
+                                }
 
-                            auth.pseudonymMissing = true;
-
-                            // the user is forced to finisht the login process
-                            // ask to set a pseudonym instantly
-                            if (self.forceMode === true) {
-                                auth.loginRequiredPseudonymMissing({
-                                    success: function () {},
-                                    failure: function () {
-                                        messageQueue.clear(self.collectionId);
-                                    }
-                                });
+                                self.ui.hideSignInLink();
+                            } else if (authData.serviceUp === false) {
+                                self.ui.makeReadOnly();
+                                self.ui.hideSignInLink();
                             }
-
-                            self.ui.hideSignInLink();
-                        } else if (authData.serviceUp === false) {
-                            self.ui.makeReadOnly();
-                            self.ui.hideSignInLink();
+                        } else if (self.forceMode === true) {
+                            var messageInTheQueue = self.messageQueue.getComment();
+                            self.ui.repopulateCommentArea(messageInTheQueue);
+                            self.messageQueue.clear();
                         }
-                    } else if (self.forceMode === true) {
-                        var messageInTheQueue = messageQueue.getComment(self.collectionId);
-                        self.ui.repopulateCommentArea(messageInTheQueue);
                     }
                 });
             } else {
@@ -281,10 +282,10 @@ var Widget = function () {
     }
 
 
-    function login (token, pseudonym, isAdmin) {
+    function login (authData) {
         loginStatus = true;
 
-        self.ui.login(token, pseudonym, isAdmin);
+        self.ui.login(authData.token, authData.displayName, authData.admin || authData.moderator);
         self.ui.addSettingsLink({
             onClick: function () {
                 var showSettingsDialog = function () {
@@ -320,13 +321,15 @@ var Widget = function () {
 
         // after login, post the comments from the message queue
         if (self.forceMode) {
-            messageQueue.postComment(self.collectionId, function (commentInfo) {
+            self.messageQueue.postComment(function (commentInfo) {
                 commentIds.push(commentInfo.commentId);
 
                 triggerCommentPostedEvent({
                     commentId: commentInfo.commentId,
                     commentBody: commentInfo.commentBody,
-                    author: pseudonym
+                    author: {
+                        displayName: authData.displayName
+                    }
                 });
             });
         }
@@ -387,7 +390,7 @@ var Widget = function () {
             bodyHtml: commentInfo.commentBody,
             id: commentInfo.commentId,
             author: {
-                displayName: commentInfo.author
+                displayName: commentInfo.author.displayName
             }
         }]);
     }
@@ -429,7 +432,9 @@ var Widget = function () {
                             triggerCommentPostedEvent({
                                 commentId: postCommentResult.commentId,
                                 commentBody: postCommentResult.bodyHtml,
-                                author: authData.displayName
+                                author: {
+                                    displayName: authData.displayName
+                                }
                             });
 
                             if (!hasCommentId(postCommentResult.commentId)) {
@@ -462,7 +467,7 @@ var Widget = function () {
 
 
     function loginRequiredToPostComment (commentBody, secondStepOfTryingToPost) {
-        messageQueue.save(self.collectionId, commentBody);
+        self.messageQueue.save(commentBody);
         commentUtilities.logger.log('user not actively logged in, save comment to the storage');
 
         var force = false;
@@ -472,11 +477,11 @@ var Widget = function () {
 
         auth.loginRequired({
             success: function () {
-                messageQueue.clear(self.collectionId);
+                self.messageQueue.clear();
                 postComment(commentBody, secondStepOfTryingToPost);
             },
             failure: function () {
-                messageQueue.clear(self.collectionId);
+                self.messageQueue.clear();
             }
         }, force);
     }

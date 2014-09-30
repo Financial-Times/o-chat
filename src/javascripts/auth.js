@@ -25,14 +25,37 @@ function Auth () {
     this.pseudonymMissing = false;
 
     /**
-     * Broadcasts a login request.
+     * Tries to obtain the user's login data. Calls a callback with the resulted status,
+     * and also fires an event if the user can be logged in.
+     * @param  {Function} callback Called with two parameters: loginStatus, authData.
      */
-    this.login = function (token, pseudonym, isAdmin) {
-        event.trigger('login.auth', [token, pseudonym, isAdmin]);
+    this.login = function (callback) {
+        oCommentData.api.getAuth(function (err, authData) {
+            if (err) {
+                callback(false);
+                return;
+            }
+
+            if (authData) {
+                if (authData.token) {
+                    callback(true, authData);
+                    event.trigger('login.auth', authData);
+                } else if (authData.pseudonym === false) {
+                    // the user doesn't have pseudonym
+
+                    self.pseudonymMissing = true;
+                    callback(false, authData);
+                } else {
+                    callback(false, authData);
+                }
+            } else {
+                callback(false);
+            }
+        });
     };
 
     /**
-     * Broadcasts a logout request.
+     * Broadcasts a logout event.
      */
     this.logout = function () {
         event.trigger('logout.auth');
@@ -40,8 +63,7 @@ function Auth () {
 
     /**
      * Login required and pseudonym is missing
-     * @param  {[type]} delegate [description]
-     * @return {[type]}          [description]
+     * @param  {[type]} delegate Has two functions: success and failure. The appropriate function will be called.
      */
     function loginRequiredPseudonymMissing (delegate) {
         commentUtilities.logger.log('pseudonymMissing');
@@ -68,8 +90,7 @@ function Auth () {
      * Login required, first attempt of the login process is successful.
      * If the user is still not logged in, then fail.
      * If the user has no pseudonym, ask for a pseudonym.
-     * @param  {[type]} delegate [description]
-     * @return {[type]}          [description]
+     * @param  {[type]} delegate Has two functions: success and failure. The appropriate function will be called.
      */
     function loginRequiredAfterASuccess (delegate) {
         oCommentData.api.getAuth({
@@ -90,8 +111,7 @@ function Auth () {
      * If pseudonym is missing, ask for a pseudonym.
      * If there is no known method to login the user, generate a `loginRequired.authAction` event that can be handled at the integration level.
      * If successful, check if the user is logged in.
-     * @param  {[type]} delegate [description]
-     * @return {[type]}          [description]
+     * @param  {[type]} delegate Has two functions: success and failure. The appropriate function will be called.
      */
     this.loginRequired = function (delegate, force) {
         oCommentData.api.getAuth({
@@ -121,5 +141,8 @@ function Auth () {
     };
 }
 
-
+/**
+ * Export a single instance.
+ * @type {Auth}
+ */
 module.exports = new Auth();
