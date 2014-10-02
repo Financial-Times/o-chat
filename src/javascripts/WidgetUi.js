@@ -23,7 +23,9 @@ function WidgetUi (widgetContainer, config) {
     this.on = events.on;
     this.off = events.off;
 
-    this.render = function (commentsData, adminMode) {
+    this.render = function (commentsData, adminMode, paginationEnabled) {
+        isPagination = paginationEnabled;
+
         widgetContainer.innerHTML = "";
 
         var addEditor = function () {
@@ -49,10 +51,6 @@ function WidgetUi (widgetContainer, config) {
                 )
             );
         };
-
-        if (commentsData.length === 50) {
-            isPagination = true;
-        }
 
         if (config.orderType === 'inverted') {
             commentsData.reverse();

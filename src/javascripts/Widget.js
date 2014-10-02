@@ -242,7 +242,7 @@ var Widget = function () {
                     commentsData.comments = preprocessCommentData(commentsData.comments);
 
                     // render the widget in the DOM
-                    self.ui.render(commentsData.comments, userIsAdmin);
+                    self.ui.render(commentsData.comments, userIsAdmin, isMorePageAvailable);
 
                     // all fine, no errors with the rendering
                     callback();
