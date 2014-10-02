@@ -29,7 +29,7 @@ function MessageQueue (collectionId) {
     };
 
     /**
-     * Verifies if the collectionId has a comment.
+     * Verifies if there are comments for the provided collection id.
      * @return {Boolean}
      */
     this.hasComment = function () {
@@ -40,6 +40,10 @@ function MessageQueue (collectionId) {
         return false;
     };
 
+    /**
+     * Returns the comment saved in the storage.
+     * @return {String} The saved comment.
+     */
     this.getComment = function () {
         if (this.hasComment(collectionId)) {
             return commentUtilities.storageWrapper.sessionStorage.getItem(storageBaseName + collectionId);
@@ -48,7 +52,11 @@ function MessageQueue (collectionId) {
         return undefined;
     };
 
-    var commentsQueuePosted = false;
+    /**
+     * Posts the saved comment.
+     * @param  {Function} callbackCommentPosted Called with the details of the comment:
+     * commentBody, commentId, createAt.
+     */
     this.postComment = function (callbackCommentPosted) {
         if (commentsQueuePosted) {
             return;
@@ -85,7 +93,12 @@ function MessageQueue (collectionId) {
 
         this.clear();
     };
+    var commentsQueuePosted = false;
 
+    /**
+     * Clears the storage attached to the provided collectionId.
+     * @return {[type]} [description]
+     */
     this.clear = function () {
         commentUtilities.storageWrapper.sessionStorage.removeItem(storageBaseName + collectionId);
     };

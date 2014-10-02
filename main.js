@@ -68,7 +68,7 @@ module.exports = {
 
     auth: require('./src/javascripts/auth.js'),
 
-    messageQueue: require('./src/javascripts/messageQueue.js'),
+    MessageQueue: require('./src/javascripts/MessageQueue.js'),
 
     utilities: commentUtilities,
     dataService: oCommentData,

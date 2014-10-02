@@ -76,7 +76,7 @@
             <li><a href="config.js.html">config.js</a></li>
             <li><a href="i18n.js.html">i18n.js</a></li>
             <li><a href="main.js.html">main.js</a></li>
-            <li><a href="messageQueue.js.html">messageQueue.js</a></li>
+            <li><a href="MessageQueue.js.html">MessageQueue.js</a></li>
             <li><a href="userDialogs.js.html">userDialogs.js</a></li>
             <li class="active"><a href="utils.js.html">utils.js</a></li>
             <li><a href="Widget.js.html">Widget.js</a></li>
@@ -84,21 +84,37 @@
           </ul>
           <div class="scrollspy">
             <ul class="nav nav-list bs-docs-sidenav affix-top">
-              <li><a href="#padForToISOStringShim"><i class="alert alert-info"></i><span>padForToISOStringShim</span></a>
+              <li><a href="#padTo2"><i class="alert alert-info"></i><span>padTo2</span></a>
               </li>
             </ul>
           </div>
         </div>
         <div class="span9">
-          <section id="padForToISOStringShim">
-            <h1>padForToISOStringShim</h1>
+          <section id="padTo2">
+            <h1>padTo2</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">function</div><span>padForToISOStringShim()</span>
+              <div class="label label-info radius ctx-type">function</div><span>padTo2()</span> -><span>String Number</span>
             </p>
           </section>
-          <div class="description"> </div>
-          <pre><code class="language-javascript">function padForToISOStringShim (number) {
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>number</td>
+                <td>Number</td>
+                <td>Number which should be pad to 2 characters.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Pad number to 2 characters.</p> </div>
+          <pre><code class="language-javascript">function padTo2 (number) {
     &quot;use strict&quot;;
 
     if (number &lt; 10) {
@@ -107,8 +123,25 @@
     return number;
 }
 
-var date = {
-    toTimestamp: function (timestampOrDate) {
+var date = {</code></pre>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>timestampOrDate</td>
+                <td>Date,String,Number</td>
+                <td>Can be Date, string which is compatible with the constructor of Date, or a timestamp.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Converts a date in any format to a timestamp in milliseconds.</p> </div>
+          <pre><code class="language-javascript">toTimestamp: function (timestampOrDate) {
         &quot;use strict&quot;;
         
         if (timestampOrDate instanceof Date) {
@@ -124,9 +157,25 @@ var date = {
         } else {
             return timestampOrDate;
         }
-    },
-
-    toDateObject: function (timestampOrDate) {
+    },</code></pre>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>timestampOrDate</td>
+                <td>Date,String,Number</td>
+                <td>Can be Date, string which is compatible with the constructor of Date, or a timestamp.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Converts a date in any format to a JS Date Object.</p> </div>
+          <pre><code class="language-javascript">toDateObject: function (timestampOrDate) {
         &quot;use strict&quot;;
         
         if (timestampOrDate instanceof Date) {
@@ -134,9 +183,25 @@ var date = {
         }
 
         return new Date(date.toTimestamp(timestampOrDate));
-    },
-
-    toISOString: function (timestampOrDate) {
+    },</code></pre>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>timestampOrDate</td>
+                <td>Date,String,Number</td>
+                <td>Can be Date, string which is compatible with the constructor of Date, or a timestamp.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Shim of Date.toISOString JS function for older browsers. Converts a date to the ISO format.</p> </div>
+          <pre><code class="language-javascript">toISOString: function (timestampOrDate) {
         &quot;use strict&quot;;
 
         var dateObj = date.toDateObject(timestampOrDate);
@@ -145,11 +210,11 @@ var date = {
             return dateObj.toISOString();
         } else {
             return dateObj.getUTCFullYear() +
-                '-' + padForToISOStringShim(dateObj.getUTCMonth() + 1) +
-                '-' + padForToISOStringShim(dateObj.getUTCDate()) +
-                'T' + padForToISOStringShim(dateObj.getUTCHours()) +
-                ':' + padForToISOStringShim(dateObj.getUTCMinutes()) +
-                ':' + padForToISOStringShim(dateObj.getUTCSeconds()) +
+                '-' + padTo2(dateObj.getUTCMonth() + 1) +
+                '-' + padTo2(dateObj.getUTCDate()) +
+                'T' + padTo2(dateObj.getUTCHours()) +
+                ':' + padTo2(dateObj.getUTCMinutes()) +
+                ':' + padTo2(dateObj.getUTCSeconds()) +
                 '.' + (dateObj.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
                 'Z';
         }
@@ -158,8 +223,25 @@ var date = {
 exports.date = date;
 
 
-var strings = {
-    trim: function (string) {
+var strings = {</code></pre>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>string</td>
+                <td>String</td>
+                <td>String to be trimmed.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Shim of String.trim for older browsers. Trims a string.</p> </div>
+          <pre><code class="language-javascript">trim: function (string) {
         &quot;use strict&quot;;
         
         if (String.prototype.trim) {

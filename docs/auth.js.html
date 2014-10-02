@@ -76,7 +76,7 @@
             <li><a href="config.js.html">config.js</a></li>
             <li><a href="i18n.js.html">i18n.js</a></li>
             <li><a href="main.js.html">main.js</a></li>
-            <li><a href="messageQueue.js.html">messageQueue.js</a></li>
+            <li><a href="MessageQueue.js.html">MessageQueue.js</a></li>
             <li><a href="userDialogs.js.html">userDialogs.js</a></li>
             <li><a href="utils.js.html">utils.js</a></li>
             <li><a href="Widget.js.html">Widget.js</a></li>
@@ -97,6 +97,8 @@
               <li><a href="#loginRequiredAfterASuccess"><i class="alert alert-info"></i><span>loginRequiredAfterASuccess</span></a>
               </li>
               <li><a href="#loginRequired"><i class="alert alert-info"></i><span>loginRequired</span></a>
+              </li>
+              <li><a href="#exports"><i class="alert alert-success"></i><span>exports</span></a>
               </li>
             </ul>
           </div>
@@ -135,6 +137,22 @@
               <div class="label label-info radius ctx-type">method</div><span>this.login()</span>
             </p>
           </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>callback</td>
+                <td>Function</td>
+                <td>Called with two parameters: loginStatus, authData.</td>
+              </tr>
+            </tbody>
+          </table>
           <div class="description"><p>Tries to obtain the user's login data. Calls a callback with the resulted status,<br />and also fires an event if the user can be logged in.</p> </div>
           <pre><code class="language-javascript">this.login = function (callback) {
         oCommentData.api.getAuth(function (err, authData) {
@@ -175,7 +193,7 @@
             <h1>loginRequiredPseudonymMissing</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">function</div><span>loginRequiredPseudonymMissing()</span> -><span>[type]</span>
+              <div class="label label-info radius ctx-type">function</div><span>loginRequiredPseudonymMissing()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -190,7 +208,7 @@
               <tr>
                 <td>delegate</td>
                 <td>[type]</td>
-                <td>[description]</td>
+                <td>Has two functions: success and failure. The appropriate function will be called.</td>
               </tr>
             </tbody>
           </table>
@@ -219,7 +237,7 @@
             <h1>loginRequiredAfterASuccess</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">function</div><span>loginRequiredAfterASuccess()</span> -><span>[type]</span>
+              <div class="label label-info radius ctx-type">function</div><span>loginRequiredAfterASuccess()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -234,7 +252,7 @@
               <tr>
                 <td>delegate</td>
                 <td>[type]</td>
-                <td>[description]</td>
+                <td>Has two functions: success and failure. The appropriate function will be called.</td>
               </tr>
             </tbody>
           </table>
@@ -256,7 +274,7 @@
             <h1>loginRequired</h1>
             <h5 class="subheader"></h5>
             <p>
-              <div class="label label-info radius ctx-type">method</div><span>this.loginRequired()</span> -><span>[type]</span>
+              <div class="label label-info radius ctx-type">method</div><span>this.loginRequired()</span>
             </p>
           </section>
           <table class="table table-bordered table-striped">
@@ -271,7 +289,7 @@
               <tr>
                 <td>delegate</td>
                 <td>[type]</td>
-                <td>[description]</td>
+                <td>Has two functions: success and failure. The appropriate function will be called.</td>
               </tr>
             </tbody>
           </table>
@@ -302,10 +320,16 @@
             }
         });
     };
-}
-
-
-module.exports = new Auth();</code></pre>
+}</code></pre>
+          <section id="exports">
+            <h1>exports</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-success radius ctx-type">property</div><span>module.exports</span>
+            </p>
+          </section>
+          <div class="description"><p>Export a single instance.</p> </div>
+          <pre><code class="language-javascript">module.exports = new Auth();</code></pre>
         </div>
       </div>
     </div>

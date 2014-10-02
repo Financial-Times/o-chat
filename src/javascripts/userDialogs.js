@@ -1,6 +1,10 @@
 var commentUi = require('comment-ui');
 var oCommentData = require('o-comment-data');
 
+/**
+ * Shows a dialog for setting the initial pseudonym (shown when the user doesn't have a pseudonym set).
+ * @param  {Function} callbacks Optional. Two possible fields: success and failure. Success will get the new authentication data as parameter.
+ */
 exports.showSetPseudonymDialog = function (callbacks) {
     "use strict";
 
@@ -55,6 +59,11 @@ exports.showSetPseudonymDialog = function (callbacks) {
     });
 };
 
+/**
+ * Settings dialog where the user can change its pseudonym or email preferences.
+ * @param  {Object} currentPseudonym Required. Current pseudonym of the user.
+ * @param  {Function} callbacks Optional. Two possible fields: success and failure. Success will get the new authentication data as parameter.
+ */
 exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
     "use strict";
 
@@ -106,9 +115,20 @@ exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
     });
 };
 
-
+/**
+ * Shows a dialog with a sign in link to re-login after a session expire.
+ * @param  {Object} callbacks Object with callback functions. Possible fields:
+ *                                - submit: Required. Function that is called when the form is submitted
+ *                                - close:  Optional. Function that is called when the dialog is closed.
+ */
 exports.showInactivityMessage = commentUi.userDialogs.showInactivityMessage;
 
+
+/**
+ * Shows a message to the user in a dialog (not modal).
+ * @param  {String} title   Title of the dialog
+ * @param  {String} message The content of the dialog (the message).
+ */
 exports.showMessage = function (title, message) {
     "use strict";
 

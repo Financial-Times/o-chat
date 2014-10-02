@@ -76,7 +76,7 @@
             <li><a href="config.js.html">config.js</a></li>
             <li><a href="i18n.js.html">i18n.js</a></li>
             <li><a href="main.js.html">main.js</a></li>
-            <li><a href="messageQueue.js.html">messageQueue.js</a></li>
+            <li><a href="MessageQueue.js.html">MessageQueue.js</a></li>
             <li><a href="userDialogs.js.html">userDialogs.js</a></li>
             <li><a href="utils.js.html">utils.js</a></li>
             <li class="active"><a href="Widget.js.html">Widget.js</a></li>
@@ -130,7 +130,25 @@
 <li>title: Title of the page</li>
 </ul>
 
-<h5>Optional fields:</h5> </div>
+<h5>Optional fields:</h5>
+
+<ul>
+<li>order: This specifies how the widget is built. It can have two values:
+<ul><li>normal: the commenting box is placed on top of the comment stream, and the comments are ordered as newest on top.</li>
+<li>inverted: the commenting box is placed at the bottom of the comment stream, and the comments are ordered newest on bottom.
+<br/>Default value is 'normal'.</li></ul></li>
+<li>layout: Specifies the layout style of the widget. It can have two values:
+<ul><li>normal: When placed in the main area of the page.</li>
+<li>side: When placed in the side area of the page.
+<br/>Default value is 'normal'.</li></ul></li>
+<li>datetimeFormat: How to format the timestamps. This is an object and has two fields:
+<ul><li>minutesUntilAbsoluteTime: specifies after how many minutes to switch from relative time to absolute.
+If -1 is specified, the timestamps will be in the absolute format immediately.
+By default it is set to 14 days.</li>
+<li>absoluteFormat: specifies the format with which the absolute timestamp is rendered.
+For more information about the possible values please visit:
+<a href='https://github.com/Financial-Times/o-date#o-dateformatdate-tpl'>https://github.com/Financial-Times/o-date#o-dateformatdate-tpl</a></li></ul></li>
+</ul> </div>
           <pre><code class="language-javascript">var Widget = function () {
     &quot;use strict&quot;;
 
@@ -142,6 +160,8 @@
     this.getWidgetEl().className += ' o-comment-client comment-order-' + this.config.order;
 
     this.collectionId = null;
+    this.messageQueue = null;
+
     var defaultDatetimeFormat = {
         minutesUntilAbsoluteTime: 20160,
         absoluteFormat: 'date'
@@ -261,6 +281,7 @@
         if (commentsData) {
             if (commentsData.unclassifiedArticle !== true) {
                 self.collectionId = commentsData.collectionId;
+                self.messageQueue = new MessageQueue(self.collectionId);
                 self.trigger('ready.widget');
 
                 auth.login(function (status, authData) {
@@ -288,7 +309,7 @@
 
                     // determine if there are messages to post before being logged in.
                     // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
-                    if (messageQueue.hasComment(self.collectionId)) {
+                    if (self.messageQueue.hasComment()) {
                         commentUtilities.logger.log(&quot;Force flag set.&quot;);
 
                         self.forceMode = true;
@@ -303,9 +324,9 @@
                                     auth.loginRequiredPseudonymMissing({
                                         success: function () {},
                                         failure: function () {
-                                            var messageInTheQueue = messageQueue.getComment(self.collectionId);
+                                            var messageInTheQueue = self.messageQueue.getComment();
                                             self.ui.repopulateCommentArea(messageInTheQueue);
-                                            messageQueue.clear(self.collectionId);
+                                            self.messageQueue.clear();
                                         }
                                     });
                                 }
@@ -316,9 +337,9 @@
                                 self.ui.hideSignInLink();
                             }
                         } else if (self.forceMode === true) {
-                            var messageInTheQueue = messageQueue.getComment(self.collectionId);
+                            var messageInTheQueue = self.messageQueue.getComment();
                             self.ui.repopulateCommentArea(messageInTheQueue);
-                            messageQueue.clear(self.collectionId);
+                            self.messageQueue.clear();
                         }
                     }
                 });
@@ -422,7 +443,7 @@
 
         // after login, post the comments from the message queue
         if (self.forceMode) {
-            messageQueue.postComment(self.collectionId, function (commentInfo) {
+            self.messageQueue.postComment(function (commentInfo) {
                 commentIds.push(commentInfo.commentId);
 
                 triggerCommentPostedEvent({
@@ -568,7 +589,7 @@
 
 
     function loginRequiredToPostComment (commentBody, secondStepOfTryingToPost) {
-        messageQueue.save(self.collectionId, commentBody);
+        self.messageQueue.save(commentBody);
         commentUtilities.logger.log('user not actively logged in, save comment to the storage');
 
         var force = false;
@@ -578,11 +599,11 @@
 
         auth.loginRequired({
             success: function () {
-                messageQueue.clear(self.collectionId);
+                self.messageQueue.clear();
                 postComment(commentBody, secondStepOfTryingToPost);
             },
             failure: function () {
-                messageQueue.clear(self.collectionId);
+                self.messageQueue.clear();
             }
         }, force);
     }

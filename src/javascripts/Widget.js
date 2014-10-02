@@ -24,6 +24,21 @@ var i18n = require('./i18n.js');
  *  - title: Title of the page
  *     
  * ##### Optional fields:
+ *  - order: This specifies how the widget is built. It can have two values:
+ *      + normal: the commenting box is placed on top of the comment stream, and the comments are ordered as newest on top.
+ *      + inverted: the commenting box is placed at the bottom of the comment stream, and the comments are ordered newest on bottom.
+ *      <br/>Default value is 'normal'.
+ *  - layout: Specifies the layout style of the widget. It can have two values:
+ *      + normal: When placed in the main area of the page.
+ *      + side: When placed in the side area of the page.
+ *      <br/>Default value is 'normal'.
+ *  - datetimeFormat: How to format the timestamps. This is an object and has two fields:
+ *      + minutesUntilAbsoluteTime: specifies after how many minutes to switch from relative time to absolute.
+ *      If -1 is specified, the timestamps will be in the absolute format immediately.
+ *      By default it is set to 14 days.
+ *      + absoluteFormat: specifies the format with which the absolute timestamp is rendered.
+ *      For more information about the possible values please visit:
+ *      https://github.com/Financial-Times/o-date#o-dateformatdate-tpl
  * 
  * @param {object} config Configuration object. See in the description the fields that are mandatory.
  */
@@ -35,15 +50,28 @@ var Widget = function () {
     var self = this;
 
     this.config.order = this.config.order || "normal";
+
+    // add appropriate classes to the widget container
     this.getWidgetEl().className += ' o-comment-client comment-order-' + this.config.order;
 
+    /**
+     * Collection ID.
+     * @type {Number}
+     */
     this.collectionId = null;
+
+    /**
+     * Message queue which is responsible to save comments when a page reload is needed
+     * to authenticate (when posting a comment).
+     * @type {[type]}
+     */
     this.messageQueue = null;
 
     var defaultDatetimeFormat = {
         minutesUntilAbsoluteTime: 20160,
         absoluteFormat: 'date'
     };
+
     // merge user date preferences with the default preferences
     if (this.config.datetimeFormat) {
         if (typeof this.config.datetimeFormat === 'string') {
@@ -68,6 +96,11 @@ var Widget = function () {
 
     var commentIds = [];
 
+    /**
+     * Comment IDs are saved to avoid duplicates. This returns if an ID already exists.
+     * @param  {Number}  id ID of a comment.
+     * @return {Boolean}
+     */
     var hasCommentId = function (id) {
         if (Array.prototype.indexOf) {
             return commentIds.indexOf(id) !== -1 ? true : false;
@@ -81,6 +114,11 @@ var Widget = function () {
         }
     };
 
+    /**
+     * Removes a comment ID from the list of existing comments IDs.
+     * @param  {Number} id ID of a comment.
+     * @return {Boolean}
+     */
     var removeCommentId = function (id) {
         var index;
         if (Array.prototype.indexOf) {
@@ -101,16 +139,30 @@ var Widget = function () {
         }
     };
 
+    /**
+     * Instance of WidgetUi. This can handle the UI part of the widget.
+     * @type {WidgetUi}
+     */
     this.ui = new WidgetUi(this.getWidgetEl(), {
         datetimeFormat: this.config.datetimeFormat,
         orderType: self.config.order
     });
     
-
+    /**
+     * Does nothing, but it is a mandatory override of commentUi.Widget.
+     * @param  {Function} callback
+     */
     this.loadResources = function (callback) {
         callback();
     };
 
+    /**
+     * Override of commentUi.Widget.init function.
+     * This is responsible to load the comments and the article related data.
+     * This function also initiates live stream from Livefyre.
+     * 
+     * @param  {Function} callback function(err, data), where data contains collectionId and comments. See o-comment-data.api.getComments
+     */
     this.init = function (callback) {
         oCommentData.api.getComments({
             articleId: self.config.articleId,
@@ -147,6 +199,12 @@ var Widget = function () {
         });
     };
 
+    /**
+     * Decides what happens when an error occurs. It clears the container.
+     * If the article is flagged as unclassified, no message appears.
+     * If any other error occurs, show a generic not available message.
+     * @param  {Object|String} err Error object or string.
+     */
     this.onError = function (err) {
         self.ui.clearContainer();
 
@@ -155,6 +213,11 @@ var Widget = function () {
         }
     };
 
+    /**
+     * Handle the comments, render them, and initiate the login process as well.
+     * @param  {Object}   commentsData Object with collectionId and comments.
+     * @param  {Function} callback     Called when the initial rendering completed.
+     */
     this.render = function (commentsData, callback) {
         if (commentsData) {
             if (commentsData.unclassifiedArticle !== true) {
@@ -229,13 +292,32 @@ var Widget = function () {
         }
     };
 
+    /**
+     * Calling this method with a height in pixels as parameter will adapt the UI
+     * to shrink within that height. If the current UI is smaller, it will fill the
+     * space to occupy the full height, or if the current UI is taller, a scroll
+     * will appear on the comments.
+     * 
+     * @param  {Number} height Desired height in pixels.
+     */
     this.adaptToHeight = function (height) {
         if (height) {
             self.ui.adaptToHeight(height);
         }
     };
 
-
+    /**
+     * Adds the following parameters to an existing comment object:
+     * 
+     *  - dateToShow: date in the format that is rendered in the UI
+     *  - datetime: date in ISO format
+     *  - relativeTime: if dateToShow is in relative time format
+     *  - timestamp: normalized timestamp (in milliseconds)
+     *  - author.displayName truncated to 50 characters
+     *  
+     * @param  {Object} aComment A comment object, which respects the format the oCommentData.api.getComments returns.
+     * @return {Object}
+     */
     function processOneComment (aComment) {
         aComment.dateToShow = self.ui.formatTimestamp(aComment.timestamp);
         aComment.datetime = utils.date.toISOString(aComment.timestamp);
@@ -247,6 +329,14 @@ var Widget = function () {
 
         return aComment;
     }
+
+    /**
+     * Iterates over an array of comments and applies the modifications made by the
+     * processOneComment function.
+     * 
+     * @param  {Array} comments Array with comments objects, which respects the format the oCommentData.api.getComments returns.
+     * @return {Array}
+     */
     function preprocessCommentData (comments) {
         if (comments) {
             if (typeof comments.length === 'number') {

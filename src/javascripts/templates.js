@@ -1,5 +1,9 @@
 var hogan = require('hogan');
 
+/**
+ * List of the templates available.
+ * @type {Object}
+ */
 module.exports = {
     editor: hogan.compile(requireText('../templates/editor.ms')),
     comments: hogan.compile(requireText('../templates/comments.ms')),
