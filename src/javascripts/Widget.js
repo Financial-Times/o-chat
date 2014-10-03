@@ -353,7 +353,10 @@ var Widget = function () {
         return comments;
     }
 
-
+    /**
+     * New comment received over the stream, this function handles it.
+     * @param  {Object} commentData A comment object, in Livefyre format.
+     */
     function newCommentReceived (commentData) {
         if (!hasCommentId(commentData.commentId)) {
             commentIds.push(commentData.commentId);
@@ -385,7 +388,7 @@ var Widget = function () {
                                 success: function (newAuthData) {
                                     if (newAuthData && newAuthData.token) {
                                         auth.logout();
-                                        auth.login(newAuthData.token, newAuthData.displayName, newAuthData.admin || newAuthData.moderator);
+                                        auth.login();
                                     }
                                 }
                             });
@@ -595,7 +598,7 @@ var Widget = function () {
                 loginRequiredToPostComment(commentBody);
             } else {
                 if (!loginStatus) {
-                    auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
+                    auth.login();
                 }
                 postComment(commentBody);
             }
@@ -680,7 +683,7 @@ var Widget = function () {
                 loginRequiredToDeleteComment(commentId);
             } else {
                 if (!loginStatus) {
-                    auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
+                    auth.login();
                 }
                 deleteComment(commentId);
             }

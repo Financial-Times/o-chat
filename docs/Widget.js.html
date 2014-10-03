@@ -86,6 +86,30 @@
             <ul class="nav nav-list bs-docs-sidenav affix-top">
               <li><a href="#Widget"><i class="alert alert-info"></i><span>Widget</span></a>
               </li>
+              <li><a href="#collectionId"><i class="alert alert-success"></i><span>collectionId</span></a>
+              </li>
+              <li><a href="#messageQueue"><i class="alert alert-success"></i><span>messageQueue</span></a>
+              </li>
+              <li><a href="#hasCommentId"><i class="alert alert-info"></i><span>hasCommentId</span></a>
+              </li>
+              <li><a href="#removeCommentId"><i class="alert alert-info"></i><span>removeCommentId</span></a>
+              </li>
+              <li><a href="#ui"><i class="alert alert-success"></i><span>ui</span></a>
+              </li>
+              <li><a href="#loadResources"><i class="alert alert-info"></i><span>loadResources</span></a>
+              </li>
+              <li><a href="#init"><i class="alert alert-info"></i><span>init</span></a>
+              </li>
+              <li><a href="#onError"><i class="alert alert-info"></i><span>onError</span></a>
+              </li>
+              <li><a href="#render"><i class="alert alert-info"></i><span>render</span></a>
+              </li>
+              <li><a href="#adaptToHeight"><i class="alert alert-info"></i><span>adaptToHeight</span></a>
+              </li>
+              <li><a href="#processOneComment"><i class="alert alert-info"></i><span>processOneComment</span></a>
+              </li>
+              <li><a href="#preprocessCommentData"><i class="alert alert-info"></i><span>preprocessCommentData</span></a>
+              </li>
               <li><a href="#postComment"><i class="alert alert-info"></i><span>postComment</span></a>
               </li>
             </ul>
@@ -157,15 +181,33 @@ For more information about the possible values please visit:
     var self = this;
 
     this.config.order = this.config.order || &quot;normal&quot;;
-    this.getWidgetEl().className += ' o-comment-client comment-order-' + this.config.order;
 
-    this.collectionId = null;
-    this.messageQueue = null;
+    // add appropriate classes to the widget container
+    this.getWidgetEl().className += ' o-comment-client comment-order-' + this.config.order;</code></pre>
+          <section id="collectionId">
+            <h1>collectionId</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-success radius ctx-type">property</div><span>this.collectionId</span>
+            </p>
+          </section>
+          <div class="description"><p>Collection ID.</p> </div>
+          <pre><code class="language-javascript">this.collectionId = null;</code></pre>
+          <section id="messageQueue">
+            <h1>messageQueue</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-success radius ctx-type">property</div><span>this.messageQueue</span>
+            </p>
+          </section>
+          <div class="description"><p>Message queue which is responsible to save comments when a page reload is needed<br />to authenticate (when posting a comment).</p> </div>
+          <pre><code class="language-javascript">this.messageQueue = null;
 
     var defaultDatetimeFormat = {
         minutesUntilAbsoluteTime: 20160,
         absoluteFormat: 'date'
     };
+
     // merge user date preferences with the default preferences
     if (this.config.datetimeFormat) {
         if (typeof this.config.datetimeFormat === 'string') {
@@ -188,9 +230,32 @@ For more information about the possible values please visit:
     var loginStatus = false;
     var userIsAdmin = false;
 
-    var commentIds = [];
-
-    var hasCommentId = function (id) {
+    var commentIds = [];</code></pre>
+          <section id="hasCommentId">
+            <h1>hasCommentId</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>hasCommentId()</span> -><span>Boolean</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>id</td>
+                <td>Number</td>
+                <td>ID of a comment.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Comment IDs are saved to avoid duplicates. This returns if an ID already exists.</p> </div>
+          <pre><code class="language-javascript">var hasCommentId = function (id) {
         if (Array.prototype.indexOf) {
             return commentIds.indexOf(id) !== -1 ? true : false;
         } else {
@@ -201,9 +266,32 @@ For more information about the possible values please visit:
              }
              return false;
         }
-    };
-
-    var removeCommentId = function (id) {
+    };</code></pre>
+          <section id="removeCommentId">
+            <h1>removeCommentId</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>removeCommentId()</span> -><span>Boolean</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>id</td>
+                <td>Number</td>
+                <td>ID of a comment.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Removes a comment ID from the list of existing comments IDs.</p> </div>
+          <pre><code class="language-javascript">var removeCommentId = function (id) {
         var index;
         if (Array.prototype.indexOf) {
             index = commentIds.indexOf(id);
@@ -221,19 +309,71 @@ For more information about the possible values please visit:
              }
              return false;
         }
-    };
-
-    this.ui = new WidgetUi(this.getWidgetEl(), {
+    };</code></pre>
+          <section id="ui">
+            <h1>ui</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-success radius ctx-type">property</div><span>this.ui</span>
+            </p>
+          </section>
+          <div class="description"><p>Instance of WidgetUi. This can handle the UI part of the widget.</p> </div>
+          <pre><code class="language-javascript">this.ui = new WidgetUi(this.getWidgetEl(), {
         datetimeFormat: this.config.datetimeFormat,
         orderType: self.config.order
-    });
-    
-
-    this.loadResources = function (callback) {
+    });</code></pre>
+          <section id="loadResources">
+            <h1>loadResources</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>this.loadResources()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>callback</td>
+                <td>Function</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Does nothing, but it is a mandatory override of commentUi.Widget.</p> </div>
+          <pre><code class="language-javascript">this.loadResources = function (callback) {
         callback();
-    };
-
-    this.init = function (callback) {
+    };</code></pre>
+          <section id="init">
+            <h1>init</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>this.init()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>callback</td>
+                <td>Function</td>
+                <td>function(err, data), where data contains collectionId and comments. See o-comment-data.api.getComments</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Override of commentUi.Widget.init function.<br />This is responsible to load the comments and the article related data.<br />This function also initiates live stream from Livefyre.</p> </div>
+          <pre><code class="language-javascript">this.init = function (callback) {
         oCommentData.api.getComments({
             articleId: self.config.articleId,
             url: self.config.url,
@@ -267,17 +407,68 @@ For more information about the possible values please visit:
                 }
             }
         });
-    };
-
-    this.onError = function (err) {
+    };</code></pre>
+          <section id="onError">
+            <h1>onError</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>this.onError()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>err</td>
+                <td>Object,String</td>
+                <td>Error object or string.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Decides what happens when an error occurs. It clears the container.<br />If the article is flagged as unclassified, no message appears.<br />If any other error occurs, show a generic not available message.</p> </div>
+          <pre><code class="language-javascript">this.onError = function (err) {
         self.ui.clearContainer();
 
         if (typeof err !== 'object' || !err || err.unclassifiedArticle !== true) {
             self.ui.addNotAvailableMessage();
         }
-    };
-
-    this.render = function (commentsData, callback) {
+    };</code></pre>
+          <section id="render">
+            <h1>render</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>this.render()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>commentsData</td>
+                <td>Object</td>
+                <td>Object with collectionId and comments.</td>
+              </tr>
+              <tr>
+                <td>callback</td>
+                <td>Function</td>
+                <td>Called when the initial rendering completed.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Handle the comments, render them, and initiate the login process as well.</p> </div>
+          <pre><code class="language-javascript">this.render = function (commentsData, callback) {
         if (commentsData) {
             if (commentsData.unclassifiedArticle !== true) {
                 self.collectionId = commentsData.collectionId;
@@ -301,7 +492,7 @@ For more information about the possible values please visit:
                     commentsData.comments = preprocessCommentData(commentsData.comments);
 
                     // render the widget in the DOM
-                    self.ui.render(commentsData.comments, userIsAdmin);
+                    self.ui.render(commentsData.comments, userIsAdmin, isMorePageAvailable);
 
                     // all fine, no errors with the rendering
                     callback();
@@ -349,16 +540,69 @@ For more information about the possible values please visit:
                 });
             }
         }
-    };
-
-    this.adaptToHeight = function (height) {
+    };</code></pre>
+          <section id="adaptToHeight">
+            <h1>adaptToHeight</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>this.adaptToHeight()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>height</td>
+                <td>Number</td>
+                <td>Desired height in pixels.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Calling this method with a height in pixels as parameter will adapt the UI<br />to shrink within that height. If the current UI is smaller, it will fill the<br />space to occupy the full height, or if the current UI is taller, a scroll<br />will appear on the comments.</p> </div>
+          <pre><code class="language-javascript">this.adaptToHeight = function (height) {
         if (height) {
             self.ui.adaptToHeight(height);
         }
-    };
+    };</code></pre>
+          <section id="processOneComment">
+            <h1>processOneComment</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>processOneComment()</span> -><span>Object</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>aComment</td>
+                <td>Object</td>
+                <td>A comment object, which respects the format the oCommentData.api.getComments returns.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Adds the following parameters to an existing comment object:</p>
 
-
-    function processOneComment (aComment) {
+<ul>
+<li>dateToShow: date in the format that is rendered in the UI</li>
+<li>datetime: date in ISO format</li>
+<li>relativeTime: if dateToShow is in relative time format</li>
+<li>timestamp: normalized timestamp (in milliseconds)</li>
+<li>author.displayName truncated to 50 characters</li>
+</ul> </div>
+          <pre><code class="language-javascript">function processOneComment (aComment) {
         aComment.dateToShow = self.ui.formatTimestamp(aComment.timestamp);
         aComment.datetime = utils.date.toISOString(aComment.timestamp);
         if (self.ui.isRelativeTime(aComment.timestamp)) {
@@ -368,8 +612,32 @@ For more information about the possible values please visit:
         aComment.author.displayName = aComment.author.displayName.substring(0, 50);
 
         return aComment;
-    }
-    function preprocessCommentData (comments) {
+    }</code></pre>
+          <section id="preprocessCommentData">
+            <h1>preprocessCommentData</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>preprocessCommentData()</span> -><span>Array</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>comments</td>
+                <td>Array</td>
+                <td>Array with comments objects, which respects the format the oCommentData.api.getComments returns.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>Iterates over an array of comments and applies the modifications made by the<br />processOneComment function.</p> </div>
+          <pre><code class="language-javascript">function preprocessCommentData (comments) {
         if (comments) {
             if (typeof comments.length === 'number') {
                 for (var index = 0; index &lt; comments.length; index++) {

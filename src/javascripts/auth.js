@@ -30,6 +30,10 @@ function Auth () {
      * @param  {Function} callback Called with two parameters: loginStatus, authData.
      */
     this.login = function (callback) {
+        if (typeof callback !== 'function') {
+            callback = function () {};
+        }
+
         oCommentData.api.getAuth(function (err, authData) {
             if (err) {
                 callback(false);

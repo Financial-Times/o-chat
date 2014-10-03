@@ -123,7 +123,9 @@ function WidgetUi (widgetContainer, config) {
     this.on = events.on;
     this.off = events.off;
 
-    this.render = function (commentsData, adminMode) {
+    this.render = function (commentsData, adminMode, paginationEnabled) {
+        isPagination = paginationEnabled;
+
         widgetContainer.innerHTML = &quot;&quot;;
 
         var addEditor = function () {
@@ -149,10 +151,6 @@ function WidgetUi (widgetContainer, config) {
                 )
             );
         };
-
-        if (commentsData.length === 50) {
-            isPagination = true;
-        }
 
         if (config.orderType === 'inverted') {
             commentsData.reverse();
@@ -282,11 +280,11 @@ function WidgetUi (widgetContainer, config) {
                 lastTime = new Date().getTime();
 
                 if (config.orderType === 'inverted') {
-                    if (commentArea.scrollTop &lt; 0.1 * commentArea.scrollHeight) {
+                    if (commentArea.scrollTop &lt; 0.2 * commentArea.scrollHeight) {
                         events.trigger('nextPage');
                     }
                 } else {
-                    if (commentArea.scrollTop + commentArea.clientHeight &gt; 0.9 * commentArea.scrollHeight) {
+                    if (commentArea.scrollTop + commentArea.clientHeight &gt; 0.8 * commentArea.scrollHeight) {
                         events.trigger('nextPage');
                     }
                 }
