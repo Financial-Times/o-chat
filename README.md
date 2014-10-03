@@ -370,7 +370,27 @@ This submodule is responsible for handling the user's authentication status.
 
 ##### Methods
 ###### login
-This method broadcasts a login event to every module that are listening to it.
+This method tries to obtain authentication data about the user, and decides if the user is logged in or not.
+
+Example:
+
+```javascript
+auth.login(function (loginStatus, authData) {
+    if (loginStatus) {
+        // make it visible in the UI
+        ui.login(authData.token, authData.displayName, authData.moderator);
+    } else {
+        if (authData.pseudonym === false) {
+            // the user doesn't have a pseudonym, but basically the user could be logged in.
+            ui.hideSignInLink();
+        }
+    }
+});
+```
+
+The login method should be provided with a callback parameter, which will get two paramters:
+ - loginStatus: true if the user is logged in, false if isn't.
+ - authData: authData 
 
 ###### logout
 This method broadcasts a logout event to every module that are listening to it.

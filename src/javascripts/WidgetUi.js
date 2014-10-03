@@ -180,11 +180,11 @@ function WidgetUi (widgetContainer, config) {
                 lastTime = new Date().getTime();
 
                 if (config.orderType === 'inverted') {
-                    if (commentArea.scrollTop < 0.1 * commentArea.scrollHeight) {
+                    if (commentArea.scrollTop < 0.2 * commentArea.scrollHeight) {
                         events.trigger('nextPage');
                     }
                 } else {
-                    if (commentArea.scrollTop + commentArea.clientHeight > 0.9 * commentArea.scrollHeight) {
+                    if (commentArea.scrollTop + commentArea.clientHeight > 0.8 * commentArea.scrollHeight) {
                         events.trigger('nextPage');
                     }
                 }
