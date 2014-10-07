@@ -72,6 +72,12 @@ var Widget = function () {
         absoluteFormat: 'date'
     };
 
+    if (!this.config.datetimeFormat) {
+        if (this.config.datetimeformat) {
+            this.config.datetimeFormat = this.config.datetimeformat;
+        }
+    }
+
     // merge user date preferences with the default preferences
     if (this.config.datetimeFormat) {
         if (typeof this.config.datetimeFormat === 'string') {
@@ -305,6 +311,10 @@ var Widget = function () {
             self.ui.adaptToHeight(height);
         }
     };
+
+    if (self.config.height) {
+        this.adaptToHeight(self.config.height);
+    }
 
     /**
      * Adds the following parameters to an existing comment object:
