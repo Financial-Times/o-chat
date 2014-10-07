@@ -2,6 +2,7 @@ var config = require('./src/javascripts/config.js'),
     oCommentData = require('o-comment-data'),
     defaultConfig = require('./config.json'),
     commentUtilities = require('comment-utilities');
+var Widget = require('./src/javascripts/Widget.js');
 
 /**
  * Default config (prod) is set.
@@ -12,6 +13,8 @@ config.set(defaultConfig);
  * Enable data caching.
  */
 oCommentData.init('cache', true);
+
+commentUtilities.initDomConstruct(Widget, 'o-comment-client');
 
 module.exports = {
     /**
@@ -58,7 +61,7 @@ module.exports = {
      * Widget.js exposed.
      * @type {object}
      */
-    Widget: require('./src/javascripts/Widget.js'),
+    Widget: Widget,
 
     WidgetUi: require('./src/javascripts/WidgetUi.js'),
 

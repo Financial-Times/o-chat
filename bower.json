@@ -1,6 +1,6 @@
 {
   "name": "o-comment-client",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "main": [
     "main.js",
     "main.scss"
@@ -8,8 +8,9 @@
   "dependencies": {
     "o-comment-data": "git+http://git.svc.ft.com:8080/scm/strat_p/o-comment-data.git#^0.6.0",
     "comment-ui": "git+http://git.svc.ft.com:8080/scm/strat_p/comment-ui.git#^0.2.0",
-    "comment-utilities": "git+http://git.svc.ft.com:8080/scm/strat_p/comment-utilities.git#^0.1.0",
+    "comment-utilities": "git+http://git.svc.ft.com:8080/scm/strat_p/comment-utilities.git#^0.2.0",
     "hogan": "git+https://github.com/twitter/hogan.js.git#3.0.0",
+    "sizzle": "https://github.com/jquery/sizzle.git#^2.0.0",
 
     "o-fonts": "^1.4.1",
     "o-date": "^0.4.2"
