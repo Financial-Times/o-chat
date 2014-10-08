@@ -160,7 +160,7 @@ Include this where you want the widget to load:
 <div class="o-comment-client" id="commentWidget" data-o-comment-client-autoconstruct="true" data-o-comment-client-config-title="title-of-the-article" data-o-comment-client-config-url="page-url" data-o-comment-client-config-articleId="ID-of-the-article"></div>
 ```
 
-In order to built the DOM element, follow the steps:
+In order to build the DOM element, follow the steps:
 
 1. Add class o-comment-client to the container element
 2. Add attribute `data-o-comment-client-autoconstruct="true"`
