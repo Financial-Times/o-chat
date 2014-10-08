@@ -110,6 +110,8 @@
               </li>
               <li><a href="#preprocessCommentData"><i class="alert alert-info"></i><span>preprocessCommentData</span></a>
               </li>
+              <li><a href="#newCommentReceived"><i class="alert alert-info"></i><span>newCommentReceived</span></a>
+              </li>
               <li><a href="#postComment"><i class="alert alert-info"></i><span>postComment</span></a>
               </li>
             </ul>
@@ -207,6 +209,12 @@ For more information about the possible values please visit:
         minutesUntilAbsoluteTime: 20160,
         absoluteFormat: 'date'
     };
+
+    if (!this.config.datetimeFormat) {
+        if (this.config.datetimeformat) {
+            this.config.datetimeFormat = this.config.datetimeformat;
+        }
+    }
 
     // merge user date preferences with the default preferences
     if (this.config.datetimeFormat) {
@@ -569,7 +577,11 @@ For more information about the possible values please visit:
         if (height) {
             self.ui.adaptToHeight(height);
         }
-    };</code></pre>
+    };
+
+    if (self.config.height) {
+        this.adaptToHeight(self.config.height);
+    }</code></pre>
           <section id="processOneComment">
             <h1>processOneComment</h1>
             <h5 class="subheader"></h5>
@@ -651,10 +663,32 @@ For more information about the possible values please visit:
         }
 
         return comments;
-    }
-
-
-    function newCommentReceived (commentData) {
+    }</code></pre>
+          <section id="newCommentReceived">
+            <h1>newCommentReceived</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">function</div><span>newCommentReceived()</span>
+            </p>
+          </section>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th style="width:20%">Option name</th>
+                <th style="width:20%">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>commentData</td>
+                <td>Object</td>
+                <td>A comment object, in Livefyre format.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="description"><p>New comment received over the stream, this function handles it.</p> </div>
+          <pre><code class="language-javascript">function newCommentReceived (commentData) {
         if (!hasCommentId(commentData.commentId)) {
             commentIds.push(commentData.commentId);
             self.ui.addComment({
@@ -685,7 +719,7 @@ For more information about the possible values please visit:
                                 success: function (newAuthData) {
                                     if (newAuthData &amp;&amp; newAuthData.token) {
                                         auth.logout();
-                                        auth.login(newAuthData.token, newAuthData.displayName, newAuthData.admin || newAuthData.moderator);
+                                        auth.login();
                                     }
                                 }
                             });
@@ -895,7 +929,7 @@ For more information about the possible values please visit:
                 loginRequiredToPostComment(commentBody);
             } else {
                 if (!loginStatus) {
-                    auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
+                    auth.login();
                 }
                 postComment(commentBody);
             }
@@ -980,7 +1014,7 @@ For more information about the possible values please visit:
                 loginRequiredToDeleteComment(commentId);
             } else {
                 if (!loginStatus) {
-                    auth.login(authData.token, authData.displayName, authData.admin || authData.moderator);
+                    auth.login();
                 }
                 deleteComment(commentId);
             }

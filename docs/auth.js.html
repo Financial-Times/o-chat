@@ -155,6 +155,10 @@
           </table>
           <div class="description"><p>Tries to obtain the user's login data. Calls a callback with the resulted status,<br />and also fires an event if the user can be logged in.</p> </div>
           <pre><code class="language-javascript">this.login = function (callback) {
+        if (typeof callback !== 'function') {
+            callback = function () {};
+        }
+
         oCommentData.api.getAuth(function (err, authData) {
             if (err) {
                 callback(false);

@@ -14,8 +14,6 @@ config.set(defaultConfig);
  */
 oCommentData.init('cache', true);
 
-commentUtilities.initDomConstruct(Widget, 'o-comment-client');
-
 module.exports = {
     /**
      * Adds or overrides configuration options. It also supports overriding or adding configs to dependencies.
@@ -75,6 +73,12 @@ module.exports = {
 
     utilities: commentUtilities,
     dataService: oCommentData,
+
+    initDomConstruct: function () {
+        "use strict";
+        
+        commentUtilities.initDomConstruct(Widget, 'o-comment-client');
+    },
 
     /**
      * Enables logging.

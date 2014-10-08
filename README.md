@@ -75,13 +75,15 @@ In order to change to the TEST environment, use the following code (o-comment-da
 
 ---
 
-## Usual integration example
+## Integration
 This integration considers that you have included the script using one of the methods mentioned in the `How to use it` section.
 
 The following functions are used only for purpose of illustration, but they are not available as part of this module:
  - readCookie
  - login
 
+
+**Common steps:**
 
 Read the user's session:
 
@@ -118,17 +120,7 @@ oCommentClient.auth.on('loginRequired.authAction', function (delegate) {
 
 **Important: if the log in needs a page reload, don't call the failure function!**
 
-
-
-Listen the events the widget triggers (optional):
-
-```javascript
-widgetInstance.on(commentPosted.tracking, function (siteId, eventData) {
-    // a comment is posted, do something, track it
-});
-```
-
-
+### Integration - programatically
 Create an instance of the Widget with the parameters that are available:
 
 ```javascript
@@ -145,13 +137,52 @@ var widgetInstance = new oCommentClient.Widget({
 });
 ```
 
+Listen the events the widget triggers (optional):
 
+```javascript
+widgetInstance.on(commentPosted.tracking, function (siteId, eventData) {
+    // a comment is posted, do something, track it
+});
+```
 
 Load the widget:
 
 ```javascript
 widgetInstance.load();
 ```
+
+### Integration - using DOM element
+The Widget will be created using data from a DOM element.
+
+Include this where you want the widget to load:
+
+```html
+<div class="o-comment-client" id="commentWidget" data-o-comment-client-autoconstruct="true" data-o-comment-client-config-title="title-of-the-article" data-o-comment-client-config-url="page-url" data-o-comment-client-config-articleId="ID-of-the-article"></div>
+```
+
+In order to built the DOM element, follow the steps:
+1. Add class o-comment-client to the container element
+2. Add attribute `data-o-comment-client-autoconstruct="true"`
+3. Specify a unique ID
+4. Add configuration options that you want to pass to the widget in the following form: data-o-comment-client-{configName}="{configValue}". Replace `{configName}` and `{configValue}` with the name of the configuration and value you want to pass.
+
+When done with the configuration of the widget, adding event listeners, etc.:
+
+```javascript
+oCommentClient.initDomConstruct();
+```
+
+**You don't have to wait until the document is fully loaded, call it whenever you are done with the configurations.**
+
+
+
+If you need a reference of the JavaScript object created, you can find it the following way:
+
+```javascript
+window['o-comment-client-widget-' + id]
+```
+
+where id is the ID of the DOM element (in this example `commentWidget`).
 
 ---
 

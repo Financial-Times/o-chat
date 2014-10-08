@@ -149,7 +149,7 @@ module.exports = {</code></pre>
         }
     },</code></pre>
           <div class="description"><p>Widget.js exposed.</p> </div>
-          <pre><code class="language-javascript">Widget: require('./src/javascripts/Widget.js'),
+          <pre><code class="language-javascript">Widget: Widget,
 
     WidgetUi: require('./src/javascripts/WidgetUi.js'),
 
@@ -162,7 +162,13 @@ module.exports = {</code></pre>
     MessageQueue: require('./src/javascripts/MessageQueue.js'),
 
     utilities: commentUtilities,
-    dataService: oCommentData,</code></pre>
+    dataService: oCommentData,
+
+    initDomConstruct: function () {
+        &quot;use strict&quot;;
+        
+        commentUtilities.initDomConstruct(Widget, 'o-comment-client');
+    },</code></pre>
           <div class="description"><p>Enables logging.</p> </div>
           <pre><code class="language-javascript">enableLogging: function () {
         &quot;use strict&quot;;
