@@ -330,11 +330,11 @@ var Widget = function () {
      */
     function processOneComment (aComment) {
         aComment.dateToShow = self.ui.formatTimestamp(aComment.timestamp);
-        aComment.datetime = utils.date.toISOString(aComment.timestamp);
+        aComment.datetime = commentUtilities.dateHelper.toISOString(aComment.timestamp);
         if (self.ui.isRelativeTime(aComment.timestamp)) {
             aComment.relativeTime = true;
         }
-        aComment.timestamp = utils.date.toTimestamp(aComment.timestamp);
+        aComment.timestamp = commentUtilities.dateHelper.toTimestamp(aComment.timestamp);
         aComment.author.displayName = aComment.author.displayName.substring(0, 50);
 
         return aComment;

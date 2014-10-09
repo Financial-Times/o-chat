@@ -270,7 +270,7 @@ function WidgetUi (widgetContainer, config) {
         var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
 
         // normalize timestamp if one provided or use current time
-        var timestamp = commentData.timestamp ? utils.date.toTimestamp(commentData.timestamp) : new Date();
+        var timestamp = commentData.timestamp ? commentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
 
         var scrolledToLast;
 
@@ -279,8 +279,8 @@ function WidgetUi (widgetContainer, config) {
                 commentId: commentData.id,
                 content: commentData.content,
                 dateToShow: this.formatTimestamp(timestamp),
-                datetime: utils.date.toISOString(timestamp),
-                timestamp: utils.date.toTimestamp(timestamp),
+                datetime: commentUtilities.dateHelper.toISOString(timestamp),
+                timestamp: commentUtilities.dateHelper.toTimestamp(timestamp),
                 relativeTime: this.isRelativeTime(timestamp),
                 author: {
                     displayName: commentData.displayName.substring(0, 50)
@@ -365,8 +365,8 @@ function WidgetUi (widgetContainer, config) {
                     commentId: commentData.commentId,
                     content: commentData.content,
                     dateToShow: this.formatTimestamp(commentData.timestamp),
-                    datetime: utils.date.toISOString(commentData.timestamp),
-                    timestamp: utils.date.toTimestamp(commentData.timestamp),
+                    datetime: commentUtilities.dateHelper.toISOString(commentData.timestamp),
+                    timestamp: commentUtilities.dateHelper.toTimestamp(commentData.timestamp),
                     relativeTime: this.isRelativeTime(commentData.timestamp),
                     author: {
                         displayName: commentData.author.displayName.substring(0, 50)
@@ -480,7 +480,7 @@ function WidgetUi (widgetContainer, config) {
     };
 
     this.formatTimestamp = function (timestampOrDate) {
-        var timestamp = utils.date.toTimestamp(timestampOrDate);
+        var timestamp = commentUtilities.dateHelper.toTimestamp(timestampOrDate);
         var isRelative = this.isRelativeTime(timestampOrDate);
 
         if (isRelative) {
@@ -497,7 +497,7 @@ function WidgetUi (widgetContainer, config) {
     };
 
     this.isRelativeTime = function (timestampOrDate) {
-        var timestamp = utils.date.toTimestamp(timestampOrDate);
+        var timestamp = commentUtilities.dateHelper.toTimestamp(timestampOrDate);
 
         if (config.datetimeFormat.minutesUntilAbsoluteTime === -1 ||
             new Date().getTime() - timestamp > config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
