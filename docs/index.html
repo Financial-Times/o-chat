@@ -189,7 +189,7 @@
 <p>The Widget will be created using data from a DOM element.</p>
 <p>Include this where you want the widget to load:</p>
 <pre><code class="lang-html">&lt;div class=&quot;o-comment-client&quot; id=&quot;commentWidget&quot; data-o-comment-client-autoconstruct=&quot;true&quot; data-o-comment-client-config-title=&quot;title-of-the-article&quot; data-o-comment-client-config-url=&quot;page-url&quot; data-o-comment-client-config-articleId=&quot;ID-of-the-article&quot;&gt;&lt;/div&gt;</code></pre>
-<p>In order to built the DOM element, follow the steps:</p>
+<p>In order to build the DOM element, follow the steps:</p>
 <ol>
 <li>Add class o-comment-client to the container element</li>
 <li>Add attribute <code>data-o-comment-client-autoconstruct=&quot;true&quot;</code></li>
@@ -198,7 +198,7 @@
 </ol>
 <p>When done with the configuration of the widget, adding event listeners, etc.:</p>
 <pre><code class="lang-javascript">oCommentClient.initDomConstruct();</code></pre>
-<p><strong>You don&#39;t want to wait until the document is fully loaded, call it whenever you are done with the configurations.</strong></p>
+<p><strong>You don&#39;t have to wait until the document is fully loaded, call it whenever you are done with the configurations.</strong></p>
 <p>If you need a reference of the JavaScript object created, you can find it the following way:</p>
 <pre><code class="lang-javascript">window[&#39;o-comment-client-widget-&#39; + id]</code></pre>
 <p>where id is the ID of the DOM element (in this example <code>commentWidget</code>).</p>

@@ -1,3 +1,5 @@
+"use strict";
+
 var commentUtilities = require('comment-utilities');
 var userDialogs = require('./userDialogs');
 var oCommentData = require('o-comment-data');
@@ -9,8 +11,6 @@ var oCommentData = require('o-comment-data');
  * Auth is responsible to handle login and logout requests and broadcast these requests.
  */
 function Auth () {
-    "use strict";
-
     var self = this;
 
     var event = new commentUtilities.Events();

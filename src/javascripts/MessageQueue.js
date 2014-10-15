@@ -1,3 +1,5 @@
+"use strict";
+
 var commentUtilities = require('comment-utilities');
 var oCommentData = require('o-comment-data');
 
@@ -14,8 +16,6 @@ var storageBaseName = "o-comment-client-comment-queue-";
  * @param {Number|String} collectionId Collection ID.
  */
 function MessageQueue (collectionId) {
-    "use strict";
-
     if (typeof collectionId === "undefined") {
         throw "Collection ID not provided.";
     }

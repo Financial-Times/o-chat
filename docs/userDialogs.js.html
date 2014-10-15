@@ -121,8 +121,6 @@
           </table>
           <div class="description"><p>Shows a dialog for setting the initial pseudonym (shown when the user doesn't have a pseudonym set).</p> </div>
           <pre><code class="language-javascript">exports.showSetPseudonymDialog = function (callbacks) {
-    &quot;use strict&quot;;
-
     if (!callbacks || typeof callbacks !== 'object') {
         callbacks = {};
     }
@@ -203,8 +201,6 @@
           </table>
           <div class="description"><p>Settings dialog where the user can change its pseudonym or email preferences.</p> </div>
           <pre><code class="language-javascript">exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
-    &quot;use strict&quot;;
-
     if (!callbacks || typeof callbacks !== 'object') {
         callbacks = {};
     }
@@ -307,8 +303,6 @@
           </table>
           <div class="description"><p>Shows a message to the user in a dialog (not modal).</p> </div>
           <pre><code class="language-javascript">exports.showMessage = function (title, message) {
-    &quot;use strict&quot;;
-
     var dialog = new commentUi.dialog.Dialog(message, {
         modal: false,
         title: title

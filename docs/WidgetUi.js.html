@@ -84,21 +84,14 @@
           </ul>
           <div class="scrollspy">
             <ul class="nav nav-list bs-docs-sidenav affix-top">
-              <li><a href="#commentUtilities"><i class="alert alert-success"></i><span>commentUtilities</span></a>
-              </li>
             </ul>
           </div>
         </div>
         <div class="span9">
-          <section id="commentUtilities">
-            <h1>commentUtilities</h1>
-            <h5 class="subheader"></h5>
-            <p>
-              <div class="label label-success radius ctx-type">declaration</div><span>commentUtilities</span>
-            </p>
-          </section>
           <div class="description"> </div>
-          <pre><code class="language-javascript">var commentUtilities = require('comment-utilities');
+          <pre><code class="language-javascript">&quot;use strict&quot;;
+
+var commentUtilities = require('comment-utilities');
 var commentUi = require('comment-ui');
 var sizzle = require('sizzle');
 var oDate = require('o-date');
@@ -108,8 +101,6 @@ var utils = require('./utils.js');
 var envConfig = require('./config.js');
 
 function WidgetUi (widgetContainer, config) {
-    &quot;use strict&quot;;
-
     commentUi.WidgetUi.apply(this, arguments);
 
     config.orderType = config.orderType || &quot;normal&quot;;
@@ -370,7 +361,7 @@ function WidgetUi (widgetContainer, config) {
         var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
 
         // normalize timestamp if one provided or use current time
-        var timestamp = commentData.timestamp ? utils.date.toTimestamp(commentData.timestamp) : new Date();
+        var timestamp = commentData.timestamp ? commentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
 
         var scrolledToLast;
 
@@ -379,8 +370,8 @@ function WidgetUi (widgetContainer, config) {
                 commentId: commentData.id,
                 content: commentData.content,
                 dateToShow: this.formatTimestamp(timestamp),
-                datetime: utils.date.toISOString(timestamp),
-                timestamp: utils.date.toTimestamp(timestamp),
+                datetime: commentUtilities.dateHelper.toISOString(timestamp),
+                timestamp: commentUtilities.dateHelper.toTimestamp(timestamp),
                 relativeTime: this.isRelativeTime(timestamp),
                 author: {
                     displayName: commentData.displayName.substring(0, 50)
@@ -465,8 +456,8 @@ function WidgetUi (widgetContainer, config) {
                     commentId: commentData.commentId,
                     content: commentData.content,
                     dateToShow: this.formatTimestamp(commentData.timestamp),
-                    datetime: utils.date.toISOString(commentData.timestamp),
-                    timestamp: utils.date.toTimestamp(commentData.timestamp),
+                    datetime: commentUtilities.dateHelper.toISOString(commentData.timestamp),
+                    timestamp: commentUtilities.dateHelper.toTimestamp(commentData.timestamp),
                     relativeTime: this.isRelativeTime(commentData.timestamp),
                     author: {
                         displayName: commentData.author.displayName.substring(0, 50)
@@ -580,7 +571,7 @@ function WidgetUi (widgetContainer, config) {
     };
 
     this.formatTimestamp = function (timestampOrDate) {
-        var timestamp = utils.date.toTimestamp(timestampOrDate);
+        var timestamp = commentUtilities.dateHelper.toTimestamp(timestampOrDate);
         var isRelative = this.isRelativeTime(timestampOrDate);
 
         if (isRelative) {
@@ -597,7 +588,7 @@ function WidgetUi (widgetContainer, config) {
     };
 
     this.isRelativeTime = function (timestampOrDate) {
-        var timestamp = utils.date.toTimestamp(timestampOrDate);
+        var timestamp = commentUtilities.dateHelper.toTimestamp(timestampOrDate);
 
         if (config.datetimeFormat.minutesUntilAbsoluteTime === -1 ||
             new Date().getTime() - timestamp &gt; config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
@@ -610,8 +601,6 @@ function WidgetUi (widgetContainer, config) {
 }
 
 WidgetUi.__extend = function(child) {
-    &quot;use strict&quot;;
-
     if (typeof Object.create === 'function') {
         child.prototype = Object.create(WidgetUi.prototype);
         child.prototype = Object.create(WidgetUi.prototype);

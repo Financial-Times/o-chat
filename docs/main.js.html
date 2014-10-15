@@ -126,8 +126,6 @@ module.exports = {</code></pre>
   }
 </pre></div> </div>
           <pre><code class="language-javascript">init: function (keyOrObject, value) {
-        &quot;use strict&quot;;
-
         if (typeof keyOrObject === 'string') {
             config.set(keyOrObject, value);
 
@@ -165,23 +163,18 @@ module.exports = {</code></pre>
     dataService: oCommentData,
 
     initDomConstruct: function () {
-        &quot;use strict&quot;;
-        
         commentUtilities.initDomConstruct(Widget, 'o-comment-client');
     },</code></pre>
           <div class="description"><p>Enables logging.</p> </div>
           <pre><code class="language-javascript">enableLogging: function () {
-        &quot;use strict&quot;;
         commentUtilities.logger.enable.apply(this, arguments);
     },</code></pre>
           <div class="description"><p>Disables logging.</p> </div>
           <pre><code class="language-javascript">disableLogging: function () {
-        &quot;use strict&quot;;
         commentUtilities.logger.disable.apply(this, arguments);
     },</code></pre>
           <div class="description"><p>Sets logging level.</p> </div>
           <pre><code class="language-javascript">setLoggingLevel: function () {
-        &quot;use strict&quot;;
         commentUtilities.logger.setLevel.apply(this, arguments);
     }
 };</code></pre>

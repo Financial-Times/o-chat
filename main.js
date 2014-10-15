@@ -1,3 +1,5 @@
+"use strict";
+
 var config = require('./src/javascripts/config.js'),
     oCommentData = require('o-comment-data'),
     defaultConfig = require('./config.json'),
@@ -32,8 +34,6 @@ module.exports = {
      * @param  {anything} value Optional. Should be specified only if keyOrObject is actually a key (string).
      */
     init: function (keyOrObject, value) {
-        "use strict";
-
         if (typeof keyOrObject === 'string') {
             config.set(keyOrObject, value);
 
@@ -75,8 +75,6 @@ module.exports = {
     dataService: oCommentData,
 
     initDomConstruct: function () {
-        "use strict";
-        
         commentUtilities.initDomConstruct(Widget, 'o-comment-client');
     },
 
@@ -85,7 +83,6 @@ module.exports = {
      * @type {function}
      */
     enableLogging: function () {
-        "use strict";
         commentUtilities.logger.enable.apply(this, arguments);
     },
 
@@ -94,7 +91,6 @@ module.exports = {
      * @type {function}
      */
     disableLogging: function () {
-        "use strict";
         commentUtilities.logger.disable.apply(this, arguments);
     },
 
@@ -103,7 +99,6 @@ module.exports = {
      * @type {number|string}
      */
     setLoggingLevel: function () {
-        "use strict";
         commentUtilities.logger.setLevel.apply(this, arguments);
     }
 };

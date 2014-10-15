@@ -1,5 +1,6 @@
+"use strict";
+
 var auth = require('./auth.js');
-var utils = require('./utils.js');
 var MessageQueue = require('./MessageQueue.js');
 var WidgetUi = require('./WidgetUi.js');
 var commentUi = require('comment-ui');
@@ -43,8 +44,6 @@ var i18n = require('./i18n.js');
  * @param {object} config Configuration object. See in the description the fields that are mandatory.
  */
 var Widget = function () {
-    "use strict";
-
     commentUi.Widget.apply(this, arguments);
 
     var self = this;
@@ -703,8 +702,6 @@ var Widget = function () {
 commentUi.Widget.__extend(Widget);
 
 Widget.__extend = function(child) {
-    "use strict";
-
     if (typeof Object.create === 'function') {
         child.prototype = Object.create( Widget.prototype );
         child.prototype = Object.create(Widget.prototype);

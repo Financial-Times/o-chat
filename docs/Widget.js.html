@@ -176,8 +176,6 @@ For more information about the possible values please visit:
 <a href='https://github.com/Financial-Times/o-date#o-dateformatdate-tpl'>https://github.com/Financial-Times/o-date#o-dateformatdate-tpl</a></li></ul></li>
 </ul> </div>
           <pre><code class="language-javascript">var Widget = function () {
-    &quot;use strict&quot;;
-
     commentUi.Widget.apply(this, arguments);
 
     var self = this;
@@ -616,11 +614,11 @@ For more information about the possible values please visit:
 </ul> </div>
           <pre><code class="language-javascript">function processOneComment (aComment) {
         aComment.dateToShow = self.ui.formatTimestamp(aComment.timestamp);
-        aComment.datetime = utils.date.toISOString(aComment.timestamp);
+        aComment.datetime = commentUtilities.dateHelper.toISOString(aComment.timestamp);
         if (self.ui.isRelativeTime(aComment.timestamp)) {
             aComment.relativeTime = true;
         }
-        aComment.timestamp = utils.date.toTimestamp(aComment.timestamp);
+        aComment.timestamp = commentUtilities.dateHelper.toTimestamp(aComment.timestamp);
         aComment.author.displayName = aComment.author.displayName.substring(0, 50);
 
         return aComment;
@@ -1024,8 +1022,6 @@ For more information about the possible values please visit:
 commentUi.Widget.__extend(Widget);
 
 Widget.__extend = function(child) {
-    &quot;use strict&quot;;
-
     if (typeof Object.create === 'function') {
         child.prototype = Object.create( Widget.prototype );
         child.prototype = Object.create(Widget.prototype);

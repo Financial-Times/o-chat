@@ -1,3 +1,5 @@
+"use strict";
+
 var strings = {
     /**
      * Shim of String.trim for older browsers. Trims a string.
@@ -5,8 +7,6 @@ var strings = {
      * @return {String} Trimmed string
      */
     trim: function (string) {
-        "use strict";
-        
         if (String.prototype.trim) {
             return string.trim();
         } else {

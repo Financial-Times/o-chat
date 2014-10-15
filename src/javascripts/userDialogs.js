@@ -1,3 +1,5 @@
+"use strict";
+
 var commentUi = require('comment-ui');
 var oCommentData = require('o-comment-data');
 
@@ -6,8 +8,6 @@ var oCommentData = require('o-comment-data');
  * @param  {Function} callbacks Optional. Two possible fields: success and failure. Success will get the new authentication data as parameter.
  */
 exports.showSetPseudonymDialog = function (callbacks) {
-    "use strict";
-
     if (!callbacks || typeof callbacks !== 'object') {
         callbacks = {};
     }
@@ -65,8 +65,6 @@ exports.showSetPseudonymDialog = function (callbacks) {
  * @param  {Function} callbacks Optional. Two possible fields: success and failure. Success will get the new authentication data as parameter.
  */
 exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
-    "use strict";
-
     if (!callbacks || typeof callbacks !== 'object') {
         callbacks = {};
     }
@@ -130,8 +128,6 @@ exports.showInactivityMessage = commentUi.userDialogs.showInactivityMessage;
  * @param  {String} message The content of the dialog (the message).
  */
 exports.showMessage = function (title, message) {
-    "use strict";
-
     var dialog = new commentUi.dialog.Dialog(message, {
         modal: false,
         title: title

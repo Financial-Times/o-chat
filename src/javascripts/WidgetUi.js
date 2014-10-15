@@ -1,3 +1,5 @@
+"use strict";
+
 var commentUtilities = require('comment-utilities');
 var commentUi = require('comment-ui');
 var sizzle = require('sizzle');
@@ -8,8 +10,6 @@ var utils = require('./utils.js');
 var envConfig = require('./config.js');
 
 function WidgetUi (widgetContainer, config) {
-    "use strict";
-
     commentUi.WidgetUi.apply(this, arguments);
 
     config.orderType = config.orderType || "normal";
@@ -510,8 +510,6 @@ function WidgetUi (widgetContainer, config) {
 }
 
 WidgetUi.__extend = function(child) {
-    "use strict";
-
     if (typeof Object.create === 'function') {
         child.prototype = Object.create(WidgetUi.prototype);
         child.prototype = Object.create(WidgetUi.prototype);
