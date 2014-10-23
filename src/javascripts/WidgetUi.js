@@ -396,14 +396,14 @@ function WidgetUi (widgetContainer, config) {
     this.markCommentAsDeleteInProgress = function (id) {
         var comment = sizzle('#commentid-'+id, widgetContainer);
         if (comment && comment.length) {
-            comment[0].className += " deleteInProgress";
+            comment[0].className += " comment-delete-progress";
         }
     };
 
     this.markCommentAsDeleteInProgressEnded = function (id) {
         var comment = sizzle('#commentid-'+id, widgetContainer);
         if (comment && comment.length) {
-            comment[0].className = comment[0].className.replace("deleteInProgress", "");
+            comment[0].className = comment[0].className.replace("comment-delete-progress", "");
         }
     };
 

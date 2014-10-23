@@ -41,7 +41,7 @@
                 list-style-type: none;
                 list-style-position: outside;
 
-                &.deleteInProgress {
+                &.comment-delete-progress {
                     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
                     filter: alpha(opacity=50);
                     -moz-opacity: 0.5;
