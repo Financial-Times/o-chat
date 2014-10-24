@@ -3,7 +3,7 @@
 var config = require('./src/javascripts/config.js'),
     oCommentData = require('o-comment-data'),
     defaultConfig = require('./config.json'),
-    commentUtilities = require('comment-utilities');
+    oCommentUtilities = require('o-comment-utilities');
 var Widget = require('./src/javascripts/Widget.js');
 
 /**
@@ -71,11 +71,11 @@ module.exports = {
 
     MessageQueue: require('./src/javascripts/MessageQueue.js'),
 
-    utilities: commentUtilities,
+    utilities: oCommentUtilities,
     dataService: oCommentData,
 
     initDomConstruct: function () {
-        commentUtilities.initDomConstruct(Widget, 'o-comment-client');
+        oCommentUtilities.initDomConstruct(Widget, 'o-comment-client');
     },
 
     /**
@@ -83,7 +83,7 @@ module.exports = {
      * @type {function}
      */
     enableLogging: function () {
-        commentUtilities.logger.enable.apply(this, arguments);
+        oCommentUtilities.logger.enable.apply(this, arguments);
     },
 
     /**
@@ -91,7 +91,7 @@ module.exports = {
      * @type {function}
      */
     disableLogging: function () {
-        commentUtilities.logger.disable.apply(this, arguments);
+        oCommentUtilities.logger.disable.apply(this, arguments);
     },
 
     /**
@@ -99,6 +99,6 @@ module.exports = {
      * @type {number|string}
      */
     setLoggingLevel: function () {
-        commentUtilities.logger.setLevel.apply(this, arguments);
+        oCommentUtilities.logger.setLevel.apply(this, arguments);
     }
 };

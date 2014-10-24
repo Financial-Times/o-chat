@@ -1,6 +1,6 @@
 "use strict";
 
-var commentUtilities = require('comment-utilities');
+var oCommentUtilities = require('o-comment-utilities');
 var oCommentData = require('o-comment-data');
 
 
@@ -25,7 +25,7 @@ function MessageQueue (collectionId) {
      * @param  {String} commentBody  Body of the comment
      */
     this.save = function (commentBody) {
-        commentUtilities.storageWrapper.sessionStorage.setItem(storageBaseName + collectionId, commentBody);
+        oCommentUtilities.storageWrapper.sessionStorage.setItem(storageBaseName + collectionId, commentBody);
     };
 
     /**
@@ -33,7 +33,7 @@ function MessageQueue (collectionId) {
      * @return {Boolean}
      */
     this.hasComment = function () {
-        if (commentUtilities.storageWrapper.sessionStorage.hasItem(storageBaseName + collectionId)) {
+        if (oCommentUtilities.storageWrapper.sessionStorage.hasItem(storageBaseName + collectionId)) {
             return true;
         }
 
@@ -46,7 +46,7 @@ function MessageQueue (collectionId) {
      */
     this.getComment = function () {
         if (this.hasComment(collectionId)) {
-            return commentUtilities.storageWrapper.sessionStorage.getItem(storageBaseName + collectionId);
+            return oCommentUtilities.storageWrapper.sessionStorage.getItem(storageBaseName + collectionId);
         }
 
         return undefined;
@@ -100,7 +100,7 @@ function MessageQueue (collectionId) {
      * @return {[type]} [description]
      */
     this.clear = function () {
-        commentUtilities.storageWrapper.sessionStorage.removeItem(storageBaseName + collectionId);
+        oCommentUtilities.storageWrapper.sessionStorage.removeItem(storageBaseName + collectionId);
     };
 }
 module.exports = MessageQueue;

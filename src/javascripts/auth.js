@@ -1,6 +1,6 @@
 "use strict";
 
-var commentUtilities = require('comment-utilities');
+var oCommentUtilities = require('o-comment-utilities');
 var userDialogs = require('./userDialogs');
 var oCommentData = require('o-comment-data');
 
@@ -13,7 +13,7 @@ var oCommentData = require('o-comment-data');
 function Auth () {
     var self = this;
 
-    var event = new commentUtilities.Events();
+    var event = new oCommentUtilities.Events();
 
     this.on = event.on;
     this.off = event.off;
@@ -70,7 +70,7 @@ function Auth () {
      * @param  {[type]} delegate Has two functions: success and failure. The appropriate function will be called.
      */
     function loginRequiredPseudonymMissing (delegate) {
-        commentUtilities.logger.log('pseudonymMissing');
+        oCommentUtilities.logger.log('pseudonymMissing');
 
         userDialogs.showSetPseudonymDialog({
             success: function (authData) {

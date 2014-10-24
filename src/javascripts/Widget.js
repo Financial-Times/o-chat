@@ -3,9 +3,9 @@
 var auth = require('./auth.js');
 var MessageQueue = require('./MessageQueue.js');
 var WidgetUi = require('./WidgetUi.js');
-var commentUi = require('comment-ui');
+var oCommentUi = require('o-comment-ui');
 var oCommentData = require('o-comment-data');
-var commentUtilities = require('comment-utilities');
+var oCommentUtilities = require('o-comment-utilities');
 var userDialogs = require('./userDialogs.js');
 var i18n = require('./i18n.js');
 
@@ -44,7 +44,7 @@ var i18n = require('./i18n.js');
  * @param {object} config Configuration object. See in the description the fields that are mandatory.
  */
 var Widget = function () {
-    commentUi.Widget.apply(this, arguments);
+    oCommentUi.Widget.apply(this, arguments);
 
     var self = this;
 
@@ -154,7 +154,7 @@ var Widget = function () {
     });
     
     /**
-     * Does nothing, but it is a mandatory override of commentUi.Widget.
+     * Does nothing, but it is a mandatory override of oCommentUi.Widget.
      * @param  {Function} callback
      */
     this.loadResources = function (callback) {
@@ -162,7 +162,7 @@ var Widget = function () {
     };
 
     /**
-     * Override of commentUi.Widget.init function.
+     * Override of oCommentUi.Widget.init function.
      * This is responsible to load the comments and the article related data.
      * This function also initiates live stream from Livefyre.
      * 
@@ -256,7 +256,7 @@ var Widget = function () {
                     // determine if there are messages to post before being logged in.
                     // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
                     if (self.messageQueue.hasComment()) {
-                        commentUtilities.logger.log("Force flag set.");
+                        oCommentUtilities.logger.log("Force flag set.");
 
                         self.forceMode = true;
                     }
@@ -329,11 +329,11 @@ var Widget = function () {
      */
     function processOneComment (aComment) {
         aComment.dateToShow = self.ui.formatTimestamp(aComment.timestamp);
-        aComment.datetime = commentUtilities.dateHelper.toISOString(aComment.timestamp);
+        aComment.datetime = oCommentUtilities.dateHelper.toISOString(aComment.timestamp);
         if (self.ui.isRelativeTime(aComment.timestamp)) {
             aComment.relativeTime = true;
         }
-        aComment.timestamp = commentUtilities.dateHelper.toTimestamp(aComment.timestamp);
+        aComment.timestamp = oCommentUtilities.dateHelper.toTimestamp(aComment.timestamp);
         aComment.author.displayName = aComment.author.displayName.substring(0, 50);
 
         return aComment;
@@ -455,7 +455,7 @@ var Widget = function () {
     self.ui.on('nextPage', function () {
         if (isMorePageAvailable && !nextPageFetchInProgress) {
             // fetch next page
-            commentUtilities.logger.log('fetch next page');
+            oCommentUtilities.logger.log('fetch next page');
 
             nextPageFetchInProgress = true;
             oCommentData.api.getComments({
@@ -516,14 +516,14 @@ var Widget = function () {
             self.ui.makeEditable();
 
             if (err) {
-                commentUtilities.logger.debug('postComment error:', err);
+                oCommentUtilities.logger.debug('postComment error:', err);
 
-                self.ui.setEditorError(commentUi.i18n.texts.genericError);
+                self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
 
                 return;
             }
 
-            commentUtilities.logger.debug('postComment result:', postCommentResult);
+            oCommentUtilities.logger.debug('postComment result:', postCommentResult);
 
             if (postCommentResult) {
                 if (postCommentResult.success === true) {
@@ -556,13 +556,13 @@ var Widget = function () {
                     if (postCommentResult.errorMessage) {
                         self.ui.setEditorError(postCommentResult.errorMessage);
                     } else {
-                        self.ui.setEditorError(commentUi.i18n.texts.genericError);
+                        self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
                     }
 
                     return;
                 }
             } else {
-                self.ui.setEditorError(commentUi.i18n.texts.genericError);
+                self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
             }
         });
     };
@@ -570,7 +570,7 @@ var Widget = function () {
 
     function loginRequiredToPostComment (commentBody, secondStepOfTryingToPost) {
         self.messageQueue.save(commentBody);
-        commentUtilities.logger.log('user not actively logged in, save comment to the storage');
+        oCommentUtilities.logger.log('user not actively logged in, save comment to the storage');
 
         var force = false;
         if (secondStepOfTryingToPost) {
@@ -592,7 +592,7 @@ var Widget = function () {
     self.ui.on('postComment', function () {
         var commentBody = self.ui.getCurrentComment();
 
-        commentUtilities.logger.debug('postComment', 'comment: "'+ commentBody +'"');
+        oCommentUtilities.logger.debug('postComment', 'comment: "'+ commentBody +'"');
         
         if (!commentBody) {
             self.ui.setEditorError(i18n.errors.emptyComment);
@@ -624,8 +624,8 @@ var Widget = function () {
             commentId: commentId
         }, function (err, deleteCommentResult) {
             if (err) {
-                userDialogs.showMessage("Delete comment", commentUi.i18n.texts.genericError);
-                commentUtilities.logger.log("delete comment call error: ", err);
+                userDialogs.showMessage("Delete comment", oCommentUi.i18n.texts.genericError);
+                oCommentUtilities.logger.log("delete comment call error: ", err);
                 return;
             }
 
@@ -644,18 +644,18 @@ var Widget = function () {
                         var match;
                         var errMsg = deleteCommentResult.errorMessage;
 
-                        for (var msgToOverride in commentUi.i18n.serviceMessageOverrides) {
-                            if (commentUi.i18n.serviceMessageOverrides.hasOwnProperty(msgToOverride)) {
+                        for (var msgToOverride in oCommentUi.i18n.serviceMessageOverrides) {
+                            if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(msgToOverride)) {
                                 match = deleteCommentResult.errorMessage.match(new RegExp(msgToOverride));
                                 if (match && match.length) {
-                                    errMsg = commentUi.i18n.serviceMessageOverrides[msgToOverride];
+                                    errMsg = oCommentUi.i18n.serviceMessageOverrides[msgToOverride];
                                 }
                             }
                         }
                          
                         userDialogs.showMessage("Delete comment", errMsg);
                     } else {
-                        userDialogs.showMessage("Delete comment", commentUi.i18n.texts.genericError);
+                        userDialogs.showMessage("Delete comment", oCommentUi.i18n.texts.genericError);
                     }
 
                     return;
@@ -663,7 +663,7 @@ var Widget = function () {
             } else {
                 self.ui.markCommentAsDeleteInProgressEnded(commentId);
 
-                userDialogs.showMessage("Delete comment", commentUi.i18n.texts.genericError);
+                userDialogs.showMessage("Delete comment", oCommentUi.i18n.texts.genericError);
             }
         });
     }
@@ -699,7 +699,7 @@ var Widget = function () {
         });
     });
 };
-commentUi.Widget.__extend(Widget);
+oCommentUi.Widget.__extend(Widget);
 
 Widget.__extend = function(child) {
     if (typeof Object.create === 'function') {

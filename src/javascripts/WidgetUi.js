@@ -1,7 +1,7 @@
 "use strict";
 
-var commentUtilities = require('comment-utilities');
-var commentUi = require('comment-ui');
+var oCommentUtilities = require('o-comment-utilities');
+var oCommentUi = require('o-comment-ui');
 var sizzle = require('sizzle');
 var oDate = require('o-date');
 
@@ -10,13 +10,13 @@ var utils = require('./utils.js');
 var envConfig = require('./config.js');
 
 function WidgetUi (widgetContainer, config) {
-    commentUi.WidgetUi.apply(this, arguments);
+    oCommentUi.WidgetUi.apply(this, arguments);
 
     config.orderType = config.orderType || "normal";
 
     var self = this;
 
-    var events = new commentUtilities.Events();
+    var events = new oCommentUtilities.Events();
 
     var isPagination = false;
 
@@ -30,10 +30,10 @@ function WidgetUi (widgetContainer, config) {
 
         var addEditor = function () {
             widgetContainer.appendChild(
-                commentUi.utils.toDOM(
+                oCommentUi.utils.toDOM(
                     templates.editor.render({
                         submitButtonLabel: "Submit Comment",
-                        termMessageTemplate: commentUi.templates.termsAndGuidelinesTemplate.render(),
+                        termMessageTemplate: oCommentUi.templates.termsAndGuidelinesTemplate.render(),
                         signInTemplate: templates.signIn.render()
                     })
                 )
@@ -42,7 +42,7 @@ function WidgetUi (widgetContainer, config) {
 
         var addComments = function () {
             widgetContainer.appendChild(
-                commentUi.utils.toDOM(
+                oCommentUi.utils.toDOM(
                     templates.comments.render({
                         comments: commentsData,
                         orderType: config.orderType,
@@ -63,7 +63,7 @@ function WidgetUi (widgetContainer, config) {
 
         try { oDate.init(); } catch(e) {}
 
-        commentUi.utils.addEventListener('click', sizzle('.signIn', widgetContainer)[0], function (event) {
+        oCommentUi.utils.addEventListener('click', sizzle('.signIn', widgetContainer)[0], function (event) {
             events.trigger('signIn');
 
             if (event.preventDefault) {
@@ -73,11 +73,11 @@ function WidgetUi (widgetContainer, config) {
             }
         });
 
-        commentUi.utils.addEventListener('click', sizzle('.comment-editor-submit > button')[0], function () {
+        oCommentUi.utils.addEventListener('click', sizzle('.comment-editor-submit > button')[0], function () {
             events.trigger('postComment');
         });
 
-        commentUi.utils.addEventListener('click', sizzle('.comment-editor-input')[0], function (event) {
+        oCommentUi.utils.addEventListener('click', sizzle('.comment-editor-input')[0], function (event) {
             sizzle('.comment-editor-input textarea')[0].focus();
             self.clearEditorError();
 
@@ -95,14 +95,14 @@ function WidgetUi (widgetContainer, config) {
                 sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'block';
             }
 
-            commentUi.utils.addEventListener('click', sizzle('.comment-show-more .comment-show-more-label', widgetContainer), function () {
+            oCommentUi.utils.addEventListener('click', sizzle('.comment-show-more .comment-show-more-label', widgetContainer), function () {
                 events.trigger('nextPage');
             });
         }
 
         if (adminMode) {
             var commentContainer = sizzle('.comment-comments-container', widgetContainer);
-            commentUi.utils.addEventListener('click', commentContainer, function (event) {
+            oCommentUi.utils.addEventListener('click', commentContainer, function (event) {
                 if (event.target.className === 'comment-delete') {
                     try {
                         var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
@@ -124,7 +124,7 @@ function WidgetUi (widgetContainer, config) {
         var adapt = function () {
             var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
             var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
-            var editorComputedStyle = commentUi.utils.getComputedStyle(editorContainer);
+            var editorComputedStyle = oCommentUi.utils.getComputedStyle(editorContainer);
 
             var editorContainerMarginTopValue;
             var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
@@ -191,7 +191,7 @@ function WidgetUi (widgetContainer, config) {
             }
         };
 
-        commentUi.utils.addEventListener('scroll', commentArea, paginationScrollHandler);
+        oCommentUi.utils.addEventListener('scroll', commentArea, paginationScrollHandler);
     }
 
     this.disableButtonPagination = function () {
@@ -270,17 +270,17 @@ function WidgetUi (widgetContainer, config) {
         var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
 
         // normalize timestamp if one provided or use current time
-        var timestamp = commentData.timestamp ? commentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
+        var timestamp = commentData.timestamp ? oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
 
         var scrolledToLast;
 
-        var commentDom = commentUi.utils.toDOM(
+        var commentDom = oCommentUi.utils.toDOM(
             templates.comment.render({
                 commentId: commentData.id,
                 content: commentData.content,
                 dateToShow: this.formatTimestamp(timestamp),
-                datetime: commentUtilities.dateHelper.toISOString(timestamp),
-                timestamp: commentUtilities.dateHelper.toTimestamp(timestamp),
+                datetime: oCommentUtilities.dateHelper.toISOString(timestamp),
+                timestamp: oCommentUtilities.dateHelper.toTimestamp(timestamp),
                 relativeTime: this.isRelativeTime(timestamp),
                 author: {
                     displayName: commentData.displayName.substring(0, 50)
@@ -360,13 +360,13 @@ function WidgetUi (widgetContainer, config) {
         for (var index = 0; index < comments.length; index++) {
             commentData = comments[index];
 
-            commentDom = commentUi.utils.toDOM(
+            commentDom = oCommentUi.utils.toDOM(
                 templates.comment.render({
                     commentId: commentData.commentId,
                     content: commentData.content,
                     dateToShow: this.formatTimestamp(commentData.timestamp),
-                    datetime: commentUtilities.dateHelper.toISOString(commentData.timestamp),
-                    timestamp: commentUtilities.dateHelper.toTimestamp(commentData.timestamp),
+                    datetime: oCommentUtilities.dateHelper.toISOString(commentData.timestamp),
+                    timestamp: oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp),
                     relativeTime: this.isRelativeTime(commentData.timestamp),
                     author: {
                         displayName: commentData.author.displayName.substring(0, 50)
@@ -436,7 +436,7 @@ function WidgetUi (widgetContainer, config) {
     this.addSettingsLink = function (options) {
         var loginBarContainer = sizzle('.comment-editor-auth', widgetContainer);
         if (loginBarContainer && loginBarContainer.length) {
-            loginBarContainer[0].appendChild(commentUi.utils.toDOM(commentUi.templates.commentingSettingsLink.render({
+            loginBarContainer[0].appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.commentingSettingsLink.render({
                 label: "Edit pseudonym",
                 withoutSeparator: true
             })));
@@ -446,7 +446,7 @@ function WidgetUi (widgetContainer, config) {
 
         var settingsLink = sizzle('.comment-settings-text', loginBarContainer[0]);
         if (settingsLink && settingsLink.length) {
-            commentUi.utils.addEventListener('click', settingsLink[0], function () {
+            oCommentUi.utils.addEventListener('click', settingsLink[0], function () {
                 if (options && typeof options.onClick === 'function') {
                     options.onClick();
                 }
@@ -480,7 +480,7 @@ function WidgetUi (widgetContainer, config) {
     };
 
     this.formatTimestamp = function (timestampOrDate) {
-        var timestamp = commentUtilities.dateHelper.toTimestamp(timestampOrDate);
+        var timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
         var isRelative = this.isRelativeTime(timestampOrDate);
 
         if (isRelative) {
@@ -497,7 +497,7 @@ function WidgetUi (widgetContainer, config) {
     };
 
     this.isRelativeTime = function (timestampOrDate) {
-        var timestamp = commentUtilities.dateHelper.toTimestamp(timestampOrDate);
+        var timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
 
         if (config.datetimeFormat.minutesUntilAbsoluteTime === -1 ||
             new Date().getTime() - timestamp > config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
@@ -521,6 +521,6 @@ WidgetUi.__extend = function(child) {
     }
 };
 
-commentUi.WidgetUi.__extend(WidgetUi);
+oCommentUi.WidgetUi.__extend(WidgetUi);
 
 module.exports = WidgetUi;
