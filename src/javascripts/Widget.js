@@ -230,7 +230,7 @@ var Widget = function () {
                 self.messageQueue = new MessageQueue(self.collectionId);
                 self.trigger('ready.widget');
 
-                auth.login(function (status, authData) {
+                auth.login(function (loggedIn, authData) {
                     if (!authData) {
                         authData = null;
                     }
@@ -261,7 +261,7 @@ var Widget = function () {
                         self.forceMode = true;
                     }
 
-                    if (!status) {
+                    if (!loggedIn) {
                         if (authData) {
                             if (authData.pseudonym === false) {
                                 // the user is forced to finish the login process
@@ -425,6 +425,13 @@ var Widget = function () {
         if (self.forceMode) {
             self.messageQueue.postComment(function (commentInfo) {
                 commentIds.push(commentInfo.commentId);
+
+                self.ui.addComment({
+                    id: commentInfo.commentId,
+                    content: commentInfo.commentBody,
+                    timestamp: commentInfo.createdAt,
+                    displayName: authData.displayName
+                }, true, authData.admin || authData.moderator);
 
                 triggerCommentPostedEvent({
                     commentId: commentInfo.commentId,
