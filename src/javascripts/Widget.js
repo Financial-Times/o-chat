@@ -285,7 +285,6 @@ var Widget = function () {
                         } else if (self.forceMode === true) {
                             var messageInTheQueue = self.messageQueue.getComment();
                             self.ui.repopulateCommentArea(messageInTheQueue);
-                            self.messageQueue.clear();
                         }
                     }
                 });
