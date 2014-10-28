@@ -1,0 +1,17 @@
+.o-comment-client {
+    font-size: 12px;
+
+    a {
+    	color: oColorsGetPaletteColor(blue);
+    	text-decoration: none;
+
+    	&:hover {
+    		color: oColorsGetPaletteColor(black);
+    	}
+    }
+
+    ul {
+    	padding: 0;
+    	margin: 0;
+    }
+}

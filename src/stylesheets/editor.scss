@@ -57,7 +57,7 @@
         }
 
         .comment-editor-input {
-            border: 1px solid $borderColor;
+            border: 1px solid oColorsGetPaletteColor(pink-tint2);
             padding: 5px 10px;
             background: oColorsGetPaletteColor(white);
             cursor: text;
@@ -98,7 +98,7 @@
         }
 
         .comment-editor-footer {
-            border: 1px solid $borderColor;
+            border: 1px solid oColorsGetPaletteColor(pink-tint2);
             border-top: 0;
 
             .comment-editor-submit {

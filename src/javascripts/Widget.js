@@ -423,14 +423,16 @@ var Widget = function () {
         // after login, post the comments from the message queue
         if (self.forceMode) {
             self.messageQueue.postComment(function (commentInfo) {
-                commentIds.push(commentInfo.commentId);
-
-                self.ui.addComment({
-                    id: commentInfo.commentId,
-                    content: commentInfo.commentBody,
-                    timestamp: commentInfo.createdAt,
-                    displayName: authData.displayName
-                }, true, authData.admin || authData.moderator);
+                if (!hasCommentId(commentInfo.commentId)) {
+                    commentIds.push(commentInfo.commentId);
+                    
+                    self.ui.addComment({
+                        id: commentInfo.commentId,
+                        content: commentInfo.commentBody,
+                        timestamp: commentInfo.createdAt,
+                        displayName: authData.displayName
+                    }, true, authData.admin || authData.moderator);
+                }
 
                 triggerCommentPostedEvent({
                     commentId: commentInfo.commentId,
