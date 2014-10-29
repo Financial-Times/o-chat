@@ -422,26 +422,11 @@ var Widget = function () {
 
         // after login, post the comments from the message queue
         if (self.forceMode) {
-            self.messageQueue.postComment(function (commentInfo) {
-                if (!hasCommentId(commentInfo.commentId)) {
-                    commentIds.push(commentInfo.commentId);
-                    
-                    self.ui.addComment({
-                        id: commentInfo.commentId,
-                        content: commentInfo.commentBody,
-                        timestamp: commentInfo.createdAt,
-                        displayName: authData.displayName
-                    }, true, authData.admin || authData.moderator);
-                }
+            var messageInTheQueue = self.messageQueue.getComment();
+            self.messageQueue.clear();
 
-                triggerCommentPostedEvent({
-                    commentId: commentInfo.commentId,
-                    commentBody: commentInfo.commentBody,
-                    author: {
-                        displayName: authData.displayName
-                    }
-                });
-            });
+            self.ui.repopulateCommentArea(messageInTheQueue);
+            postComment(messageInTheQueue);
         }
     }
     auth.on('login.auth', login);
@@ -514,9 +499,7 @@ var Widget = function () {
      * If unsuccessful, remove the comment from the DOM, repopulate the comment area with the comment and show the error message.
      * @return {[type]} [description]
      */
-    var postComment = function (secondStepOfTryingToPost) {
-        var commentBody = self.ui.getCurrentComment();
-
+    var postComment = function (commentBody, secondStepOfTryingToPost) {
         oCommentData.api.postComment({
             collectionId: self.collectionId,
             commentBody: commentBody

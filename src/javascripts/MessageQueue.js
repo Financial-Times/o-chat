@@ -1,7 +1,6 @@
 "use strict";
 
 var oCommentUtilities = require('o-comment-utilities');
-var oCommentData = require('o-comment-data');
 
 
 /**
@@ -51,49 +50,6 @@ function MessageQueue (collectionId) {
 
         return undefined;
     };
-
-    /**
-     * Posts the saved comment.
-     * @param  {Function} callbackCommentPosted Called with the details of the comment:
-     * commentBody, commentId, createAt.
-     */
-    this.postComment = function (callbackCommentPosted) {
-        if (commentsQueuePosted) {
-            return;
-        }
-
-        commentsQueuePosted = true;
-
-
-        var postCommentToCcs = function (commentBody) {
-            oCommentData.api.postComment({
-                collectionId: collectionId,
-                commentBody: commentBody
-            }, function (err, postCommentResult) {
-                if (err) {
-                    return;
-                }
-
-                if (postCommentResult && postCommentResult.success === true) {
-                    if (typeof callbackCommentPosted === 'function') {
-                        callbackCommentPosted({
-                            commentBody: postCommentResult.bodyHtml,
-                            commentId: postCommentResult.commentId,
-                            createdAt: postCommentResult.createdAt
-                        });
-                    }
-                }
-            });
-        };
-
-        if (this.hasComment()) {
-            var comment = this.getComment();
-            postCommentToCcs(comment);
-        }
-
-        this.clear();
-    };
-    var commentsQueuePosted = false;
 
     /**
      * Clears the storage attached to the provided collectionId.
