@@ -545,7 +545,19 @@ var Widget = function () {
                     loginRequiredToPostComment(commentBody, true);
                 } else {
                     if (postCommentResult.errorMessage) {
-                        self.ui.setEditorError(postCommentResult.errorMessage);
+                        var match;
+                        var errMsg = postCommentResult.errorMessage;
+
+                        for (var msgToOverride in oCommentUi.i18n.serviceMessageOverrides) {
+                            if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(msgToOverride)) {
+                                match = postCommentResult.errorMessage.match(new RegExp(msgToOverride));
+                                if (match && match.length) {
+                                    errMsg = oCommentUi.i18n.serviceMessageOverrides[msgToOverride];
+                                }
+                            }
+                        }
+                        
+                        self.ui.setEditorError(errMsg);
                     } else {
                         self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
                     }
