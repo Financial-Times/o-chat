@@ -421,7 +421,7 @@ var Widget = function () {
 
 
         // after login, post the comments from the message queue
-        if (self.forceMode) {
+        if (self.forceMode && self.messageQueue.hasComment()) {
             var messageInTheQueue = self.messageQueue.getComment();
             self.messageQueue.clear();
 

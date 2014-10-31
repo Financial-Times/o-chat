@@ -428,7 +428,7 @@ function WidgetUi (widgetContainer, config) {
     this.repopulateCommentArea = function (text) {
         var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
 
-        if (commentArea && commentArea.length) {
+        if (commentArea && commentArea.length && text && text.length) {
             commentArea[0].value = text.replace(/<br \/>/g, '\n');
         }
     };
