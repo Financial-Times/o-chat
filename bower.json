@@ -1,6 +1,6 @@
 {
   "name": "o-comment-client",
-  "version": "0.4.14",
+  "version": "0.4.15",
   "main": [
     "main.js",
     "main.scss"
