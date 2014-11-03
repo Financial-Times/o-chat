@@ -415,6 +415,13 @@ function WidgetUi (widgetContainer, config) {
         }
     };
 
+    this.updateComment = function (id, newContent) {
+        var commentContentEl = sizzle('#commentid-' + id + ' .comment-content', widgetContainer);
+        if (commentContentEl && commentContentEl.length) {
+            commentContentEl[0].innerHTML = newContent;
+        }
+    };
+
     this.markCommentAsDeleteInProgress = function (id) {
         var comment = sizzle('#commentid-'+id, widgetContainer);
         if (comment && comment.length) {

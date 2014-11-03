@@ -193,28 +193,7 @@ var Widget = function () {
                 callback(null, data.collection);
             } else if (data.hasOwnProperty('stream')) {
                 // streaming info
-                if (data.stream.comment) {
-                    // comment related
-                    if (data.stream.comment.deleted === true) {
-                        // comment deleted
-                        commentDeleted(data.stream.comment.commentId);
-                    } else if (data.stream.comment.commentId) {
-                        // new comment
-                        newCommentReceived(data.stream.comment);
-                    }
-                }
-
-                if (data.stream.collection) {
-                    // collection related
-                    
-                    if (data.stream.collection.hasOwnProperty('commentsEnabled')) {
-                        if (data.stream.collection.commentsEnabled === false) {
-                            self.ui.close();
-                        } else if (data.stream.collection.commentsEnabled === true) {
-                            self.ui.open();
-                        }
-                    }
-                }
+                handleStream(data.stream);
             }
         });
     };
@@ -395,6 +374,41 @@ var Widget = function () {
     function commentDeleted (commentId) {
         removeCommentId(commentId);
         self.ui.removeComment(commentId);
+    }
+
+    function commentUpdated (comment) {
+        self.ui.updateComment(comment.commentId, comment.content);
+    }
+
+
+    function handleStream (streamData) {
+        if (streamData.comment) {
+            // comment related
+            if (streamData.comment.deleted === true) {
+                // comment deleted
+                commentDeleted(streamData.comment.commentId);
+            } else if (streamData.comment.updated === true) {
+                commentUpdated({
+                    commentId: streamData.comment.commentId,
+                    content: streamData.comment.content
+                });
+            } else if (streamData.comment.commentId) {
+                // new comment
+                newCommentReceived(streamData.comment);
+            }
+        }
+
+        if (streamData.collection) {
+            // collection related
+            
+            if (streamData.collection.hasOwnProperty('commentsEnabled')) {
+                if (streamData.collection.commentsEnabled === false) {
+                    self.ui.close();
+                } else if (streamData.collection.commentsEnabled === true) {
+                    self.ui.open();
+                }
+            }
+        }
     }
 
 
