@@ -196,7 +196,7 @@ var Widget = function () {
                 if (data.comment.deleted === true) {
                     // comment deleted
                     commentDeleted(data.comment.commentId);
-                } else {
+                } else if (data.comment.commentId) {
                     // new comment
                     newCommentReceived(data.comment);
                 }
