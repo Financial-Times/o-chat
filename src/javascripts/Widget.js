@@ -191,14 +191,29 @@ var Widget = function () {
                 }
                 
                 callback(null, data.collection);
-            } else if (data.hasOwnProperty('comment')) {
+            } else if (data.hasOwnProperty('stream')) {
                 // streaming info
-                if (data.comment.deleted === true) {
-                    // comment deleted
-                    commentDeleted(data.comment.commentId);
-                } else if (data.comment.commentId) {
-                    // new comment
-                    newCommentReceived(data.comment);
+                if (data.stream.comment) {
+                    // comment related
+                    if (data.stream.comment.deleted === true) {
+                        // comment deleted
+                        commentDeleted(data.stream.comment.commentId);
+                    } else if (data.stream.comment.commentId) {
+                        // new comment
+                        newCommentReceived(data.stream.comment);
+                    }
+                }
+
+                if (data.stream.collection) {
+                    // collection related
+                    
+                    if (data.stream.collection.hasOwnProperty('commentsEnabled')) {
+                        if (data.stream.collection.commentsEnabled === false) {
+                            self.ui.close();
+                        } else if (data.stream.collection.commentsEnabled === true) {
+                            self.ui.open();
+                        }
+                    }
                 }
             }
         });

@@ -6,6 +6,10 @@
         <div class="comment-clear"></div>
     </div>
 
+    <div class="comment-editor-closed">
+        <span class="o-comment-ui-icon-lock"></span> This conversation is closed to new comments.
+    </div>
+
     <div class="comment-editor-input">
         <textarea></textarea>
         <div class="comment-editor-error"></div>

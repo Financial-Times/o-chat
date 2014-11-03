@@ -10,49 +10,60 @@
     .comment-editor-container {
         font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
 
+        .comment-editor-closed {
+            display: none;
+
+            background: oColorsGetPaletteColor(white);
+            border: 1px solid #b2b2b2;
+            color: oColorsGetPaletteColor(grey-tint4);
+            font-size: 13px;
+            margin-top: 41px;
+            margin-bottom: 42px;
+            padding: 5px 10px;
+            font-weight: bold;
+        }
+
         .comment-editor-header {
             margin-bottom: 4px;
 
-            .comment-editor-auth {
-                .comment-loggedin {
-                    float: left;
-                    position: relative;
+            .comment-loggedin {
+                float: left;
+                position: relative;
 
-                    .comment-pseudonym {
-                        cursor: default;
+                .comment-pseudonym {
+                    cursor: default;
+                }
+
+                .comment-admin-links {
+                    display: none;
+
+                    background: white;
+                    padding: 5px;
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    z-index: 1000;
+                    border: 1px solid oColorsGetPaletteColor(pink-tint4);
+
+                    li {
+                        border-bottom: 1px solid  oColorsGetPaletteColor(pink-tint4);
+                        white-space: nowrap;
+
+                        &:last-child {
+                            border: 0;
+                        }
                     }
+                }
 
+                &:hover {
                     .comment-admin-links {
-                        display: none;
-
-                        background: white;
-                        padding: 5px;
-                        position: absolute;
-                        top: 100%;
-                        left: 0;
-                        z-index: 1000;
-                        border: 1px solid oColorsGetPaletteColor(pink-tint4);
-
-                        li {
-                            border-bottom: 1px solid  oColorsGetPaletteColor(pink-tint4);
-                            white-space: nowrap;
-
-                            &:last-child {
-                                border: 0;
-                            }
-                        }
-                    }
-
-                    &:hover {
-                        .comment-admin-links {
-                            display: block;
-                        }
+                        display: block;
                     }
                 }
+            }
 
-                .comment-settings {
-                    float: right;
-                }
+            .comment-settings {
+                float: right;
             }
         }
 

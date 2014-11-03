@@ -19,9 +19,31 @@ function WidgetUi (widgetContainer, config) {
     var events = new oCommentUtilities.Events();
 
     var isPagination = false;
+    var isOpen = true;
 
     this.on = events.on;
     this.off = events.off;
+
+
+    this.open = function () {
+        if (isOpen === false) {
+            isOpen = true;
+
+            sizzle('.comment-editor-closed', widgetContainer)[0].style.display = 'none';
+            sizzle('.comment-editor-input', widgetContainer)[0].style.display = 'block';
+            sizzle('.comment-editor-footer', widgetContainer)[0].style.display = 'block';
+        }
+    };
+
+    this.close = function () {
+        if (isOpen === true) {
+            isOpen = false;
+
+            sizzle('.comment-editor-closed', widgetContainer)[0].style.display = 'block';
+            sizzle('.comment-editor-input', widgetContainer)[0].style.display = 'none';
+            sizzle('.comment-editor-footer', widgetContainer)[0].style.display = 'none';
+        }
+    };
 
     this.render = function (commentsData, adminMode, paginationEnabled) {
         isPagination = paginationEnabled;
