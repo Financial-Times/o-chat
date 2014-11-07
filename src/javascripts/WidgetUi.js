@@ -18,6 +18,7 @@ function WidgetUi (widgetContainer, config) {
 
     var events = new oCommentUtilities.Events();
 
+    var adaptedToHeight = false;
     var isPagination = false;
     var isOpen = true;
 
@@ -165,20 +166,23 @@ function WidgetUi (widgetContainer, config) {
             }
 
             var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
-
             commentArea.style.overflow = "auto";
             commentArea.style.height = (height - editorHeight) + "px";
-            if (config.orderType === 'inverted') {
-                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
-            } else {
-                commentArea.scrollTop = 0;
-            }
 
+            if (!adaptedToHeight) {
+                adaptedToHeight = true;
 
-            if (isPagination) {
-                self.disableButtonPagination();
+                if (config.orderType === 'inverted') {
+                    commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
+                } else {
+                    commentArea.scrollTop = 0;
+                }
 
-                initScrollPagination();
+                if (isPagination) {
+                    self.disableButtonPagination();
+
+                    initScrollPagination();
+                }
             }
         };
 
