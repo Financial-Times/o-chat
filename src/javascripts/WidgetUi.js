@@ -8,6 +8,7 @@ var oDate = require('o-date');
 var templates = require('./templates.js');
 var utils = require('./utils.js');
 var envConfig = require('./config.js');
+var NewCommentNotification = require('./NewCommentNotification.js');
 
 function WidgetUi (widgetContainer, config) {
     oCommentUi.WidgetUi.apply(this, arguments);
@@ -17,6 +18,8 @@ function WidgetUi (widgetContainer, config) {
     var self = this;
 
     var events = new oCommentUtilities.Events();
+    var newCommentNotification = new NewCommentNotification();
+    //var scrollContainerToMonitor = document.body;
 
     var isPagination = false;
     var isOpen = true;
@@ -337,6 +340,8 @@ function WidgetUi (widgetContainer, config) {
 
             if (ownComment || scrolledToLast) {
                 commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
+            } else {
+                notifyNewComment(commentData);
             }
         } else {
             scrolledToLast = (commentContainer.scrollTop === 0);
@@ -355,6 +360,8 @@ function WidgetUi (widgetContainer, config) {
 
             if (ownComment || scrolledToLast) {
                 commentArea.scrollTop = 0;
+            } else {
+                notifyNewComment(commentData);
             }
         }
 
@@ -371,6 +378,10 @@ function WidgetUi (widgetContainer, config) {
             }, timeoutToStart);
         }
     };
+
+    function notifyNewComment (commentData) {
+        newCommentNotification.add(commentData);
+    }
 
     this.addNextPageComments = function (comments, adminMode) {
         var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
