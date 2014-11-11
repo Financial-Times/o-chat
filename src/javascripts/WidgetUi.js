@@ -18,8 +18,9 @@ function WidgetUi (widgetContainer, config) {
     var self = this;
 
     var events = new oCommentUtilities.Events();
-    var newCommentNotification = new NewCommentNotification();
-    //var scrollContainerToMonitor = document.body;
+    var newCommentNotification;
+    var notificationActive = false;
+    var scrollMonitorForNotification;
 
     var isPagination = false;
     var isOpen = true;
@@ -50,7 +51,6 @@ function WidgetUi (widgetContainer, config) {
 
     this.render = function (commentsData, adminMode, paginationEnabled) {
         isPagination = paginationEnabled;
-
         widgetContainer.innerHTML = "";
 
         var addEditor = function () {
@@ -125,8 +125,9 @@ function WidgetUi (widgetContainer, config) {
             });
         }
 
+        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+
         if (adminMode) {
-            var commentContainer = sizzle('.comment-comments-container', widgetContainer);
             oCommentUi.utils.addEventListener('click', commentContainer, function (event) {
                 if (event.target.className === 'comment-delete') {
                     try {
@@ -143,6 +144,38 @@ function WidgetUi (widgetContainer, config) {
                 }
             });
         }
+
+
+
+        newCommentNotification = new NewCommentNotification();
+        var verifyNotificationStatus = function (position) {
+            var lastCommentOffset = oCommentUtilities.dom.offset(commentContainer);
+            var windowSize = oCommentUi.utils.windowSize();
+
+            if (config.orderType === "inverted") {
+                if (position < lastCommentOffset.top + commentContainer.clientHeight &&
+                    position + windowSize.height > lastCommentOffset.top + commentContainer.clientHeight) {
+                    if (notificationActive === true) {
+                        newCommentNotification.reset();
+                    }
+                    notificationActive = false;
+                } else {
+                    notificationActive = true;
+                }
+            } else {
+                if (position < lastCommentOffset.top &&
+                    position + windowSize.height > lastCommentOffset.top) {
+                    if (notificationActive === true) {
+                        newCommentNotification.reset();
+                    }
+                    notificationActive = false;
+                } else {
+                    notificationActive = true;
+                }
+            }
+        };
+        scrollMonitorForNotification = new oCommentUtilities.dom.ScrollMonitor(window, verifyNotificationStatus);
+        verifyNotificationStatus(document.body.scrollTop || document.getElementsByTagName('html')[0].scrollTop);
     };
 
     this.adaptToHeight = function (height) {
@@ -176,6 +209,31 @@ function WidgetUi (widgetContainer, config) {
             } else {
                 commentArea.scrollTop = 0;
             }
+
+            scrollMonitorForNotification.stop();
+            var verifyNotificationStatus = function (position) {
+                if (config.orderType === "inverted") {
+                    if (position === commentArea.scrollHeight - commentArea.clientHeight) {
+                        if (notificationActive === true) {
+                            newCommentNotification.reset();
+                        }
+                        notificationActive = false;
+                    } else {
+                        notificationActive = true;
+                    }
+                } else {
+                    if (position === 0) {
+                        if (notificationActive === true) {
+                            newCommentNotification.reset();
+                        }
+                        notificationActive = false;
+                    } else {
+                        notificationActive = true;
+                    }
+                }
+            };
+            scrollMonitorForNotification = new oCommentUtilities.dom.ScrollMonitor(commentArea, verifyNotificationStatus);
+            verifyNotificationStatus(commentArea.scrollTop);
 
 
             if (isPagination) {
@@ -340,11 +398,9 @@ function WidgetUi (widgetContainer, config) {
 
             if (ownComment || scrolledToLast) {
                 commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
-            } else {
-                notifyNewComment(commentData);
             }
         } else {
-            scrolledToLast = (commentContainer.scrollTop === 0);
+            scrolledToLast = (commentArea.scrollTop === 0);
 
             for (i = 0; i < comments.length; i++) {
                 if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
@@ -360,8 +416,6 @@ function WidgetUi (widgetContainer, config) {
 
             if (ownComment || scrolledToLast) {
                 commentArea.scrollTop = 0;
-            } else {
-                notifyNewComment(commentData);
             }
         }
 
@@ -376,6 +430,11 @@ function WidgetUi (widgetContainer, config) {
             setTimeout(function () {
                 try { oDate.init(commentDom); } catch(e) {}
             }, timeoutToStart);
+        }
+
+        oCommentUtilities.logger.debug('notificationActive', notificationActive);
+        if (notificationActive) {
+            notifyNewComment(commentData);
         }
     };
 
