@@ -178,17 +178,13 @@ function WidgetUi (widgetContainer, config) {
             var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
             commentArea.style.overflow = "auto";
             commentArea.style.height = (height - editorHeight) + "px";
-            if (config.orderType === 'inverted') {
-                oCommentUtilities.logger.debug("adapt to height, scroll to last");
-                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
-            } else {
-                commentArea.scrollTop = 0;
-            }
 
             if (!adaptedToHeight) {
                 adaptedToHeight = true;
 
+                oCommentUtilities.logger.debug("adapt to height, scroll to last");
                 scrollToLastComment();
+
 				initNotification();
             }
         };
