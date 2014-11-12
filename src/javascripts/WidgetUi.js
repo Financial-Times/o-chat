@@ -17,6 +17,7 @@ function WidgetUi (widgetContainer, config) {
     var self = this;
 
     var events = new oCommentUtilities.Events();
+    var newCommentNotification;
 
     var adaptedToHeight = false;
     var isPagination = false;
@@ -48,7 +49,6 @@ function WidgetUi (widgetContainer, config) {
 
     this.render = function (commentsData, adminMode, paginationEnabled) {
         isPagination = paginationEnabled;
-
         widgetContainer.innerHTML = "";
 
         var addEditor = function () {
@@ -123,8 +123,9 @@ function WidgetUi (widgetContainer, config) {
             });
         }
 
+        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+
         if (adminMode) {
-            var commentContainer = sizzle('.comment-comments-container', widgetContainer);
             oCommentUi.utils.addEventListener('click', commentContainer, function (event) {
                 if (event.target.className === 'comment-delete') {
                     try {
@@ -145,6 +146,12 @@ function WidgetUi (widgetContainer, config) {
 
     this.adaptToHeight = function (height) {
         var adapt = function () {
+            if (isPagination) {
+                self.disableButtonPagination();
+
+                initScrollPagination();
+            }
+
             var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
             var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
             var editorComputedStyle = oCommentUi.utils.getComputedStyle(editorContainer);
@@ -168,6 +175,12 @@ function WidgetUi (widgetContainer, config) {
             var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
             commentArea.style.overflow = "auto";
             commentArea.style.height = (height - editorHeight) + "px";
+            if (config.orderType === 'inverted') {
+                oCommentUtilities.logger.debug("adapt to height, scroll to last");
+                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
+            } else {
+                commentArea.scrollTop = 0;
+            }
 
             if (!adaptedToHeight) {
                 adaptedToHeight = true;
@@ -183,6 +196,7 @@ function WidgetUi (widgetContainer, config) {
 
                     initScrollPagination();
                 }
+				initNotification();
             }
         };
 
@@ -195,30 +209,45 @@ function WidgetUi (widgetContainer, config) {
         }, 200);
     };
 
-    function initScrollPagination () {
-        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
 
-        var throttleTime = 200;
-        var lastTime = new Date().getTime();
+    // Specific functions for the widget that was shrinked to a fixed height
 
-        var paginationScrollHandler = function () {
-            if (new Date().getTime() - lastTime > throttleTime) {
-                lastTime = new Date().getTime();
-
+        function initScrollPagination () {
+            var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+            new oCommentUtilities.dom.ScrollMonitor(commentArea, function (scrollPos) {
                 if (config.orderType === 'inverted') {
-                    if (commentArea.scrollTop < 0.2 * commentArea.scrollHeight) {
+                    if (scrollPos < 0.2 * commentArea.scrollHeight) {
                         events.trigger('nextPage');
                     }
                 } else {
-                    if (commentArea.scrollTop + commentArea.clientHeight > 0.8 * commentArea.scrollHeight) {
+                    if (scrollPos + commentArea.clientHeight > 0.8 * commentArea.scrollHeight) {
                         events.trigger('nextPage');
                     }
                 }
-            }
-        };
+            });
+        }
 
-        oCommentUi.utils.addEventListener('scroll', commentArea, paginationScrollHandler);
-    }
+        function initNotification () {
+            var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+            newCommentNotification = new NewCommentNotification(self, commentArea, (config.orderType === "inverted" ? 'bottom' : 'top'));
+        }
+
+
+        function scrollToLastComment () {
+            var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+
+            if (config.orderType === "inverted") {
+                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
+            } else {
+                commentArea.scrollTop = 0;
+            }
+        }
+
+        function notifyNewComment () {
+            setTimeout(function () {
+                newCommentNotification.newComment();
+            }, 100);
+        }
 
     this.disableButtonPagination = function () {
         sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'none';
@@ -321,7 +350,10 @@ function WidgetUi (widgetContainer, config) {
         var inserted = false;
 
         if (config.orderType === "inverted") {
+            oCommentUtilities.logger.debug("new comment");
             scrolledToLast = (commentArea.scrollTop === (commentArea.scrollHeight - commentArea.clientHeight));
+
+            oCommentUtilities.logger.debug("scrolledToLast", scrolledToLast);
 
             for (i = comments.length-1; i >= 0; i--) {
                 if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
@@ -340,10 +372,10 @@ function WidgetUi (widgetContainer, config) {
             }
 
             if (ownComment || scrolledToLast) {
-                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
+                scrollToLastComment();
             }
         } else {
-            scrolledToLast = (commentContainer.scrollTop === 0);
+            scrolledToLast = (commentArea.scrollTop === 0);
 
             for (i = 0; i < comments.length; i++) {
                 if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
@@ -358,7 +390,7 @@ function WidgetUi (widgetContainer, config) {
             }
 
             if (ownComment || scrolledToLast) {
-                commentArea.scrollTop = 0;
+                scrollToLastComment();
             }
         }
 
@@ -374,6 +406,8 @@ function WidgetUi (widgetContainer, config) {
                 try { oDate.init(commentDom); } catch(e) {}
             }, timeoutToStart);
         }
+
+        notifyNewComment();
     };
 
     this.addNextPageComments = function (comments, adminMode) {

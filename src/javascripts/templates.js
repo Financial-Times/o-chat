@@ -11,5 +11,6 @@ module.exports = {
     comments: hogan.compile(requireText('../templates/comments.ms')),
     comment: hogan.compile(requireText('../templates/comment.ms')),
     signIn: hogan.compile(requireText('../templates/signIn.ms')),
-    loggedIn: hogan.compile(requireText('../templates/loggedIn.ms'))
+    loggedIn: hogan.compile(requireText('../templates/loggedIn.ms')),
+    notification: hogan.compile(requireText('../templates/notification.ms'))
 };

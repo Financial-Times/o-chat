@@ -1,5 +1,11 @@
 .o-comment-client {
+    .comment-comments-wrapper {
+        position: relative;
+    }
+
     .comment-comments-area {
+        font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+        
         .comment-show-more {
             display: none;
 
