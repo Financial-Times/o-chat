@@ -5,51 +5,79 @@ var oCommentUi = require('o-comment-ui');
 var sizzle = require('sizzle');
 var oCommentUtilities = require('o-comment-utilities');
 
-function NewCommentNotification () {
+function NewCommentNotification (widgetUi, container, position) {
 	var self = this;
 
-	var activeCommentCount = 0;
+	if (position !== "bottom" && position !== "top") {
+		position = "top";
+	}
+
 	var notificationId = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
 
-	document.body.appendChild(oCommentUi.utils.toDOM(templates.notification.render({
-		id: notificationId
+	var active = false;
+
+	container.parentNode.appendChild(oCommentUi.utils.toDOM(templates.notification.render({
+		id: notificationId,
+		position: position
 	})));
 	var notificationElement = sizzle('#o-comment-client-notification-' + notificationId)[0];
-	var notificationContainer = sizzle('.o-comment-client-notification-container', notificationElement)[0];
-	var notificationCounter = sizzle('.o-comment-client-notification-counter', notificationElement)[0];
+	var notificationButton = sizzle('.o-comment-client-notification-button', notificationElement)[0];
 
-	this.add = function (commentData) {
-		activeCommentCount++;
-		notificationCounter.innerHTML = activeCommentCount;
 
-		notificationContainer.appendChild(oCommentUi.utils.toDOM(templates.notificationEntry.render({
-			id: commentData.id,
-			content: commentData.content
-		})));
-
-		notificationElement.style.display = 'block';
-
-		self.listen(commentData.id);
-
-		setTimeout(function () {
-			self.remove(commentData.id);
-		}, 5000);
+	var onClick = function () {
+		self.reset();
+		if (position === "bottom") {
+			container.scrollTop = container.scrollHeight - container.clientHeight;
+		} else {
+			container.scrollTop = 0;
+		}
 	};
+	oCommentUtilities.dom.eventListener.addEventListener('click', notificationButton, onClick);
+	oCommentUtilities.dom.eventListener.addEventListener('click', notificationElement, function () {
+		container.focus();
+	});
 
-	this.remove = function (id) {
-		var el = sizzle('#o-comment-client-notification-entry-id-' + id, notificationContainer);
-		if (el && el.length) {
-			el[0].style.display = 'none';
+	var verifyNotificationStatus = function (scrollPos) {
+        if (position === "bottom") {
+            if (scrollPos === container.scrollHeight - container.clientHeight) {
+                if (active === true) {
+                    self.reset();
+                }
+                active = false;
+            } else {
+                active = true;
+            }
+        } else {
+            if (scrollPos === 0) {
+                if (active === true) {
+                    self.reset();
+                }
+                active = false;
+            } else {
+                active = true;
+            }
+        }
+    };
+    var scrollMonitorForNotification = new oCommentUtilities.dom.ScrollMonitor(container, verifyNotificationStatus);
+    verifyNotificationStatus(container.scrollTop);
+
+	this.newComment = function () {
+		verifyNotificationStatus(container.scrollTop);
+		if (active) {
+			oCommentUtilities.logger.debug('notification activated');
+			notificationElement.style.display = 'block';
 		}
 	};
 
 	this.reset = function () {
 		notificationElement.style.display = 'none';
-		notificationContainer.innerHTML = "";
-		activeCommentCount = 0;
-		notificationCounter.innerHTML = activeCommentCount;
 
 		oCommentUtilities.logger.debug('notification reset');
+	};
+
+	this.destroy = function () {
+		scrollMonitorForNotification.stop();
+		notificationElement.parentNode.removeChild(notificationElement);
 	};
 }
 
