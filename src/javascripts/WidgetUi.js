@@ -5,6 +5,7 @@ var oCommentUi = require('o-comment-ui');
 var sizzle = require('sizzle');
 var oDate = require('o-date');
 
+var NewCommentNotification = require('./NewCommentNotification.js');
 var templates = require('./templates.js');
 var utils = require('./utils.js');
 var envConfig = require('./config.js');
@@ -146,10 +147,12 @@ function WidgetUi (widgetContainer, config) {
 
     this.adaptToHeight = function (height) {
         var adapt = function () {
-            if (isPagination) {
-                self.disableButtonPagination();
+            if (!adaptedToHeight) {
+                if (isPagination) {
+                    self.disableButtonPagination();
 
-                initScrollPagination();
+                    initScrollPagination();
+                }
             }
 
             var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
@@ -185,17 +188,7 @@ function WidgetUi (widgetContainer, config) {
             if (!adaptedToHeight) {
                 adaptedToHeight = true;
 
-                if (config.orderType === 'inverted') {
-                    commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
-                } else {
-                    commentArea.scrollTop = 0;
-                }
-
-                if (isPagination) {
-                    self.disableButtonPagination();
-
-                    initScrollPagination();
-                }
+                scrollToLastComment();
 				initNotification();
             }
         };
