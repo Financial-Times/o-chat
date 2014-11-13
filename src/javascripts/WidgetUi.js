@@ -514,6 +514,13 @@ function WidgetUi (widgetContainer, config) {
         }
     };
 
+    this.addNotAvailableMessage = function () {
+        widgetContainer.innerHTML = oCommentUi.templates.unavailableTemplate.render({
+            message: oCommentUi.i18n.texts.unavailable,
+            fontSize: "12px"
+        });
+    };
+
     this.removeSettingsLink = function () {
         var settingsLink = sizzle('.comment-settings', widgetContainer);
         if (settingsLink && settingsLink.length) {
