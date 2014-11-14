@@ -517,7 +517,8 @@ function WidgetUi (widgetContainer, config) {
     this.addNotAvailableMessage = function () {
         widgetContainer.innerHTML = oCommentUi.templates.unavailableTemplate.render({
             message: oCommentUi.i18n.texts.unavailable,
-            fontSize: "12px"
+            fontSize: "12px",
+            style: "padding: 10px 0 20px 0;"
         });
     };
 
