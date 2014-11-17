@@ -1,19 +1,19 @@
 .o-chat {
-    font-size: 12px;
+	font-size: 12px;
 
-    a {
-    	color: oColorsGetPaletteColor(blue);
-    	text-decoration: none;
+	a {
+		color: oColorsGetPaletteColor(blue);
+		text-decoration: none;
 
-    	&:hover {
-    		color: oColorsGetPaletteColor(black);
-    	}
-    }
+		&:hover {
+			color: oColorsGetPaletteColor(black);
+		}
+	}
 
-    ul {
-    	padding: 0;
-    	margin: 0;
-        list-style-type: none;
-        list-style-position: outside;
-    }
+	ul {
+		padding: 0;
+		margin: 0;
+		list-style-type: none;
+		list-style-position: outside;
+	}
 }

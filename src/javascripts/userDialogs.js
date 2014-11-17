@@ -8,55 +8,55 @@ var oCommentData = require('o-comment-data');
  * @param  {Function} callbacks Optional. Two possible fields: success and failure. Success will get the new authentication data as parameter.
  */
 exports.showSetPseudonymDialog = function (callbacks) {
-    if (!callbacks || typeof callbacks !== 'object') {
-        callbacks = {};
-    }
+	if (!callbacks || typeof callbacks !== 'object') {
+		callbacks = {};
+	}
 
-    callbacks.success = callbacks.success || function () {};
-    callbacks.failure = callbacks.failure || function () {};
+	callbacks.success = callbacks.success || function () {};
+	callbacks.failure = callbacks.failure || function () {};
 
-    oCommentUi.userDialogs.showSetPseudonymDialog({
-        submit: function (formData, responseCallback) {
-            if (formData && formData.pseudonym) {
-                oCommentData.api.updateUser({
-                    pseudonym: formData.pseudonym
-                }, function (err) {
-                    if (err) {
-                        if (typeof err === 'object' && err.sudsError) {
-                            if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(err.error)) {
-                                responseCallback(oCommentUi.i18n.serviceMessageOverrides[err.error]);
-                            } else {
-                                responseCallback(err.error);
-                            }
-                        } else {
-                            responseCallback(oCommentUi.i18n.texts.changePseudonymError);
-                        }
-                        
-                        return;
-                    }
+	oCommentUi.userDialogs.showSetPseudonymDialog({
+		submit: function (formData, responseCallback) {
+			if (formData && formData.pseudonym) {
+				oCommentData.api.updateUser({
+					pseudonym: formData.pseudonym
+				}, function (err) {
+					if (err) {
+						if (typeof err === 'object' && err.sudsError) {
+							if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(err.error)) {
+								responseCallback(oCommentUi.i18n.serviceMessageOverrides[err.error]);
+							} else {
+								responseCallback(err.error);
+							}
+						} else {
+							responseCallback(oCommentUi.i18n.texts.changePseudonymError);
+						}
+
+						return;
+					}
 
 
-                    oCommentData.api.getAuth({
-                        force: true
-                    }, function (err, authData) {
-                        if (err) {
-                            responseCallback(oCommentUi.i18n.texts.changePseudonymError);
-                            callbacks.failure();
-                            return;
-                        }
+					oCommentData.api.getAuth({
+						force: true
+					}, function (err, authData) {
+						if (err) {
+							responseCallback(oCommentUi.i18n.texts.changePseudonymError);
+							callbacks.failure();
+							return;
+						}
 
-                        callbacks.success(authData);
-                        responseCallback();
-                    });
-                });
-            } else {
-                responseCallback(oCommentUi.i18n.texts.changePseudonymBlankError);
-            }
-        },
-        close: function () {
-            callbacks.failure();
-        }
-    });
+						callbacks.success(authData);
+						responseCallback();
+					});
+				});
+			} else {
+				responseCallback(oCommentUi.i18n.texts.changePseudonymBlankError);
+			}
+		},
+		close: function () {
+			callbacks.failure();
+		}
+	});
 };
 
 /**
@@ -65,52 +65,52 @@ exports.showSetPseudonymDialog = function (callbacks) {
  * @param  {Function} callbacks Optional. Two possible fields: success and failure. Success will get the new authentication data as parameter.
  */
 exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
-    if (!callbacks || typeof callbacks !== 'object') {
-        callbacks = {};
-    }
+	if (!callbacks || typeof callbacks !== 'object') {
+		callbacks = {};
+	}
 
-    callbacks.success = callbacks.success || function () {};
-    callbacks.failure = callbacks.failure || function () {};
+	callbacks.success = callbacks.success || function () {};
+	callbacks.failure = callbacks.failure || function () {};
 
-    oCommentUi.userDialogs.showChangePseudonymDialog(currentPseudonym, {
-        submit: function (formData, responseCallback) {
-            if (formData) {
-                oCommentData.api.updateUser(formData, function (err) {
-                    if (err) {
-                        if (typeof err === 'object' && err.sudsError) {
-                            if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(err.error)) {
-                                responseCallback(oCommentUi.i18n.serviceMessageOverrides[err.error]);
-                            } else {
-                                responseCallback(err.error);
-                            }
-                        } else {
-                            responseCallback(oCommentUi.i18n.texts.genericError);
-                        }
-                        
-                        return;
-                    }
+	oCommentUi.userDialogs.showChangePseudonymDialog(currentPseudonym, {
+		submit: function (formData, responseCallback) {
+			if (formData) {
+				oCommentData.api.updateUser(formData, function (err) {
+					if (err) {
+						if (typeof err === 'object' && err.sudsError) {
+							if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(err.error)) {
+								responseCallback(oCommentUi.i18n.serviceMessageOverrides[err.error]);
+							} else {
+								responseCallback(err.error);
+							}
+						} else {
+							responseCallback(oCommentUi.i18n.texts.genericError);
+						}
 
-                    oCommentData.api.getAuth({
-                        force: true
-                    }, function (err, authData) {
-                        if (err) {
-                            callbacks.failure();
-                            responseCallback(oCommentUi.i18n.texts.genericError);
-                            return;
-                        }
+						return;
+					}
 
-                        callbacks.success(authData);
-                        responseCallback();
-                    });
-                });
-            } else {
-                responseCallback(oCommentUi.i18n.texts.genericError);
-            }
-        },
-        close: function () {
-            callbacks.failure();
-        }
-    });
+					oCommentData.api.getAuth({
+						force: true
+					}, function (err, authData) {
+						if (err) {
+							callbacks.failure();
+							responseCallback(oCommentUi.i18n.texts.genericError);
+							return;
+						}
+
+						callbacks.success(authData);
+						responseCallback();
+					});
+				});
+			} else {
+				responseCallback(oCommentUi.i18n.texts.genericError);
+			}
+		},
+		close: function () {
+			callbacks.failure();
+		}
+	});
 };
 
 /**
@@ -128,9 +128,9 @@ exports.showInactivityMessage = oCommentUi.userDialogs.showInactivityMessage;
  * @param  {String} message The content of the dialog (the message).
  */
 exports.showMessage = function (title, message) {
-    var dialog = new oCommentUi.dialog.Dialog(message, {
-        modal: false,
-        title: title
-    });
-    dialog.open();
+	var dialog = new oCommentUi.dialog.Dialog(message, {
+		modal: false,
+		title: title
+	});
+	dialog.open();
 };

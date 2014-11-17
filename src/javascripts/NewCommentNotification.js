@@ -38,28 +38,28 @@ function NewCommentNotification (widgetUi, container, position) {
 	});
 
 	var verifyNotificationStatus = function (scrollPos) {
-        if (position === "bottom") {
-            if (scrollPos === container.scrollHeight - container.clientHeight) {
-                if (active === true) {
-                    self.reset();
-                }
-                active = false;
-            } else {
-                active = true;
-            }
-        } else {
-            if (scrollPos === 0) {
-                if (active === true) {
-                    self.reset();
-                }
-                active = false;
-            } else {
-                active = true;
-            }
-        }
-    };
-    var scrollMonitorForNotification = new oCommentUtilities.dom.ScrollMonitor(container, verifyNotificationStatus);
-    verifyNotificationStatus(container.scrollTop);
+		if (position === "bottom") {
+			if (scrollPos === container.scrollHeight - container.clientHeight) {
+				if (active === true) {
+					self.reset();
+				}
+				active = false;
+			} else {
+				active = true;
+			}
+		} else {
+			if (scrollPos === 0) {
+				if (active === true) {
+					self.reset();
+				}
+				active = false;
+			} else {
+				active = true;
+			}
+		}
+	};
+	var scrollMonitorForNotification = new oCommentUtilities.dom.ScrollMonitor(container, verifyNotificationStatus);
+	verifyNotificationStatus(container.scrollTop);
 
 	this.newComment = function () {
 		verifyNotificationStatus(container.scrollTop);

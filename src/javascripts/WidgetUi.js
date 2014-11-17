@@ -11,578 +11,578 @@ var utils = require('./utils.js');
 var envConfig = require('./config.js');
 
 function WidgetUi (widgetContainer, config) {
-    oCommentUi.WidgetUi.apply(this, arguments);
+	oCommentUi.WidgetUi.apply(this, arguments);
 
-    config.orderType = config.orderType || "normal";
+	config.orderType = config.orderType || "normal";
 
-    var self = this;
+	var self = this;
 
-    var events = new oCommentUtilities.Events();
-    var newCommentNotification;
+	var events = new oCommentUtilities.Events();
+	var newCommentNotification;
 
-    var adaptedToHeight = false;
-    var isPagination = false;
-    var isOpen = true;
+	var adaptedToHeight = false;
+	var isPagination = false;
+	var isOpen = true;
 
-    this.on = events.on;
-    this.off = events.off;
+	this.on = events.on;
+	this.off = events.off;
 
 
-    this.open = function () {
-        if (isOpen === false) {
-            isOpen = true;
+	this.open = function () {
+		if (isOpen === false) {
+			isOpen = true;
 
-            sizzle('.comment-editor-closed', widgetContainer)[0].style.display = 'none';
-            sizzle('.comment-editor-input', widgetContainer)[0].style.display = 'block';
-            sizzle('.comment-editor-footer', widgetContainer)[0].style.display = 'block';
-        }
-    };
+			sizzle('.comment-editor-closed', widgetContainer)[0].style.display = 'none';
+			sizzle('.comment-editor-input', widgetContainer)[0].style.display = 'block';
+			sizzle('.comment-editor-footer', widgetContainer)[0].style.display = 'block';
+		}
+	};
 
-    this.close = function () {
-        if (isOpen === true) {
-            isOpen = false;
+	this.close = function () {
+		if (isOpen === true) {
+			isOpen = false;
 
-            sizzle('.comment-editor-closed', widgetContainer)[0].style.display = 'block';
-            sizzle('.comment-editor-input', widgetContainer)[0].style.display = 'none';
-            sizzle('.comment-editor-footer', widgetContainer)[0].style.display = 'none';
-        }
-    };
+			sizzle('.comment-editor-closed', widgetContainer)[0].style.display = 'block';
+			sizzle('.comment-editor-input', widgetContainer)[0].style.display = 'none';
+			sizzle('.comment-editor-footer', widgetContainer)[0].style.display = 'none';
+		}
+	};
 
-    this.render = function (commentsData, adminMode, paginationEnabled) {
-        isPagination = paginationEnabled;
-        widgetContainer.innerHTML = "";
+	this.render = function (commentsData, adminMode, paginationEnabled) {
+		isPagination = paginationEnabled;
+		widgetContainer.innerHTML = "";
 
-        var addEditor = function () {
-            widgetContainer.appendChild(
-                oCommentUi.utils.toDOM(
-                    templates.editor.render({
-                        submitButtonLabel: "Submit Comment",
-                        termMessageTemplate: oCommentUi.templates.termsAndGuidelinesTemplate.render(),
-                        signInTemplate: templates.signIn.render()
-                    })
-                )
-            );
-        };
+		var addEditor = function () {
+			widgetContainer.appendChild(
+				oCommentUi.utils.toDOM(
+					templates.editor.render({
+						submitButtonLabel: "Submit Comment",
+						termMessageTemplate: oCommentUi.templates.termsAndGuidelinesTemplate.render(),
+						signInTemplate: templates.signIn.render()
+					})
+				)
+			);
+		};
 
-        var addComments = function () {
-            widgetContainer.appendChild(
-                oCommentUi.utils.toDOM(
-                    templates.comments.render({
-                        comments: commentsData,
-                        orderType: config.orderType,
-                        adminMode: adminMode
-                    })
-                )
-            );
-        };
+		var addComments = function () {
+			widgetContainer.appendChild(
+				oCommentUi.utils.toDOM(
+					templates.comments.render({
+						comments: commentsData,
+						orderType: config.orderType,
+						adminMode: adminMode
+					})
+				)
+			);
+		};
 
-        if (config.orderType === 'inverted') {
-            commentsData.reverse();
-            addComments();
-            addEditor();
-        } else {
-            addEditor();
-            addComments();
-        }
+		if (config.orderType === 'inverted') {
+			commentsData.reverse();
+			addComments();
+			addEditor();
+		} else {
+			addEditor();
+			addComments();
+		}
 
-        try { oDate.init(); } catch(e) {}
+		try { oDate.init(); } catch(e) {}
 
-        oCommentUi.utils.addEventListener('click', sizzle('.signIn', widgetContainer)[0], function (event) {
-            events.trigger('signIn');
+		oCommentUi.utils.addEventListener('click', sizzle('.signIn', widgetContainer)[0], function (event) {
+			events.trigger('signIn');
 
-            if (event.preventDefault) {
-                event.preventDefault();
-            } else {
-                event.returnValue = false;
-            }
-        });
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
+		});
 
-        oCommentUi.utils.addEventListener('click', sizzle('.comment-editor-submit > button')[0], function () {
-            events.trigger('postComment');
-        });
+		oCommentUi.utils.addEventListener('click', sizzle('.comment-editor-submit > button')[0], function () {
+			events.trigger('postComment');
+		});
 
-        oCommentUi.utils.addEventListener('click', sizzle('.comment-editor-input')[0], function (event) {
-            sizzle('.comment-editor-input textarea')[0].focus();
-            self.clearEditorError();
+		oCommentUi.utils.addEventListener('click', sizzle('.comment-editor-input')[0], function (event) {
+			sizzle('.comment-editor-input textarea')[0].focus();
+			self.clearEditorError();
 
-            if (event.preventDefault) {
-                event.preventDefault();
-            } else {
-                event.returnValue = false;
-            }
-        });
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
+		});
 
-        if (isPagination) {
-            if (config.orderType === 'inverted') {
-                sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'block';
-            } else {
-                sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'block';
-            }
+		if (isPagination) {
+			if (config.orderType === 'inverted') {
+				sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'block';
+			} else {
+				sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'block';
+			}
 
-            oCommentUi.utils.addEventListener('click', sizzle('.comment-show-more .comment-show-more-label', widgetContainer), function () {
-                events.trigger('nextPage');
-            });
-        }
+			oCommentUi.utils.addEventListener('click', sizzle('.comment-show-more .comment-show-more-label', widgetContainer), function () {
+				events.trigger('nextPage');
+			});
+		}
 
-        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+		var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
 
-        if (adminMode) {
-            oCommentUi.utils.addEventListener('click', commentContainer, function (event) {
-                if (event.target.className === 'comment-delete') {
-                    try {
-                        var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
+		if (adminMode) {
+			oCommentUi.utils.addEventListener('click', commentContainer, function (event) {
+				if (event.target.className === 'comment-delete') {
+					try {
+						var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
 
-                        events.trigger('deleteComment', commentId);
-                    } catch (e) {}
+						events.trigger('deleteComment', commentId);
+					} catch (e) {}
 
-                    if (event.preventDefault) {
-                        event.preventDefault();
-                    } else {
-                        event.returnValue = false;
-                    }
-                }
-            });
-        }
-    };
+					if (event.preventDefault) {
+						event.preventDefault();
+					} else {
+						event.returnValue = false;
+					}
+				}
+			});
+		}
+	};
 
-    this.adaptToHeight = function (height) {
-        var adapt = function () {
-            if (!adaptedToHeight) {
-                if (isPagination) {
-                    self.disableButtonPagination();
+	this.adaptToHeight = function (height) {
+		var adapt = function () {
+			if (!adaptedToHeight) {
+				if (isPagination) {
+					self.disableButtonPagination();
 
-                    initScrollPagination();
-                }
-            }
+					initScrollPagination();
+				}
+			}
 
-            var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-            var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
-            var editorComputedStyle = oCommentUi.utils.getComputedStyle(editorContainer);
+			var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+			var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
+			var editorComputedStyle = oCommentUi.utils.getComputedStyle(editorContainer);
 
-            var editorContainerMarginTopValue;
-            var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
-            if (editorContainerMarginTop.indexOf('px') !== -1) {
-                editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
-            } else {
-                editorContainerMarginTopValue = 0;
-            }
+			var editorContainerMarginTopValue;
+			var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
+			if (editorContainerMarginTop.indexOf('px') !== -1) {
+				editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
+			} else {
+				editorContainerMarginTopValue = 0;
+			}
 
-            var editorContainerMarginBottomValue;
-            var editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
-            if (editorContainerMarginBottom.indexOf('px') !== -1) {
-                editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
-            } else {
-                editorContainerMarginBottomValue = 0;
-            }
+			var editorContainerMarginBottomValue;
+			var editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
+			if (editorContainerMarginBottom.indexOf('px') !== -1) {
+				editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
+			} else {
+				editorContainerMarginBottomValue = 0;
+			}
 
-            var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
-            commentArea.style.overflow = "auto";
-            commentArea.style.height = (height - editorHeight) + "px";
+			var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
+			commentArea.style.overflow = "auto";
+			commentArea.style.height = (height - editorHeight) + "px";
 
-            if (!adaptedToHeight) {
-                adaptedToHeight = true;
+			if (!adaptedToHeight) {
+				adaptedToHeight = true;
 
-                oCommentUtilities.logger.debug("adapt to height, scroll to last");
-                scrollToLastComment();
+				oCommentUtilities.logger.debug("adapt to height, scroll to last");
+				scrollToLastComment();
 
 				initNotification();
-            }
-        };
-
-        // poll for the existence of container
-        var pollForContainer = setInterval(function () {
-            if (sizzle('.comment-editor-container', widgetContainer).length > 0) {
-                clearInterval(pollForContainer);
-                adapt();
-            }
-        }, 200);
-    };
-
-
-    // Specific functions for the widget that was shrinked to a fixed height
-
-        function initScrollPagination () {
-            var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-            new oCommentUtilities.dom.ScrollMonitor(commentArea, function (scrollPos) {
-                if (config.orderType === 'inverted') {
-                    if (scrollPos < 0.2 * commentArea.scrollHeight) {
-                        events.trigger('nextPage');
-                    }
-                } else {
-                    if (scrollPos + commentArea.clientHeight > 0.8 * commentArea.scrollHeight) {
-                        events.trigger('nextPage');
-                    }
-                }
-            });
-        }
-
-        function initNotification () {
-            var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-            newCommentNotification = new NewCommentNotification(self, commentArea, (config.orderType === "inverted" ? 'bottom' : 'top'));
-        }
-
-
-        function scrollToLastComment () {
-            var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-
-            if (config.orderType === "inverted") {
-                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
-            } else {
-                commentArea.scrollTop = 0;
-            }
-        }
-
-        function notifyNewComment () {
-            setTimeout(function () {
-                newCommentNotification.newComment();
-            }, 100);
-        }
-
-    this.disableButtonPagination = function () {
-        sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'none';
-        sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'none';
-    };
-
-    this.login = function (token, pseudonym, isAdmin) {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl && authEl.length) {
-            authEl[0].innerHTML = templates.loggedIn.render({
-                token: token,
-                pseudonym: pseudonym.substring(0, 50),
-                livefyreNetwork: envConfig.get().livefyre.network,
-                isAdmin: isAdmin
-            });
-        }
-    };
-
-    this.logout = function () {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl && authEl.length) {
-            authEl[0].innerHTML = templates.signIn.render();
-        }
-    };
-
-    this.getCurrentPseudonym = function () {
-        var pseudonymArea = sizzle('.comment-editor-auth .comment-pseudonym', widgetContainer);
-
-        if (pseudonymArea && pseudonymArea.length) {
-            return pseudonymArea[0].innerHTML;
-        }
-
-        return "";
-    };
-
-    this.hideSignInLink = function () {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl && authEl.length) {
-            authEl[0].innerHTML = "";
-        }
-    };
-
-    this.makeReadOnly = function () {
-        var commentEditorInputContainer = sizzle('.comment-editor-input', widgetContainer);
-
-        if (commentEditorInputContainer && commentEditorInputContainer.length) {
-            commentEditorInputContainer = commentEditorInputContainer[0];
-
-            commentEditorInputContainer.className += " disabled";
-            sizzle('textarea', commentEditorInputContainer)[0].setAttribute('disabled', 'disabled');
-            sizzle('.comment-editor-submit button', widgetContainer)[0].setAttribute('disabled', 'disabled');
-        }
-    };
-
-    this.makeEditable = function () {
-        var commentEditorInputContainer = sizzle('.comment-editor-input', widgetContainer);
-
-        if (commentEditorInputContainer && commentEditorInputContainer.length) {
-            commentEditorInputContainer = commentEditorInputContainer[0];
-
-            commentEditorInputContainer.className = commentEditorInputContainer.className.replace('disabled', '');
-            sizzle('textarea', commentEditorInputContainer)[0].removeAttribute('disabled');
-            sizzle('.comment-editor-submit button', widgetContainer)[0].removeAttribute('disabled');
-        }
-    };
-
-    // content, pseudonym, id, timestamp
-    this.addComment = function (commentData, ownComment, adminMode) {
-        ownComment = typeof ownComment === 'boolean' ? ownComment : false;
-
-        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
-        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-
-        // normalize timestamp if one provided or use current time
-        var timestamp = commentData.timestamp ? oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
-
-        var scrolledToLast;
-
-        var commentDom = oCommentUi.utils.toDOM(
-            templates.comment.render({
-                commentId: commentData.id,
-                content: commentData.content,
-                dateToShow: this.formatTimestamp(timestamp),
-                datetime: oCommentUtilities.dateHelper.toISOString(timestamp),
-                timestamp: oCommentUtilities.dateHelper.toTimestamp(timestamp),
-                relativeTime: this.isRelativeTime(timestamp),
-                author: {
-                    displayName: commentData.displayName.substring(0, 50)
-                },
-                adminMode: adminMode
-            })
-        );
-
-
-        var comments = sizzle('.comment-wrapper', commentContainer);
-        var i;
-        var inserted = false;
-
-        if (config.orderType === "inverted") {
-            oCommentUtilities.logger.debug("new comment");
-            scrolledToLast = (commentArea.scrollTop === (commentArea.scrollHeight - commentArea.clientHeight));
-
-            oCommentUtilities.logger.debug("scrolledToLast", scrolledToLast);
-
-            for (i = comments.length-1; i >= 0; i--) {
-                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
-                    if (i === comments.length-1) {
-                        commentContainer.appendChild(commentDom);
-                    } else {
-                        commentContainer.insertBefore(commentDom, comments[i+1]);
-                    }
-                    inserted = true;
-                    break;
-                }
-            }
-
-            if (!inserted) {
-                commentContainer.insertBefore(commentDom, commentContainer.firstChild);
-            }
-
-            if (ownComment || scrolledToLast) {
-                scrollToLastComment();
-            }
-        } else {
-            scrolledToLast = (commentArea.scrollTop === 0);
-
-            for (i = 0; i < comments.length; i++) {
-                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
-                    commentContainer.insertBefore(commentDom, comments[i]);
-                    inserted = true;
-                    break;
-                }
-            }
-
-            if (!inserted) {
-                commentContainer.appendChild(commentDom);
-            }
-
-            if (ownComment || scrolledToLast) {
-                scrollToLastComment();
-            }
-        }
-
-        if (this.isRelativeTime(timestamp)) {
-            commentDom = sizzle('#commentid-' + commentData.id, widgetContainer)[0];
-
-            var timeoutToStart = 10000;
-            if (new Date().getTime() - timestamp < 0) {
-                timeoutToStart += Math.abs(new Date().getTime() - timestamp);
-            }
-
-            setTimeout(function () {
-                try { oDate.init(commentDom); } catch(e) {}
-            }, timeoutToStart);
-        }
-
-        notifyNewComment();
-    };
-
-    this.addNextPageComments = function (comments, adminMode) {
-        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
-        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-
-        var commentData;
-        var commentDom;
-
-        for (var index = 0; index < comments.length; index++) {
-            commentData = comments[index];
-
-            commentDom = oCommentUi.utils.toDOM(
-                templates.comment.render({
-                    commentId: commentData.commentId,
-                    content: commentData.content,
-                    dateToShow: this.formatTimestamp(commentData.timestamp),
-                    datetime: oCommentUtilities.dateHelper.toISOString(commentData.timestamp),
-                    timestamp: oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp),
-                    relativeTime: this.isRelativeTime(commentData.timestamp),
-                    author: {
-                        displayName: commentData.author.displayName.substring(0, 50)
-                    },
-                    adminMode: adminMode
-                })
-            );
-
-            var previousScrollHeight = commentArea.scrollHeight;
-            if (config.orderType === "inverted") {
-                commentContainer.insertBefore(commentDom, commentContainer.firstChild);
-
-                commentArea.scrollTop += commentArea.scrollHeight - previousScrollHeight;
-            } else {
-                commentContainer.appendChild(commentDom);
-            }
-        }
-    };
-
-    this.removeComment = function (id) {
-        var comment = sizzle('#commentid-'+id, widgetContainer);
-        if (comment && comment.length) {
-            comment[0].parentNode.removeChild(comment[0]);
-        }
-    };
-
-    this.updateComment = function (id, newContent) {
-        var commentContentEl = sizzle('#commentid-' + id + ' .comment-content', widgetContainer);
-        if (commentContentEl && commentContentEl.length) {
-            commentContentEl[0].innerHTML = newContent;
-        }
-    };
-
-    this.markCommentAsDeleteInProgress = function (id) {
-        var comment = sizzle('#commentid-'+id, widgetContainer);
-        if (comment && comment.length) {
-            comment[0].className += " comment-delete-progress";
-        }
-    };
-
-    this.markCommentAsDeleteInProgressEnded = function (id) {
-        var comment = sizzle('#commentid-'+id, widgetContainer);
-        if (comment && comment.length) {
-            comment[0].className = comment[0].className.replace("comment-delete-progress", "");
-        }
-    };
-
-    this.getCurrentComment = function () {
-        var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
-
-        if (commentArea && commentArea.length) {
-            return utils.strings.trim(commentArea[0].value).replace(/(?:\r\n|\r|\n)/g, '<br />');
-        }
-
-        return "";
-    };
-
-    this.emptyCommentArea = function () {
-        var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
-
-        if (commentArea && commentArea.length) {
-            commentArea[0].value = "";
-        }
-    };
-
-    this.repopulateCommentArea = function (text) {
-        var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
-
-        if (commentArea && commentArea.length && text && text.length) {
-            commentArea[0].value = text.replace(/<br \/>/g, '\n');
-        }
-    };
-
-    this.addSettingsLink = function (options) {
-        var loginBarContainer = sizzle('.comment-editor-auth', widgetContainer);
-        if (loginBarContainer && loginBarContainer.length) {
-            loginBarContainer[0].appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.commentingSettingsLink.render({
-                label: "Edit pseudonym",
-                withoutSeparator: true
-            })));
-        } else {
-            return;
-        }
-
-        var settingsLink = sizzle('.comment-settings-text', loginBarContainer[0]);
-        if (settingsLink && settingsLink.length) {
-            oCommentUi.utils.addEventListener('click', settingsLink[0], function () {
-                if (options && typeof options.onClick === 'function') {
-                    options.onClick();
-                }
-            });
-
-            if (options && typeof options.onAdded === 'function') {
-                options.onAdded();
-            }
-        }
-    };
-
-    this.addNotAvailableMessage = function () {
-        widgetContainer.innerHTML = oCommentUi.templates.unavailableTemplate.render({
-            message: oCommentUi.i18n.texts.unavailable,
-            fontSize: "12px",
-            style: "padding: 10px 0 20px 0;"
-        });
-    };
-
-    this.removeSettingsLink = function () {
-        var settingsLink = sizzle('.comment-settings', widgetContainer);
-        if (settingsLink && settingsLink.length) {
-            settingsLink[0].parentNode.removeChild(settingsLink[0]);
-        }
-    };
-
-    this.setEditorError = function (err) {
-        var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
-
-        editorErrorContainer.innerHTML = err;
-        editorErrorContainer.style.display = 'block';
-    };
-
-    this.clearEditorError = function () {
-        var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
-
-        editorErrorContainer.style.display = 'none';
-        editorErrorContainer.innerHTML = '';
-    };
-
-    this.formatTimestamp = function (timestampOrDate) {
-        var timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
-        var isRelative = this.isRelativeTime(timestampOrDate);
-
-        if (isRelative) {
-            // relative time
-            if (timestamp >= new Date().getTime() - 1500) {
-                return "just now";
-            } else {
-                return oDate.timeAgo(timestamp);
-            }
-        } else {
-            // absolute time
-            return oDate.format(timestamp, config.datetimeFormat.absoluteFormat);
-        }
-    };
-
-    this.isRelativeTime = function (timestampOrDate) {
-        var timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
-
-        if (config.datetimeFormat.minutesUntilAbsoluteTime === -1 ||
-            new Date().getTime() - timestamp > config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
-
-            return false;
-        } else {
-            return true;
-        }
-    };
+			}
+		};
+
+		// poll for the existence of container
+		var pollForContainer = setInterval(function () {
+			if (sizzle('.comment-editor-container', widgetContainer).length > 0) {
+				clearInterval(pollForContainer);
+				adapt();
+			}
+		}, 200);
+	};
+
+
+	// Specific functions for the widget that was shrinked to a fixed height
+
+		function initScrollPagination () {
+			var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+			new oCommentUtilities.dom.ScrollMonitor(commentArea, function (scrollPos) {
+				if (config.orderType === 'inverted') {
+					if (scrollPos < 0.2 * commentArea.scrollHeight) {
+						events.trigger('nextPage');
+					}
+				} else {
+					if (scrollPos + commentArea.clientHeight > 0.8 * commentArea.scrollHeight) {
+						events.trigger('nextPage');
+					}
+				}
+			});
+		}
+
+		function initNotification () {
+			var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+			newCommentNotification = new NewCommentNotification(self, commentArea, (config.orderType === "inverted" ? 'bottom' : 'top'));
+		}
+
+
+		function scrollToLastComment () {
+			var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+
+			if (config.orderType === "inverted") {
+				commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
+			} else {
+				commentArea.scrollTop = 0;
+			}
+		}
+
+		function notifyNewComment () {
+			setTimeout(function () {
+				newCommentNotification.newComment();
+			}, 100);
+		}
+
+	this.disableButtonPagination = function () {
+		sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'none';
+		sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'none';
+	};
+
+	this.login = function (token, pseudonym, isAdmin) {
+		var authEl = sizzle('.comment-editor-auth', widgetContainer);
+
+		if (authEl && authEl.length) {
+			authEl[0].innerHTML = templates.loggedIn.render({
+				token: token,
+				pseudonym: pseudonym.substring(0, 50),
+				livefyreNetwork: envConfig.get().livefyre.network,
+				isAdmin: isAdmin
+			});
+		}
+	};
+
+	this.logout = function () {
+		var authEl = sizzle('.comment-editor-auth', widgetContainer);
+
+		if (authEl && authEl.length) {
+			authEl[0].innerHTML = templates.signIn.render();
+		}
+	};
+
+	this.getCurrentPseudonym = function () {
+		var pseudonymArea = sizzle('.comment-editor-auth .comment-pseudonym', widgetContainer);
+
+		if (pseudonymArea && pseudonymArea.length) {
+			return pseudonymArea[0].innerHTML;
+		}
+
+		return "";
+	};
+
+	this.hideSignInLink = function () {
+		var authEl = sizzle('.comment-editor-auth', widgetContainer);
+
+		if (authEl && authEl.length) {
+			authEl[0].innerHTML = "";
+		}
+	};
+
+	this.makeReadOnly = function () {
+		var commentEditorInputContainer = sizzle('.comment-editor-input', widgetContainer);
+
+		if (commentEditorInputContainer && commentEditorInputContainer.length) {
+			commentEditorInputContainer = commentEditorInputContainer[0];
+
+			commentEditorInputContainer.className += " disabled";
+			sizzle('textarea', commentEditorInputContainer)[0].setAttribute('disabled', 'disabled');
+			sizzle('.comment-editor-submit button', widgetContainer)[0].setAttribute('disabled', 'disabled');
+		}
+	};
+
+	this.makeEditable = function () {
+		var commentEditorInputContainer = sizzle('.comment-editor-input', widgetContainer);
+
+		if (commentEditorInputContainer && commentEditorInputContainer.length) {
+			commentEditorInputContainer = commentEditorInputContainer[0];
+
+			commentEditorInputContainer.className = commentEditorInputContainer.className.replace('disabled', '');
+			sizzle('textarea', commentEditorInputContainer)[0].removeAttribute('disabled');
+			sizzle('.comment-editor-submit button', widgetContainer)[0].removeAttribute('disabled');
+		}
+	};
+
+	// content, pseudonym, id, timestamp
+	this.addComment = function (commentData, ownComment, adminMode) {
+		ownComment = typeof ownComment === 'boolean' ? ownComment : false;
+
+		var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+		var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+
+		// normalize timestamp if one provided or use current time
+		var timestamp = commentData.timestamp ? oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
+
+		var scrolledToLast;
+
+		var commentDom = oCommentUi.utils.toDOM(
+			templates.comment.render({
+				commentId: commentData.id,
+				content: commentData.content,
+				dateToShow: this.formatTimestamp(timestamp),
+				datetime: oCommentUtilities.dateHelper.toISOString(timestamp),
+				timestamp: oCommentUtilities.dateHelper.toTimestamp(timestamp),
+				relativeTime: this.isRelativeTime(timestamp),
+				author: {
+					displayName: commentData.displayName.substring(0, 50)
+				},
+				adminMode: adminMode
+			})
+		);
+
+
+		var comments = sizzle('.comment-wrapper', commentContainer);
+		var i;
+		var inserted = false;
+
+		if (config.orderType === "inverted") {
+			oCommentUtilities.logger.debug("new comment");
+			scrolledToLast = (commentArea.scrollTop === (commentArea.scrollHeight - commentArea.clientHeight));
+
+			oCommentUtilities.logger.debug("scrolledToLast", scrolledToLast);
+
+			for (i = comments.length-1; i >= 0; i--) {
+				if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
+					if (i === comments.length-1) {
+						commentContainer.appendChild(commentDom);
+					} else {
+						commentContainer.insertBefore(commentDom, comments[i+1]);
+					}
+					inserted = true;
+					break;
+				}
+			}
+
+			if (!inserted) {
+				commentContainer.insertBefore(commentDom, commentContainer.firstChild);
+			}
+
+			if (ownComment || scrolledToLast) {
+				scrollToLastComment();
+			}
+		} else {
+			scrolledToLast = (commentArea.scrollTop === 0);
+
+			for (i = 0; i < comments.length; i++) {
+				if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
+					commentContainer.insertBefore(commentDom, comments[i]);
+					inserted = true;
+					break;
+				}
+			}
+
+			if (!inserted) {
+				commentContainer.appendChild(commentDom);
+			}
+
+			if (ownComment || scrolledToLast) {
+				scrollToLastComment();
+			}
+		}
+
+		if (this.isRelativeTime(timestamp)) {
+			commentDom = sizzle('#commentid-' + commentData.id, widgetContainer)[0];
+
+			var timeoutToStart = 10000;
+			if (new Date().getTime() - timestamp < 0) {
+				timeoutToStart += Math.abs(new Date().getTime() - timestamp);
+			}
+
+			setTimeout(function () {
+				try { oDate.init(commentDom); } catch(e) {}
+			}, timeoutToStart);
+		}
+
+		notifyNewComment();
+	};
+
+	this.addNextPageComments = function (comments, adminMode) {
+		var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+		var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+
+		var commentData;
+		var commentDom;
+
+		for (var index = 0; index < comments.length; index++) {
+			commentData = comments[index];
+
+			commentDom = oCommentUi.utils.toDOM(
+				templates.comment.render({
+					commentId: commentData.commentId,
+					content: commentData.content,
+					dateToShow: this.formatTimestamp(commentData.timestamp),
+					datetime: oCommentUtilities.dateHelper.toISOString(commentData.timestamp),
+					timestamp: oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp),
+					relativeTime: this.isRelativeTime(commentData.timestamp),
+					author: {
+						displayName: commentData.author.displayName.substring(0, 50)
+					},
+					adminMode: adminMode
+				})
+			);
+
+			var previousScrollHeight = commentArea.scrollHeight;
+			if (config.orderType === "inverted") {
+				commentContainer.insertBefore(commentDom, commentContainer.firstChild);
+
+				commentArea.scrollTop += commentArea.scrollHeight - previousScrollHeight;
+			} else {
+				commentContainer.appendChild(commentDom);
+			}
+		}
+	};
+
+	this.removeComment = function (id) {
+		var comment = sizzle('#commentid-'+id, widgetContainer);
+		if (comment && comment.length) {
+			comment[0].parentNode.removeChild(comment[0]);
+		}
+	};
+
+	this.updateComment = function (id, newContent) {
+		var commentContentEl = sizzle('#commentid-' + id + ' .comment-content', widgetContainer);
+		if (commentContentEl && commentContentEl.length) {
+			commentContentEl[0].innerHTML = newContent;
+		}
+	};
+
+	this.markCommentAsDeleteInProgress = function (id) {
+		var comment = sizzle('#commentid-'+id, widgetContainer);
+		if (comment && comment.length) {
+			comment[0].className += " comment-delete-progress";
+		}
+	};
+
+	this.markCommentAsDeleteInProgressEnded = function (id) {
+		var comment = sizzle('#commentid-'+id, widgetContainer);
+		if (comment && comment.length) {
+			comment[0].className = comment[0].className.replace("comment-delete-progress", "");
+		}
+	};
+
+	this.getCurrentComment = function () {
+		var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
+
+		if (commentArea && commentArea.length) {
+			return utils.strings.trim(commentArea[0].value).replace(/(?:\r\n|\r|\n)/g, '<br />');
+		}
+
+		return "";
+	};
+
+	this.emptyCommentArea = function () {
+		var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
+
+		if (commentArea && commentArea.length) {
+			commentArea[0].value = "";
+		}
+	};
+
+	this.repopulateCommentArea = function (text) {
+		var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
+
+		if (commentArea && commentArea.length && text && text.length) {
+			commentArea[0].value = text.replace(/<br \/>/g, '\n');
+		}
+	};
+
+	this.addSettingsLink = function (options) {
+		var loginBarContainer = sizzle('.comment-editor-auth', widgetContainer);
+		if (loginBarContainer && loginBarContainer.length) {
+			loginBarContainer[0].appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.commentingSettingsLink.render({
+				label: "Edit pseudonym",
+				withoutSeparator: true
+			})));
+		} else {
+			return;
+		}
+
+		var settingsLink = sizzle('.comment-settings-text', loginBarContainer[0]);
+		if (settingsLink && settingsLink.length) {
+			oCommentUi.utils.addEventListener('click', settingsLink[0], function () {
+				if (options && typeof options.onClick === 'function') {
+					options.onClick();
+				}
+			});
+
+			if (options && typeof options.onAdded === 'function') {
+				options.onAdded();
+			}
+		}
+	};
+
+	this.addNotAvailableMessage = function () {
+		widgetContainer.innerHTML = oCommentUi.templates.unavailableTemplate.render({
+			message: oCommentUi.i18n.texts.unavailable,
+			fontSize: "12px",
+			style: "padding: 10px 0 20px 0;"
+		});
+	};
+
+	this.removeSettingsLink = function () {
+		var settingsLink = sizzle('.comment-settings', widgetContainer);
+		if (settingsLink && settingsLink.length) {
+			settingsLink[0].parentNode.removeChild(settingsLink[0]);
+		}
+	};
+
+	this.setEditorError = function (err) {
+		var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
+
+		editorErrorContainer.innerHTML = err;
+		editorErrorContainer.style.display = 'block';
+	};
+
+	this.clearEditorError = function () {
+		var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
+
+		editorErrorContainer.style.display = 'none';
+		editorErrorContainer.innerHTML = '';
+	};
+
+	this.formatTimestamp = function (timestampOrDate) {
+		var timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
+		var isRelative = this.isRelativeTime(timestampOrDate);
+
+		if (isRelative) {
+			// relative time
+			if (timestamp >= new Date().getTime() - 1500) {
+				return "just now";
+			} else {
+				return oDate.timeAgo(timestamp);
+			}
+		} else {
+			// absolute time
+			return oDate.format(timestamp, config.datetimeFormat.absoluteFormat);
+		}
+	};
+
+	this.isRelativeTime = function (timestampOrDate) {
+		var timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
+
+		if (config.datetimeFormat.minutesUntilAbsoluteTime === -1 ||
+			new Date().getTime() - timestamp > config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
+
+			return false;
+		} else {
+			return true;
+		}
+	};
 }
 
 WidgetUi.__extend = function(child) {
-    if (typeof Object.create === 'function') {
-        child.prototype = Object.create(WidgetUi.prototype);
-        child.prototype = Object.create(WidgetUi.prototype);
-    } else {
-        var Tmp = function () {};
-        Tmp.prototype = WidgetUi.prototype;
-        child.prototype = new Tmp();
-        child.prototype.constructor = child;
-    }
+	if (typeof Object.create === 'function') {
+		child.prototype = Object.create(WidgetUi.prototype);
+		child.prototype = Object.create(WidgetUi.prototype);
+	} else {
+		var Tmp = function () {};
+		Tmp.prototype = WidgetUi.prototype;
+		child.prototype = new Tmp();
+		child.prototype.constructor = child;
+	}
 };
 
 oCommentUi.WidgetUi.__extend(WidgetUi);

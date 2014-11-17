@@ -1,133 +1,133 @@
 .o-chat {
-    &.comment-order-normal .comment-editor-container {
-        margin-bottom: 10px;
-    }
+	&.comment-order-normal .comment-editor-container {
+		margin-bottom: 10px;
+	}
 
-    &.comment-order-inverted .comment-editor-container {
-        margin-top: 10px;
-    }
+	&.comment-order-inverted .comment-editor-container {
+		margin-top: 10px;
+	}
 
-    .comment-editor-container {
-        font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+	.comment-editor-container {
+		font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
 
-        .comment-editor-closed {
-            display: none;
+		.comment-editor-closed {
+			display: none;
 
-            background: oColorsGetPaletteColor(white);
-            border: 1px solid #b2b2b2;
-            color: oColorsGetPaletteColor(grey-tint4);
-            margin-top: 41px;
-            margin-bottom: 42px;
-            padding: 5px 10px;
-            font-weight: bold;
-        }
+			background: oColorsGetPaletteColor(white);
+			border: 1px solid #b2b2b2;
+			color: oColorsGetPaletteColor(grey-tint4);
+			margin-top: 41px;
+			margin-bottom: 42px;
+			padding: 5px 10px;
+			font-weight: bold;
+		}
 
-        .comment-editor-header {
-            margin-bottom: 4px;
+		.comment-editor-header {
+			margin-bottom: 4px;
 
-            .comment-loggedin {
-                float: left;
-                position: relative;
+			.comment-loggedin {
+				float: left;
+				position: relative;
 
-                .comment-pseudonym {
-                    cursor: default;
-                }
+				.comment-pseudonym {
+					cursor: default;
+				}
 
-                .comment-admin-links {
-                    display: none;
+				.comment-admin-links {
+					display: none;
 
-                    background: white;
-                    padding: 5px;
-                    position: absolute;
-                    top: 100%;
-                    left: 0;
-                    z-index: 1000;
-                    border: 1px solid oColorsGetPaletteColor(pink-tint4);
+					background: white;
+					padding: 5px;
+					position: absolute;
+					top: 100%;
+					left: 0;
+					z-index: 1000;
+					border: 1px solid oColorsGetPaletteColor(pink-tint4);
 
-                    li {
-                        border-bottom: 1px solid  oColorsGetPaletteColor(pink-tint4);
-                        white-space: nowrap;
+					li {
+						border-bottom: 1px solid  oColorsGetPaletteColor(pink-tint4);
+						white-space: nowrap;
 
-                        &:last-child {
-                            border: 0;
-                        }
-                    }
-                }
+						&:last-child {
+							border: 0;
+						}
+					}
+				}
 
-                &:hover {
-                    .comment-admin-links {
-                        display: block;
-                    }
-                }
-            }
+				&:hover {
+					.comment-admin-links {
+						display: block;
+					}
+				}
+			}
 
-            .comment-settings {
-                float: right;
-            }
-        }
+			.comment-settings {
+				float: right;
+			}
+		}
 
-        .comment-editor-input {
-            border: 1px solid oColorsGetPaletteColor(pink-tint2);
-            padding: 5px 10px;
-            background: oColorsGetPaletteColor(white);
-            cursor: text;
-            position: relative;
+		.comment-editor-input {
+			border: 1px solid oColorsGetPaletteColor(pink-tint2);
+			padding: 5px 10px;
+			background: oColorsGetPaletteColor(white);
+			cursor: text;
+			position: relative;
 
-            &.disabled {
-                background: oColorsGetPaletteColor(pink-tint2);
-            }
+			&.disabled {
+				background: oColorsGetPaletteColor(pink-tint2);
+			}
 
-            textarea {
-                width: 100%;
-                border: 0;
-                resize: none;
-                padding: 0;
-                height: 60px;
-                margin-top: 5px;
-                outline: 0;
-                color: oColorsGetPaletteColor(grey-tint5);
-                font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
-                font-size: 12px;
+			textarea {
+				width: 100%;
+				border: 0;
+				resize: none;
+				padding: 0;
+				height: 60px;
+				margin-top: 5px;
+				outline: 0;
+				color: oColorsGetPaletteColor(grey-tint5);
+				font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+				font-size: 12px;
 
-                &[disabled] {
-                    background: oColorsGetPaletteColor(pink-tint2);
-                }
-            }
+				&[disabled] {
+					background: oColorsGetPaletteColor(pink-tint2);
+				}
+			}
 
-            .comment-editor-error {
-                position: absolute;
-                bottom: 0;
-                right: 0;
-                max-width: 50%;
-                padding: 5px 10px;
-                background: oColorsGetPaletteColor(red);
-                color: oColorsGetPaletteColor(white);
-                line-height: 15px;
-                display: none;
-            }
-        }
+			.comment-editor-error {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				max-width: 50%;
+				padding: 5px 10px;
+				background: oColorsGetPaletteColor(red);
+				color: oColorsGetPaletteColor(white);
+				line-height: 15px;
+				display: none;
+			}
+		}
 
-        .comment-editor-footer {
-            border: 1px solid oColorsGetPaletteColor(pink-tint2);
-            border-top: 0;
+		.comment-editor-footer {
+			border: 1px solid oColorsGetPaletteColor(pink-tint2);
+			border-top: 0;
 
-            .comment-editor-submit {
-                float: right;
+			.comment-editor-submit {
+				float: right;
 
-                button {
-                    @include comment-button();
-                    border-radius: 0;
-                    font-size: 12px;
-                    font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
-                    text-shadow: none;
-                    min-height: 28px;
-                    line-height: 28px;
-                }
-            }
-        }
-    }
+				button {
+					@include comment-button();
+					border-radius: 0;
+					font-size: 12px;
+					font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+					text-shadow: none;
+					min-height: 28px;
+					line-height: 28px;
+				}
+			}
+		}
+	}
 
-    .comment-editor-terms {
-        padding-bottom: 16px;
-    }
+	.comment-editor-terms {
+		padding-bottom: 16px;
+	}
 }

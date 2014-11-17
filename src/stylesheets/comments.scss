@@ -1,89 +1,89 @@
 .o-chat {
-    .comment-comments-wrapper {
-        position: relative;
-    }
+	.comment-comments-wrapper {
+		position: relative;
+	}
 
-    .comment-comments-area {
-        font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
-        
-        .comment-show-more {
-            display: none;
+	.comment-comments-area {
+		font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
 
-            color: white;
-            text-align: center;
-            position: relative;
+		.comment-show-more {
+			display: none;
 
-            .comment-show-more-line {
-                position: absolute;
-                top: 50%;
-                width: 100%;
-                border-top: 1px solid oColorsGetPaletteColor(pink-tint2);
-            }
+			color: white;
+			text-align: center;
+			position: relative;
 
-            .comment-show-more-label {
-                display: inline-block;
-                position: relative;
-                background: #4e8fbd;
-                background: -webkit-gradient(linear, left top, left bottom, from(#549ccf), to(#4782ab));
-                background: -moz-linear-gradient(#549ccf, #4782ab);
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#549ccf,endColorstr=#4782ab);
-                -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#549ccf, endColorstr=#4782ab)";
-                padding: 2px 5px;
-                border-radius: 3px;
-                cursor: pointer;
-            }
+			.comment-show-more-line {
+				position: absolute;
+				top: 50%;
+				width: 100%;
+				border-top: 1px solid oColorsGetPaletteColor(pink-tint2);
+			}
 
-            .comment-show-more-label:active {
-                background: oColorsGetPaletteColor(pink-tint4);
-            }
-        }
+			.comment-show-more-label {
+				display: inline-block;
+				position: relative;
+				background: #4e8fbd;
+				background: -webkit-gradient(linear, left top, left bottom, from(#549ccf), to(#4782ab));
+				background: -moz-linear-gradient(#549ccf, #4782ab);
+				filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#549ccf,endColorstr=#4782ab);
+				-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#549ccf, endColorstr=#4782ab)";
+				padding: 2px 5px;
+				border-radius: 3px;
+				cursor: pointer;
+			}
 
-        .comment-comments-container {
-            .comment-wrapper {
-                color: oColorsGetPaletteColor(grey-tint5);
-                font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
-                border-bottom: 1px solid oColorsGetPaletteColor(pink-tint2);
-                padding: 10px 0;
-                list-style-type: none;
-                list-style-position: outside;
+			.comment-show-more-label:active {
+				background: oColorsGetPaletteColor(pink-tint4);
+			}
+		}
 
-                &.comment-delete-progress {
-                    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
-                    filter: alpha(opacity=50);
-                    -moz-opacity: 0.5;
-                    -khtml-opacity: 0.5;
-                    opacity: 0.5;
-                }
+		.comment-comments-container {
+			.comment-wrapper {
+				color: oColorsGetPaletteColor(grey-tint5);
+				font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+				border-bottom: 1px solid oColorsGetPaletteColor(pink-tint2);
+				padding: 10px 0;
+				list-style-type: none;
+				list-style-position: outside;
 
-                &:last-child {
-                    border-bottom: 0;
-                }
+				&.comment-delete-progress {
+					-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+					filter: alpha(opacity=50);
+					-moz-opacity: 0.5;
+					-khtml-opacity: 0.5;
+					opacity: 0.5;
+				}
 
-                .comment-timestamp {
-                    display: inline;
-                    font-size: 10px;
-                    color: oColorsGetPaletteColor(grey-tint3);
-                    font-style: italic;
-                }
+				&:last-child {
+					border-bottom: 0;
+				}
 
-                .comment-author {
-                    display: inline;
-                    font-weight: bold;
-                }
+				.comment-timestamp {
+					display: inline;
+					font-size: 10px;
+					color: oColorsGetPaletteColor(grey-tint3);
+					font-style: italic;
+				}
 
-                .comment-content {
-                    display: inline;
+				.comment-author {
+					display: inline;
+					font-weight: bold;
+				}
 
-                    p {
-                        display: inline;
-                    }
-                }
+				.comment-content {
+					display: inline;
 
-                .comment-delete {
-                    float: right;
-                    padding: 0 10px;
-                }
-            }
-        }
-    }
+					p {
+						display: inline;
+					}
+				}
+
+				.comment-delete {
+					float: right;
+					padding: 0 10px;
+				}
+			}
+		}
+	}
 }
