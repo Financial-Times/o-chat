@@ -4,7 +4,7 @@ var auth = require('./auth.js');
 var MessageQueue = require('./MessageQueue.js');
 var WidgetUi = require('./WidgetUi.js');
 var oCommentUi = require('o-comment-ui');
-var oCommentData = require('o-comment-data');
+var oCommentApi = require('o-comment-api');
 var oCommentUtilities = require('o-comment-utilities');
 var userDialogs = require('./userDialogs.js');
 var i18n = require('./i18n.js');
@@ -166,10 +166,10 @@ var Widget = function () {
 	 * This is responsible to load the comments and the article related data.
 	 * This function also initiates live stream from Livefyre.
 	 *
-	 * @param  {Function} callback function(err, data), where data contains collectionId and comments. See o-comment-data.api.getComments
+	 * @param  {Function} callback function(err, data), where data contains collectionId and comments. See o-comment-api.api.getComments
 	 */
 	this.init = function (callback) {
-		oCommentData.api.getComments({
+		oCommentApi.api.getComments({
 			articleId: self.config.articleId,
 			url: self.config.url,
 			title: self.config.title,
@@ -317,7 +317,7 @@ var Widget = function () {
 	 *  - timestamp: normalized timestamp (in milliseconds)
 	 *  - author.displayName truncated to 50 characters
 	 *
-	 * @param  {Object} aComment A comment object, which respects the format the oCommentData.api.getComments returns.
+	 * @param  {Object} aComment A comment object, which respects the format the oCommentApi.api.getComments returns.
 	 * @return {Object}
 	 */
 	function processOneComment (aComment) {
@@ -336,7 +336,7 @@ var Widget = function () {
 	 * Iterates over an array of comments and applies the modifications made by the
 	 * processOneComment function.
 	 *
-	 * @param  {Array} comments Array with comments objects, which respects the format the oCommentData.api.getComments returns.
+	 * @param  {Array} comments Array with comments objects, which respects the format the oCommentApi.api.getComments returns.
 	 * @return {Array}
 	 */
 	function preprocessCommentData (comments) {
@@ -419,7 +419,7 @@ var Widget = function () {
 		self.ui.addSettingsLink({
 			onClick: function () {
 				var showSettingsDialog = function () {
-					oCommentData.api.getAuth(function (err, currentAuthData) {
+					oCommentApi.api.getAuth(function (err, currentAuthData) {
 						if (!err && currentAuthData) {
 							userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
 								success: function (newAuthData) {
@@ -433,7 +433,7 @@ var Widget = function () {
 					});
 				};
 
-				oCommentData.api.getAuth(function (err, currentAuthData) {
+				oCommentApi.api.getAuth(function (err, currentAuthData) {
 					if (err || !currentAuthData) {
 						auth.loginRequired({
 							success: function () {
@@ -480,7 +480,7 @@ var Widget = function () {
 			oCommentUtilities.logger.log('fetch next page');
 
 			nextPageFetchInProgress = true;
-			oCommentData.api.getComments({
+			oCommentApi.api.getComments({
 				articleId: self.config.articleId,
 				url: self.config.url,
 				title: self.config.title,
@@ -529,7 +529,7 @@ var Widget = function () {
 	 * @return {[type]} [description]
 	 */
 	var postComment = function (commentBody, secondStepOfTryingToPost) {
-		oCommentData.api.postComment({
+		oCommentApi.api.postComment({
 			collectionId: self.collectionId,
 			commentBody: commentBody
 		}, function (err, postCommentResult) {
@@ -549,7 +549,7 @@ var Widget = function () {
 				if (postCommentResult.success === true) {
 					self.ui.emptyCommentArea();
 
-					oCommentData.api.getAuth(function (err, authData) {
+					oCommentApi.api.getAuth(function (err, authData) {
 						if (authData) {
 							triggerCommentPostedEvent({
 								commentId: postCommentResult.commentId,
@@ -633,7 +633,7 @@ var Widget = function () {
 
 		self.ui.makeReadOnly();
 
-		oCommentData.api.getAuth(function (err, authData) {
+		oCommentApi.api.getAuth(function (err, authData) {
 			if (!authData || !authData.token) {
 				self.ui.makeEditable();
 				loginRequiredToPostComment(commentBody);
@@ -651,7 +651,7 @@ var Widget = function () {
 
 
 	function deleteComment (commentId, secondStepOfTryingToDelete) {
-		oCommentData.api.deleteComment({
+		oCommentApi.api.deleteComment({
 			collectionId: self.collectionId,
 			commentId: commentId
 		}, function (err, deleteCommentResult) {
@@ -719,7 +719,7 @@ var Widget = function () {
 	self.ui.on('deleteComment', function (commentId) {
 		self.ui.markCommentAsDeleteInProgress(commentId);
 
-		oCommentData.api.getAuth(function (err, authData) {
+		oCommentApi.api.getAuth(function (err, authData) {
 			if (!authData || !authData.token) {
 				loginRequiredToDeleteComment(commentId);
 			} else {

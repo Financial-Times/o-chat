@@ -1,7 +1,7 @@
 "use strict";
 
 var oCommentUi = require('o-comment-ui');
-var oCommentData = require('o-comment-data');
+var oCommentApi = require('o-comment-api');
 
 /**
  * Shows a dialog for setting the initial pseudonym (shown when the user doesn't have a pseudonym set).
@@ -18,7 +18,7 @@ exports.showSetPseudonymDialog = function (callbacks) {
 	oCommentUi.userDialogs.showSetPseudonymDialog({
 		submit: function (formData, responseCallback) {
 			if (formData && formData.pseudonym) {
-				oCommentData.api.updateUser({
+				oCommentApi.api.updateUser({
 					pseudonym: formData.pseudonym
 				}, function (err) {
 					if (err) {
@@ -36,7 +36,7 @@ exports.showSetPseudonymDialog = function (callbacks) {
 					}
 
 
-					oCommentData.api.getAuth({
+					oCommentApi.api.getAuth({
 						force: true
 					}, function (err, authData) {
 						if (err) {
@@ -75,7 +75,7 @@ exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
 	oCommentUi.userDialogs.showChangePseudonymDialog(currentPseudonym, {
 		submit: function (formData, responseCallback) {
 			if (formData) {
-				oCommentData.api.updateUser(formData, function (err) {
+				oCommentApi.api.updateUser(formData, function (err) {
 					if (err) {
 						if (typeof err === 'object' && err.sudsError) {
 							if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(err.error)) {
@@ -90,7 +90,7 @@ exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
 						return;
 					}
 
-					oCommentData.api.getAuth({
+					oCommentApi.api.getAuth({
 						force: true
 					}, function (err, authData) {
 						if (err) {

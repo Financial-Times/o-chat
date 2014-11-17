@@ -2,7 +2,7 @@
 
 var oCommentUtilities = require('o-comment-utilities');
 var userDialogs = require('./userDialogs');
-var oCommentData = require('o-comment-data');
+var oCommentApi = require('o-comment-api');
 
 
 
@@ -34,7 +34,7 @@ function Auth () {
 			callback = function () {};
 		}
 
-		oCommentData.api.getAuth(function (err, authData) {
+		oCommentApi.api.getAuth(function (err, authData) {
 			if (err) {
 				callback(false);
 				return;
@@ -97,7 +97,7 @@ function Auth () {
 	 * @param  {[type]} delegate Has two functions: success and failure. The appropriate function will be called.
 	 */
 	function loginRequiredAfterASuccess (delegate) {
-		oCommentData.api.getAuth({
+		oCommentApi.api.getAuth({
 			force: true
 		}, function (err, authData) {
 			if (authData && authData.pseudonym === false) {
@@ -118,7 +118,7 @@ function Auth () {
 	 * @param  {[type]} delegate Has two functions: success and failure. The appropriate function will be called.
 	 */
 	this.loginRequired = function (delegate, force) {
-		oCommentData.api.getAuth({
+		oCommentApi.api.getAuth({
 			force: force
 		}, function (err, authData) {
 			if (authData && authData.pseudonym === false) {
