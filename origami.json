@@ -1,5 +1,5 @@
 {
-    "description": "Comment widget built on top of Livefyre API's and FT comment services.",
+    "description": "A chat-style commenting component. Integrated with FT authentication and user data services.",
     "origamiType": "module",
     "origamiVersion": 1,
     "support": "hyperion@ft.com",
