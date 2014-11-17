@@ -29,7 +29,7 @@ module.exports = function (grunt) {
 
     gruntModuleAggregator.addModule(gruntBower);
     gruntModuleAggregator.addModule(gruntJsDoc);
-    gruntModuleAggregator.addModule(gruntBrowserifyBuild, "oCommentClient");
+    gruntModuleAggregator.addModule(gruntBrowserifyBuild, "oChat");
     gruntModuleAggregator.addModule(gruntJsHint);
     gruntModuleAggregator.addModule(gruntSass);
     gruntModuleAggregator.addModule(gruntQunit);

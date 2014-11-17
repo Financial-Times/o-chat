@@ -1,4 +1,4 @@
-# o-comment-client
+# o-chat
 
 Commenting widget built on top of data APIs provided by o-comment-data module. This Widget uses both SUDS (Session user data service) and CCS (Comment creation service).
 
@@ -9,13 +9,13 @@ There are two ways of using this module:
 
 ### Build tool
 Include the script provided by the build tool.
-The script exposes a global variable named `oCommentClient`.
+The script exposes a global variable named `oChat`.
 
 ### Bower
 As a bower dependency:
 
 ```javascript
-var oCommentClient = require('o-comment-client');
+var oChat = require('o-chat');
 ```
 
 The module should be built using `browserify` (with `debowerify` transform).
@@ -29,7 +29,7 @@ This method is responsible for changing the default configuration used by this m
 In order to use this module with authentication enabled, you should specify the user's session ID:
 
 ```javascript
-oCommentClient.init({
+oChat.init({
     sessionId: 'sessID'
 });
 ```
@@ -95,7 +95,7 @@ var userSession = readCookie('FTSession');
 Set the user's session if one is available:
 
 ```javascript
-oCommentClient.init({
+oChat.init({
     sessionId: userSession
 });
 ```
@@ -104,7 +104,7 @@ oCommentClient.init({
 Listen on the 'login required' event, and try to log in the user within the page:
 
 ```javascript
-oCommentClient.auth.on('loginRequired.authAction', function (delegate) {
+oChat.auth.on('loginRequired.authAction', function (delegate) {
     // the user is not logged in, but an action was performed within the comment widget that requires the user to be logged in
 
     login();
@@ -124,7 +124,7 @@ oCommentClient.auth.on('loginRequired.authAction', function (delegate) {
 Create an instance of the Widget with the parameters that are available:
 
 ```javascript
-var widgetInstance = new oCommentClient.Widget({
+var widgetInstance = new oChat.Widget({
     elId: 'container-id',
     title: document.title,
     url: document.location.href,
@@ -157,20 +157,20 @@ The Widget will be created using data from a DOM element.
 Include this where you want the widget to load:
 
 ```html
-<div class="o-comment-client" id="commentWidget" data-o-comment-client-autoconstruct="true" data-o-comment-client-config-title="title-of-the-article" data-o-comment-client-config-url="page-url" data-o-comment-client-config-articleId="ID-of-the-article"></div>
+<div class="o-chat" id="commentWidget" data-o-chat-autoconstruct="true" data-o-chat-config-title="title-of-the-article" data-o-chat-config-url="page-url" data-o-chat-config-articleId="ID-of-the-article"></div>
 ```
 
 In order to build the DOM element, follow the steps:
 
-1. Add class o-comment-client to the container element
-2. Add attribute `data-o-comment-client-autoconstruct="true"`
+1. Add class o-chat to the container element
+2. Add attribute `data-o-chat-autoconstruct="true"`
 3. Specify a unique ID
-4. Add configuration options that you want to pass to the widget in the following form: data-o-comment-client-{configName}="{configValue}". Replace `{configName}` and `{configValue}` with the name of the configuration and value you want to pass.
+4. Add configuration options that you want to pass to the widget in the following form: data-o-chat-{configName}="{configValue}". Replace `{configName}` and `{configValue}` with the name of the configuration and value you want to pass.
 
 When done with the configuration of the widget, adding event listeners, etc.:
 
 ```javascript
-oCommentClient.initDomConstruct();
+oChat.initDomConstruct();
 ```
 
 **You don't have to wait until the document is fully loaded, call it whenever you are done with the configurations.**
@@ -180,7 +180,7 @@ oCommentClient.initDomConstruct();
 If you need a reference of the JavaScript object created, you can find it the following way:
 
 ```javascript
-window['o-comment-client-widget-' + id]
+window['o-chat-widget-' + id]
 ```
 
 where id is the ID of the DOM element (in this example `commentWidget`).
@@ -238,7 +238,7 @@ widget.init(callback) {
 ```
 
 ###### loadResources
-**This method is used internally, but its behavior can be overridden if desired.** This method is responsible to load any third party resources that are needed to load the widget. By default this method does nothing for o-comment-client widget.
+**This method is used internally, but its behavior can be overridden if desired.** This method is responsible to load any third party resources that are needed to load the widget. By default this method does nothing for o-chat widget.
 A callback is passed as a parameter, which should be called when all resources are fully loaded.
 
 ```javascript

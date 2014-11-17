@@ -7,7 +7,7 @@ var oCommentUtilities = require('o-comment-utilities');
  * Base name for the message queue session storage container, which is completed with the collectionId.
  * @type {String}
  */
-var storageBaseName = "o-comment-client-comment-queue-";
+var storageBaseName = "o-chat-comment-queue-";
 
 /**
  * MessageQueue saves a message to the session storage to preserve it

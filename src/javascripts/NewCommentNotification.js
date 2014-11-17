@@ -20,8 +20,8 @@ function NewCommentNotification (widgetUi, container, position) {
 		id: notificationId,
 		position: position
 	})));
-	var notificationElement = sizzle('#o-comment-client-notification-' + notificationId)[0];
-	var notificationButton = sizzle('.o-comment-client-notification-button', notificationElement)[0];
+	var notificationElement = sizzle('#o-chat-notification-' + notificationId)[0];
+	var notificationButton = sizzle('.o-chat-notification-button', notificationElement)[0];
 
 
 	var onClick = function () {
