@@ -75,7 +75,7 @@ module.exports = {
 	dataService: oCommentApi,
 
 	initDomConstruct: function () {
-		oCommentUtilities.initDomConstruct(Widget, 'o-comment-client');
+		oCommentUtilities.initDomConstruct(Widget, 'o-chat');
 	},
 
 	/**
