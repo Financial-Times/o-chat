@@ -1,5 +1,6 @@
 "use strict";
 
+var self = module;
 var config = require('./src/javascripts/config.js'),
 	oCommentApi = require('o-comment-api'),
 	defaultConfig = require('./config.json'),
@@ -75,7 +76,12 @@ module.exports = {
 	dataService: oCommentApi,
 
 	initDomConstruct: function () {
-		oCommentUtilities.initDomConstruct(Widget, 'o-chat');
+		oCommentUtilities.initDomConstruct({
+			Widget: Widget,
+			baseClass: 'o-chat',
+			namespace: 'oChat',
+			module: self
+		});
 	},
 
 	/**
