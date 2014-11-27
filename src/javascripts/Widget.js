@@ -98,6 +98,7 @@ var Widget = function () {
 	var nextPageFetchInProgress = false;
 	var loginStatus = false;
 	var userIsAdmin = false;
+	var renderComplete = false;
 
 	var commentIds = [];
 
@@ -193,7 +194,13 @@ var Widget = function () {
 				callback(null, data.collection);
 			} else if (data.hasOwnProperty('stream')) {
 				// streaming info
-				handleStream(data.stream);
+				if (renderComplete) {
+					handleStream(data.stream);
+				} else {
+					self.on('renderComplete.widget', function () {
+						handleStream(data.stream);
+					});
+				}
 			}
 		});
 	};
@@ -246,6 +253,7 @@ var Widget = function () {
 					// all fine, no errors with the rendering
 					callback();
 					self.trigger('renderComplete.widget');
+					renderComplete = true;
 
 					// determine if there are messages to post before being logged in.
 					// in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
