@@ -8,6 +8,7 @@ var oCommentApi = require('o-comment-api');
 var oCommentUtilities = require('o-comment-utilities');
 var userDialogs = require('./userDialogs.js');
 var i18n = require('./i18n.js');
+var globalEvents = require('./globalEvents.js');
 
 /**
  * Incorporates the communication with the content creation service,
@@ -197,7 +198,7 @@ var Widget = function () {
 				if (renderComplete) {
 					handleStream(data.stream);
 				} else {
-					self.on('renderComplete.widget', function () {
+					self.on('widget.renderComplete', function () {
 						handleStream(data.stream);
 					});
 				}
@@ -229,14 +230,14 @@ var Widget = function () {
 			if (commentsData.unclassifiedArticle !== true) {
 				self.collectionId = commentsData.collectionId;
 				self.messageQueue = new MessageQueue(self.collectionId);
-				self.trigger('ready.widget');
+				self.trigger('widget.ready');
 
 				auth.login(function (loggedIn, authData) {
 					if (!authData) {
 						authData = null;
 					}
 
-					self.trigger('loaded.auth', authData);
+					self.trigger('data.auth', authData);
 
 					if (authData) {
 						if (authData.admin || authData.moderator) {
@@ -252,7 +253,7 @@ var Widget = function () {
 
 					// all fine, no errors with the rendering
 					callback();
-					self.trigger('renderComplete.widget');
+					self.trigger('widget.renderComplete');
 					renderComplete = true;
 
 					// determine if there are messages to post before being logged in.
@@ -466,14 +467,14 @@ var Widget = function () {
 			postComment(messageInTheQueue);
 		}
 	}
-	auth.on('login.auth', login);
+	globalEvents.on('auth.login', login);
 
 	function logout () {
 		loginStatus = false;
 		self.ui.logout();
 		self.ui.removeSettingsLink();
 	}
-	auth.on('logout.auth', logout);
+	globalEvents.on('auth.logout', logout);
 
 
 
@@ -518,13 +519,16 @@ var Widget = function () {
 	});
 
 	function triggerCommentPostedEvent (commentInfo) {
-		self.trigger('commentPosted.tracking', [self.collectionId, {
-			bodyHtml: commentInfo.commentBody,
-			id: commentInfo.commentId,
-			author: {
-				displayName: commentInfo.author.displayName
+		self.trigger('tracking.postComment', {
+			collectionId: self.collectionId,
+			comment: {
+				bodyHtml: commentInfo.commentBody,
+				id: commentInfo.commentId,
+				author: {
+					displayName: commentInfo.author.displayName
+				}
 			}
-		}]);
+		});
 	}
 
 	/**
@@ -672,9 +676,12 @@ var Widget = function () {
 			if (deleteCommentResult) {
 				if (deleteCommentResult.success === true) {
 					self.ui.removeComment(commentId);
-					self.trigger('commentDeleted.tracking', [self.collectionId, {
-						id: commentId
-					}]);
+					self.trigger('tracking.deleteComment', {
+						collectionId: self.collectionId,
+						comment: {
+							id: commentId
+						}
+					});
 				} else if (deleteCommentResult.invalidSession === true && secondStepOfTryingToDelete !== true) {
 					loginRequiredToDeleteComment(commentId, true);
 				} else {
@@ -739,9 +746,9 @@ var Widget = function () {
 		});
 	});
 };
-oCommentUi.Widget.__extend(Widget);
+oCommentUi.Widget.__extend(Widget, 'oChat');
 
-Widget.__extend = function(child) {
+Widget.__extend = function(child, eventNamespace) {
 	if (typeof Object.create === 'function') {
 		child.prototype = Object.create( Widget.prototype );
 		child.prototype = Object.create(Widget.prototype);
@@ -750,6 +757,10 @@ Widget.__extend = function(child) {
 		Tmp.prototype = Widget.prototype;
 		child.prototype = new Tmp();
 		child.prototype.constructor = child;
+	}
+
+	if (eventNamespace) {
+		child.prototype.eventNamespace = eventNamespace;
 	}
 };
 

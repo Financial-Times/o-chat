@@ -3,7 +3,7 @@
 var oCommentUtilities = require('o-comment-utilities');
 var userDialogs = require('./userDialogs');
 var oCommentApi = require('o-comment-api');
-
+var globalEvents = require('./globalEvents.js');
 
 
 
@@ -12,11 +12,6 @@ var oCommentApi = require('o-comment-api');
  */
 function Auth () {
 	var self = this;
-
-	var event = new oCommentUtilities.Events();
-
-	this.on = event.on;
-	this.off = event.off;
 
 	/**
 	 * Pseudonym is still missing.
@@ -43,7 +38,7 @@ function Auth () {
 			if (authData) {
 				if (authData.token) {
 					callback(true, authData);
-					event.trigger('login.auth', authData);
+					globalEvents.trigger('auth.login', authData);
 				} else if (authData.pseudonym === false) {
 					// the user doesn't have pseudonym
 
@@ -62,7 +57,7 @@ function Auth () {
 	 * Broadcasts a logout event.
 	 */
 	this.logout = function () {
-		event.trigger('logout.auth');
+		globalEvents.trigger('auth.logout');
 	};
 
 	/**
@@ -124,7 +119,7 @@ function Auth () {
 			if (authData && authData.pseudonym === false) {
 				loginRequiredPseudonymMissing(delegate);
 			} else if (!authData || !authData.token) {
-				event.trigger('loginRequired.authAction', {
+				globalEvents.trigger('authAction.loginRequired', {
 					success: function () {
 						loginRequiredAfterASuccess(delegate);
 					},
