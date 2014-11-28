@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width" charset="utf-8">
-    <title>o-comment-client</title>
+    <title>o-chat</title>
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/docs.css">
@@ -63,7 +63,7 @@
     </div>
     <header id="overview" class="jumbotron subhead">
       <div class="container">
-        <h1>o-comment-client</h1>
+        <h1>o-chat</h1>
         <p class="lead"></p>
       </div>
     </header>
@@ -74,9 +74,11 @@
             <li><a href="index.html">Main</a></li>
             <li class="active"><a href="auth.js.html">auth.js</a></li>
             <li><a href="config.js.html">config.js</a></li>
+            <li><a href="globalEvents.js.html">globalEvents.js</a></li>
             <li><a href="i18n.js.html">i18n.js</a></li>
             <li><a href="main.js.html">main.js</a></li>
             <li><a href="MessageQueue.js.html">MessageQueue.js</a></li>
+            <li><a href="NewCommentNotification.js.html">NewCommentNotification.js</a></li>
             <li><a href="userDialogs.js.html">userDialogs.js</a></li>
             <li><a href="utils.js.html">utils.js</a></li>
             <li><a href="Widget.js.html">Widget.js</a></li>
@@ -113,12 +115,7 @@
           </section>
           <div class="description"><p>Auth is responsible to handle login and logout requests and broadcast these requests.</p> </div>
           <pre><code class="language-javascript">function Auth () {
-    var self = this;
-
-    var event = new commentUtilities.Events();
-
-    this.on = event.on;
-    this.off = event.off;</code></pre>
+	var self = this;</code></pre>
           <section id="pseudonymMissing">
             <h1>pseudonymMissing</h1>
             <h5 class="subheader"></h5>
@@ -151,35 +148,35 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Tries to obtain the user's login data. Calls a callback with the resulted status,<br />and also fires an event if the user can be logged in.</p> </div>
+          <div class="description"><p>Tries to obtain the user&#39;s login data. Calls a callback with the resulted status,<br />and also fires an event if the user can be logged in.</p> </div>
           <pre><code class="language-javascript">this.login = function (callback) {
-        if (typeof callback !== 'function') {
-            callback = function () {};
-        }
+	if (typeof callback !== 'function') {
+		callback = function () {};
+	}
 
-        oCommentData.api.getAuth(function (err, authData) {
-            if (err) {
-                callback(false);
-                return;
-            }
+	oCommentApi.api.getAuth(function (err, authData) {
+		if (err) {
+			callback(false);
+			return;
+		}
 
-            if (authData) {
-                if (authData.token) {
-                    callback(true, authData);
-                    event.trigger('login.auth', authData);
-                } else if (authData.pseudonym === false) {
-                    // the user doesn't have pseudonym
+		if (authData) {
+			if (authData.token) {
+				callback(true, authData);
+				globalEvents.trigger('auth.login', authData);
+			} else if (authData.pseudonym === false) {
+				// the user doesn't have pseudonym
 
-                    self.pseudonymMissing = true;
-                    callback(false, authData);
-                } else {
-                    callback(false, authData);
-                }
-            } else {
-                callback(false);
-            }
-        });
-    };</code></pre>
+				self.pseudonymMissing = true;
+				callback(false, authData);
+			} else {
+				callback(false, authData);
+			}
+		} else {
+			callback(false);
+		}
+	});
+};</code></pre>
           <section id="logout">
             <h1>logout</h1>
             <h5 class="subheader"></h5>
@@ -189,8 +186,8 @@
           </section>
           <div class="description"><p>Broadcasts a logout event.</p> </div>
           <pre><code class="language-javascript">this.logout = function () {
-        event.trigger('logout.auth');
-    };</code></pre>
+	globalEvents.trigger('auth.logout');
+};</code></pre>
           <section id="loginRequiredPseudonymMissing">
             <h1>loginRequiredPseudonymMissing</h1>
             <h5 class="subheader"></h5>
@@ -216,25 +213,25 @@
           </table>
           <div class="description"><p>Login required and pseudonym is missing</p> </div>
           <pre><code class="language-javascript">function loginRequiredPseudonymMissing (delegate) {
-        commentUtilities.logger.log('pseudonymMissing');
+	oCommentUtilities.logger.log('pseudonymMissing');
 
-        userDialogs.showSetPseudonymDialog({
-            success: function (authData) {
-                if (authData &amp;&amp; authData.token) {
-                    self.login(authData.token, authData.displayName, authData.isAdmin || authData.isModerator);
-                }
+	userDialogs.showSetPseudonymDialog({
+		success: function (authData) {
+			if (authData &amp;&amp; authData.token) {
+				self.login(authData.token, authData.displayName, authData.isAdmin || authData.isModerator);
+			}
 
-                if (delegate &amp;&amp; delegate.success) {
-                    delegate.success();
-                }
-            },
-            failure: function () {
-                if (delegate &amp;&amp; delegate.failure) {
-                    delegate.failure();
-                }
-            }
-        });
-    }</code></pre>
+			if (delegate &amp;&amp; delegate.success) {
+				delegate.success();
+			}
+		},
+		failure: function () {
+			if (delegate &amp;&amp; delegate.failure) {
+				delegate.failure();
+			}
+		}
+	});
+}</code></pre>
           <section id="loginRequiredAfterASuccess">
             <h1>loginRequiredAfterASuccess</h1>
             <h5 class="subheader"></h5>
@@ -260,18 +257,18 @@
           </table>
           <div class="description"><p>Login required, first attempt of the login process is successful.<br />If the user is still not logged in, then fail.<br />If the user has no pseudonym, ask for a pseudonym.</p> </div>
           <pre><code class="language-javascript">function loginRequiredAfterASuccess (delegate) {
-        oCommentData.api.getAuth({
-            force: true
-        }, function (err, authData) {
-            if (authData &amp;&amp; authData.pseudonym === false) {
-                loginRequiredPseudonymMissing(delegate);
-            } else {
-                if (delegate &amp;&amp; delegate.failure) {
-                    delegate.failure();
-                }
-            }
-        });
-    }</code></pre>
+	oCommentApi.api.getAuth({
+		force: true
+	}, function (err, authData) {
+		if (authData &amp;&amp; authData.pseudonym === false) {
+			loginRequiredPseudonymMissing(delegate);
+		} else {
+			if (delegate &amp;&amp; delegate.failure) {
+				delegate.failure();
+			}
+		}
+	});
+}</code></pre>
           <section id="loginRequired">
             <h1>loginRequired</h1>
             <h5 class="subheader"></h5>
@@ -297,31 +294,31 @@
           </table>
           <div class="description"><p>Login is required.<br />If pseudonym is missing, ask for a pseudonym.<br />If there is no known method to login the user, generate a <code>loginRequired.authAction</code> event that can be handled at the integration level.<br />If successful, check if the user is logged in.</p> </div>
           <pre><code class="language-javascript">this.loginRequired = function (delegate, force) {
-        oCommentData.api.getAuth({
-            force: force
-        }, function (err, authData) {
-            if (authData &amp;&amp; authData.pseudonym === false) {
-                loginRequiredPseudonymMissing(delegate);
-            } else if (!authData || !authData.token) {
-                event.trigger('loginRequired.authAction', {
-                    success: function () {
-                        loginRequiredAfterASuccess(delegate);
-                    },
-                    failure: function () {
-                        if (delegate &amp;&amp; delegate.failure) {
-                            delegate.failure();
-                        }
-                    }
-                });
-            } else {
-                self.login(authData.token, authData.displayName, authData.isAdmin || authData.isModerator);
-                
-                if (delegate &amp;&amp; delegate.success) {
-                    delegate.success();
-                }
-            }
-        });
-    };
+	oCommentApi.api.getAuth({
+		force: force
+	}, function (err, authData) {
+		if (authData &amp;&amp; authData.pseudonym === false) {
+			loginRequiredPseudonymMissing(delegate);
+		} else if (!authData || !authData.token) {
+			globalEvents.trigger('auth.loginRequired', {
+				success: function () {
+					loginRequiredAfterASuccess(delegate);
+				},
+				failure: function () {
+					if (delegate &amp;&amp; delegate.failure) {
+						delegate.failure();
+					}
+				}
+			});
+		} else {
+			self.login(authData.token, authData.displayName, authData.isAdmin || authData.isModerator);
+
+			if (delegate &amp;&amp; delegate.success) {
+				delegate.success();
+			}
+		}
+	});
+};
 }</code></pre>
           <section id="exports">
             <h1>exports</h1>
@@ -337,8 +334,8 @@
     </div>
     <footer class="footer">
       <div class="container">
-        <p>Documentation generated with<a href="https://github.com/FGRibreau/doxx">Doxx</a>created by<a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau</a></p>
-        <p>Doxx is sponsored by<a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr</a>and<a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
+        <p>Documentation generated with <a href="https://github.com/FGRibreau/doxx">Doxx </a> created by <a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau </a></p>
+        <p>Doxx is sponsored by <a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr </a> and <a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
         <p>Theme borrowed from Twitter Bootstrap</p>
       </div>
     </footer>

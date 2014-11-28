@@ -1,6 +1,7 @@
 "use strict";
 
 var self = module;
+var globalEvents = require('./src/javascripts/globalEvents');
 var config = require('./src/javascripts/config.js'),
 	oCommentApi = require('o-comment-api'),
 	defaultConfig = require('./config.json'),
@@ -108,3 +109,6 @@ module.exports = {
 		oCommentUtilities.logger.setLevel.apply(this, arguments);
 	}
 };
+
+module.exports.on = globalEvents.on;
+module.exports.off = globalEvents.off;

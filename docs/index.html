@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width" charset="utf-8">
-    <title>o-comment-client</title>
+    <title>o-chat</title>
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/docs.css">
@@ -63,7 +63,7 @@
     </div>
     <header id="overview" class="jumbotron subhead">
       <div class="container">
-        <h1>o-comment-client</h1>
+        <h1>o-chat</h1>
         <p class="lead"></p>
       </div>
     </header>
@@ -74,9 +74,11 @@
             <li class="active"><a href="index.html">Main</a></li>
             <li><a href="auth.js.html">auth.js</a></li>
             <li><a href="config.js.html">config.js</a></li>
+            <li><a href="globalEvents.js.html">globalEvents.js</a></li>
             <li><a href="i18n.js.html">i18n.js</a></li>
             <li><a href="main.js.html">main.js</a></li>
             <li><a href="MessageQueue.js.html">MessageQueue.js</a></li>
+            <li><a href="NewCommentNotification.js.html">NewCommentNotification.js</a></li>
             <li><a href="userDialogs.js.html">userDialogs.js</a></li>
             <li><a href="utils.js.html">utils.js</a></li>
             <li><a href="Widget.js.html">Widget.js</a></li>
@@ -88,34 +90,30 @@
           </div>
         </div>
         <div class="span9">
-          <section id="Main"><h1 id="o-comment-client">o-comment-client</h1>
-<p>Commenting widget built on top of data APIs provided by o-comment-data module. This Widget uses both SUDS (Session user data service) and CCS (Comment creation service).</p>
-<hr>
-<h2 id="how-to-use-it">How to use it</h2>
-<p>There are two ways of using this module:</p>
-<h3 id="build-tool">Build tool</h3>
-<p>Include the script provided by the build tool.<br>The script exposes a global variable named <code>oCommentClient</code>.</p>
-<h3 id="bower">Bower</h3>
-<p>As a bower dependency:</p>
-<pre><code class="lang-javascript">var oCommentClient = require(&#39;o-comment-client&#39;);</code></pre>
-<p>The module should be built using <code>browserify</code> (with <code>debowerify</code> transform).</p>
-<h2 id="configuration">Configuration</h2>
-<p><strong>The methods which are meant to configure the module are the following:</strong></p>
-<h3 id="init">init</h3>
-<p>This method is responsible for changing the default configuration used by this module. Calling this method with an object will merge the default configuration with the object specified (deep merge, primitive type values of the same key will be overwritten).</p>
-<p>In order to use this module with authentication enabled, you should specify the user&#39;s session ID:</p>
-<pre><code class="lang-javascript">oCommentClient.init({
+          <section id="Main"><h1>o-chat</h1>
+<p>Commenting widget built on top of data APIs provided by o-comment-data module. This Widget uses both SUDS (Session user data service) and CCS (Comment creation service).</p><hr>
+<h2>How to use it</h2>
+<p>There are two ways of using this module:</p><h3>Build tool</h3>
+<p>Include the script provided by the build tool.<br />The script exposes a global variable named <code>oChat</code>.</p><h3>Bower</h3>
+<p>As a bower dependency:</p><p><strong>Javascript:</strong></p><pre><code class="lang-javascript">var oChat = require(&#39;o-chat&#39;);
+</code></pre>
+<p><strong>SCSS:</strong></p><pre><code class="lang-ccs">@import &#39;o-chat/main&#39;;
+</code></pre>
+<p>The module should be built using <code>browserify</code> (with <code>debowerify</code> and <code>textrequireify</code> transform).</p><h2>Configuration</h2>
+<p><strong>The methods which are meant to configure the module are the following:</strong></p><h3>init</h3>
+<p>This method is responsible for changing the default configuration used by this module. Calling this method with an object will merge the default configuration with the object specified (deep merge, primitive type values of the same key will be overwritten).</p><p>In order to use this module with authentication enabled, you should specify the user&#39;s session ID:</p><pre><code class="lang-javascript">oChat.init({
     sessionId: &#39;sessID&#39;
-});</code></pre>
-<h5 id="default-configuration">Default configuration</h5>
+});
+</code></pre>
+<h5>Default configuration</h5>
 <pre><code class="lang-javascript">{
     &quot;livefyre&quot;: {
         &quot;network&quot;: &quot;ft.fyre.co&quot;
     }
-}</code></pre>
-<h5 id="change-the-environment">Change the environment</h5>
-<p>In order to change to the TEST environment, use the following code (o-comment-data should be switched to TEST env as well):</p>
-<pre><code class="lang-javascript">{
+}
+</code></pre>
+<h5>Change the environment</h5>
+<p>In order to change to the TEST environment, use the following code (o-comment-data should be switched to TEST env as well):</p><pre><code class="lang-javascript">{
     &quot;livefyre&quot;: {
         &quot;network&quot;: &quot;ft-1.fyre.co&quot;
     },
@@ -136,24 +134,21 @@
             }
         }
     }
-}</code></pre>
+}
+</code></pre>
 <hr>
-<h2 id="integration">Integration</h2>
-<p>This integration considers that you have included the script using one of the methods mentioned in the <code>How to use it</code> section.</p>
-<p>The following functions are used only for purpose of illustration, but they are not available as part of this module:</p>
-<ul>
+<h2>Integration</h2>
+<p>This integration considers that you have included the script using one of the methods mentioned in the <code>How to use it</code> section.</p><p>The following functions are used only for purpose of illustration, but they are not available as part of this module:</p><ul>
 <li>readCookie</li>
 <li>login</li>
 </ul>
-<p><strong>Common steps:</strong></p>
-<p>Read the user&#39;s session:</p>
-<pre><code class="lang-javascript">var userSession = readCookie(&#39;FTSession&#39;);</code></pre>
-<p>Set the user&#39;s session if one is available:</p>
-<pre><code class="lang-javascript">oCommentClient.init({
+<p><strong>Common steps:</strong></p><p>Read the user&#39;s session:</p><pre><code class="lang-javascript">var userSession = readCookie(&#39;FTSession&#39;);
+</code></pre>
+<p>Set the user&#39;s session if one is available:</p><pre><code class="lang-javascript">oChat.init({
     sessionId: userSession
-});</code></pre>
-<p>Listen on the &#39;login required&#39; event, and try to log in the user within the page:</p>
-<pre><code class="lang-javascript">oCommentClient.auth.on(&#39;loginRequired.authAction&#39;, function (delegate) {
+});
+</code></pre>
+<p>Listen on the &#39;login required&#39; event, and try to log in the user within the page:</p><pre><code class="lang-javascript">oChat.auth.on(&#39;loginRequired.authAction&#39;, function (delegate) {
     // the user is not logged in, but an action was performed within the comment widget that requires the user to be logged in
 
     login();
@@ -164,11 +159,10 @@
     } else if (loginFailure) {
         delegate.failure();
     }
-});</code></pre>
-<p><strong>Important: if the log in needs a page reload, don&#39;t call the failure function!</strong></p>
-<h3 id="integration-programatically">Integration - programatically</h3>
-<p>Create an instance of the Widget with the parameters that are available:</p>
-<pre><code class="lang-javascript">var widgetInstance = new oCommentClient.Widget({
+});
+</code></pre>
+<p><strong>Important: if the log in needs a page reload, don&#39;t call the failure function!</strong></p><h3>Integration - programatically</h3>
+<p>Create an instance of the Widget with the parameters that are available:</p><pre><code class="lang-javascript">var widgetInstance = new oChat.Widget({
     elId: &#39;container-id&#39;,
     title: document.title,
     url: document.location.href,
@@ -178,59 +172,148 @@
         minutesUntilAbsoluteTime: -1,
         absoluteFormat: &#39;MMM dd hh:mm a&#39;
     }
-});</code></pre>
-<p>Listen the events the widget triggers (optional):</p>
-<pre><code class="lang-javascript">widgetInstance.on(commentPosted.tracking, function (siteId, eventData) {
+});
+</code></pre>
+<p>Listen the events the widget triggers (optional):</p><pre><code class="lang-javascript">widgetInstance.on(tracking.postComment, function (evt) {
     // a comment is posted, do something, track it
-});</code></pre>
-<p>Load the widget:</p>
-<pre><code class="lang-javascript">widgetInstance.load();</code></pre>
-<h3 id="integration-using-dom-element">Integration - using DOM element</h3>
-<p>The Widget will be created using data from a DOM element.</p>
-<p>Include this where you want the widget to load:</p>
-<pre><code class="lang-html">&lt;div class=&quot;o-comment-client&quot; id=&quot;commentWidget&quot; data-o-comment-client-autoconstruct=&quot;true&quot; data-o-comment-client-config-title=&quot;title-of-the-article&quot; data-o-comment-client-config-url=&quot;page-url&quot; data-o-comment-client-config-articleId=&quot;ID-of-the-article&quot;&gt;&lt;/div&gt;</code></pre>
-<p>In order to build the DOM element, follow the steps:</p>
-<ol>
-<li>Add class o-comment-client to the container element</li>
-<li>Add attribute <code>data-o-comment-client-autoconstruct=&quot;true&quot;</code></li>
+});
+</code></pre>
+<p>Load the widget:</p><pre><code class="lang-javascript">widgetInstance.load();
+</code></pre>
+<h3>Integration - using DOM element</h3>
+<p>The Widget will be created using data from a DOM element.</p><p>Include this where you want the widget to load:</p><pre><code class="lang-html">&lt;div class=&quot;o-chat&quot; id=&quot;commentWidget&quot; data-o-chat-autoconstruct=&quot;true&quot; data-o-chat-config-title=&quot;title-of-the-article&quot; data-o-chat-config-url=&quot;page-url&quot; data-o-chat-config-articleId=&quot;ID-of-the-article&quot;&gt;&lt;/div&gt;
+</code></pre>
+<p>In order to build the DOM element, follow the steps:</p><ol>
+<li>Add class o-chat to the container element</li>
+<li>Add attribute <code>data-o-chat-autoconstruct=&quot;true&quot;</code></li>
 <li>Specify a unique ID</li>
-<li>Add configuration options that you want to pass to the widget in the following form: data-o-comment-client-{configName}=&quot;{configValue}&quot;. Replace <code>{configName}</code> and <code>{configValue}</code> with the name of the configuration and value you want to pass.</li>
+<li>Add configuration options that you want to pass to the widget in the following form: data-o-chat-{configName}=&quot;{configValue}&quot;. Replace <code>{configName}</code> and <code>{configValue}</code> with the name of the configuration and value you want to pass.</li>
 </ol>
-<p>When done with the configuration of the widget, adding event listeners, etc.:</p>
-<pre><code class="lang-javascript">oCommentClient.initDomConstruct();</code></pre>
-<p><strong>You don&#39;t have to wait until the document is fully loaded, call it whenever you are done with the configurations.</strong></p>
-<p>If you need a reference of the JavaScript object created, you can find it the following way:</p>
-<pre><code class="lang-javascript">window[&#39;o-comment-client-widget-&#39; + id]</code></pre>
-<p>where id is the ID of the DOM element (in this example <code>commentWidget</code>).</p>
+<p>If you need a reference of the JavaScript object created, you can listen the event on the body element the following way:</p><pre><code class="lang-javascript">var widgetInstance;
+document.body.addEventListener(&#39;oChat.domConstruct&#39;, function (evt) {
+    if (evt.detail.id === &#39;commentWidget&#39;) {
+        widgetInstance = evt.detail.instance;
+    }
+});
+</code></pre>
+<p>where evt.detail.id is the ID of the DOM element (in this example <code>commentWidget</code>).</p><p>When done with the configuration of the widget, adding event listeners, etc., execute the following to initiate the widget generation:</p><pre><code class="lang-javascript">oChat.initDomConstruct();
+</code></pre>
+<p><strong>You don&#39;t have to wait until the document is fully loaded, call it whenever you are done with the configurations.</strong></p><hr>
+<h5>Events</h5>
+<h3>Widget level events</h3>
+<p>Widget level events are triggered on the container of the widget. They have the following format:<br /><code>oChat.nameOfTheEvent</code>, where &#39;nameOfTheEvent&#39; is one of the following mentioned below.</p><p>All events has also a payload data to identify the widget from which the event is coming from, and also specific event data if there&#39;s some, which has the following format:</p><pre><code class="lang-javascript">{
+    detail: {
+        id: &quot;idOfTheWidget&quot;,
+        widget: widgetInstance,
+        data: {...} //data specific to the event
+    }
+}
+</code></pre>
+<p>There&#39;s also an easier way to listen to widget level events, with the following function:</p><pre><code class="lang-javascript">widgetInstance.on(&#39;nameOfTheEvent&#39;, function (evt) {
+    // event handler
+});
+</code></pre>
+<p><em>Please note that you should omit the namespace (oChat.) before the event name.</em></p><p>Using the <code>off</code> method event handlers can be removed.</p><p>The list of events are:</p><h5>widget.timeout</h5>
+<p>Triggered when loading the widget exceeded a given time.</p><h6>error.resources</h6>
+<p>Error while loading the resources.<br />Event detail data: error object/message.</p><h6>error.init</h6>
+<p>Error while loading the initialization data and the comments.<br />Event detail data: error object/message.</p><h6>error.widget</h6>
+<p>Triggered when any error appear (triggered together with the above mentioned error events).<br />Event detail data: error object/message.</p><h5>data.init</h5>
+<p>Loaded when the initialization is finished and the necessary data is obtained.<br />Event detail data: initialization data in the following form:</p><pre><code class="lang-javascript">{
+    &quot;collection&quot;: {
+        &quot;unclassified&quot;: false,
+        &quot;collectionId&quot;: &quot;91440735&quot;,
+        &quot;lastEvent&quot;: 1411541039265900,
+        &quot;comments&quot;: [{
+            &quot;parentId&quot;: &quot;&quot;,
+            &quot;author&quot;: {
+                &quot;displayName&quot;: &quot;roli main&quot;,
+                &quot;tags&quot;: [&quot;FT&quot;],
+                &quot;type&quot;: 1
+            },
+            &quot;content&quot;: &quot;&lt;p&gt;comment&lt;/p&gt;&quot;,
+            &quot;timestamp&quot;: 1411541039,
+            &quot;commentId&quot;: &quot;216743299&quot;,
+            &quot;visibility&quot;: 1
+        }],
+        &quot;totalPages&quot;: &quot;6&quot;
+    }
+}
+</code></pre>
+<h5>data.auth</h5>
+<p>The first time the auth object is loaded, it is broadcasted using this event. Event detail data: authentication and user detail data in the following form:</p><pre><code class="lang-javascript">{
+    &quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiJ9.eyJkb21haW4iOiJmdC0xLmZ5cmUuY28iLCJleHBpcmVzIjoxNDE3MTE2Nzk5LCJ1c2VyX2lkIjoiODk0ODc0MzkiLCJkaXNwbGF5X25hbWUiOiJyb2xpIG1haW4ifQ.maN1bKWvDQLA-mvgNp9lSKdI9Izj9rmX3XrEaVwUTNY&quot;,
+    &quot;expires&quot;: 1417116799,
+    &quot;displayName&quot;: &quot;user pseudonym&quot;,
+    &quot;settings&quot;: {
+        &quot;emailcomments&quot;: &quot;never&quot;,
+        &quot;emailreplies&quot;: &quot;never&quot;,
+        &quot;emaillikes&quot;: &quot;never&quot;,
+        &quot;emailautofollow&quot;: &quot;off&quot;
+    }
+}
+</code></pre>
+<h5>widget.ready</h5>
+<p>The widget is ready to be rendered, the initialization process has finished.</p><h5>widget.renderComplete</h5>
+<p>The UI is fully rendered.</p><h5>tracking.postComment</h5>
+<p>A comment is posted.<br />Event detail data:</p><ul>
+<li>collectionId</li>
+<li>info about the comment:<ul>
+<li>id</li>
+<li>bodyHtml: the content of the comment</li>
+<li>author:<ul>
+<li>displayName: the author&#39;s pseudonym</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h5>tracking.deleteComment</h5>
+<p>A comment is deleted within the widget.<br />Event detail data:</p><ul>
+<li>collectionId</li>
+<li>info about the comment:<ul>
+<li>id</li>
+</ul>
+</li>
+</ul>
+<h3>Module level events</h3>
+<p>These events are triggered on the <code>body</code> element. They have the same format as the widget level events: <code>oChat.nameOfTheEvent</code>, where nameOfTheEvent is one of the following below.</p><p>The payload data consists only of event specific data:</p><pre><code class="lang-javascript">{
+    detail: {...} // event specific data
+}
+</code></pre>
+<p>The events are the following:</p><h5>auth.login</h5>
+<p>Triggered when a user is successfully logged in.<br />Payload is the jwt token with which the user is logged in.</p><h5>auth.logout</h5>
+<p>Triggered when a user is logged out.</p><h5>auth.loginRequired</h5>
+<p>Triggered on any activity which explicitly requires a logged in status. This could mean from the product perspective that the user is not logged in, or his/her login status expired (e.g. session expire).</p><p>The payload data contains two functions: success and failure. Based on the outcome of the login process, one of these should be called by the handler.<br /><strong>Important: if the log in needs a page reload, don&#39;t call the failure function!</strong></p><pre><code class="lang-javascript">oChat.auth.on(&#39;auth.loginRequired&#39;, function (evt) {
+    if (logInSuccess) {
+        evt.detail.success();
+    }
+
+    if (logInFails || logInRefused) {
+        evt.detail.failure();
+    }
+});
+</code></pre>
 <hr>
-<h2 id="more-about-the-submodules">More about the submodules</h2>
-<h3 id="widget">Widget</h3>
-<p>Widget incorporates all aspects of a commenting Widget: handling data and creating the UI.</p>
-<h5 id="configuration">Configuration</h5>
-<p>To create an instance, you need to provide a configuration object. This should have the following structure:</p>
-<h6 id="mandatory-fields-">Mandatory fields:</h6>
+<h2>More about the submodules</h2>
+<h3>Widget</h3>
+<p>Widget incorporates all aspects of a commenting Widget: handling data and creating the UI.</p><h5>Configuration</h5>
+<p>To create an instance, you need to provide a configuration object. This should have the following structure:</p><h6>Mandatory fields:</h6>
 <ul>
 <li>elId: ID of the HTML element in which the widget should be loaded</li>
 <li>articleId: ID of the article, any string</li>
 <li>url: canonical URL of the page</li>
 <li>title: Title of the page</li>
 </ul>
-<h6 id="optional-fields-">Optional fields:</h6>
+<h6>Optional fields:</h6>
 <ul>
-<li><p>order: This specifies how the widget is built. It can have two values:</p>
-<ul>
+<li><p>order: This specifies how the widget is built. It can have two values:</p><ul>
 <li>normal: the commenting box is placed on top of the comment stream, and the comments are ordered as newest on top.</li>
-<li><p>inverted: the commenting box is placed at the bottom of the comment stream, and the comments are ordered newest on bottom.</p>
-<p>Default value is &#39;normal&#39;.</p>
-</li>
+<li><p>inverted: the commenting box is placed at the bottom of the comment stream, and the comments are ordered newest on bottom.</p><p>Default value is &#39;normal&#39;.</p></li>
 </ul>
 </li>
-<li><p>layout: Specifies the layout style of the widget. It can have two values:</p>
-<ul>
+<li><p>layout: Specifies the layout style of the widget. It can have two values:</p><ul>
 <li>normal: When placed in the main area of the page.</li>
-<li><p>side: When placed in the side area of the page.</p>
-<p>Default value is &#39;normal&#39;.</p>
-</li>
+<li><p>side: When placed in the side area of the page.</p><p>Default value is &#39;normal&#39;.</p></li>
 </ul>
 </li>
 <li>datetimeFormat: How to format the timestamps. This is an object and has two fields:<ul>
@@ -239,45 +322,16 @@
 </ul>
 </li>
 </ul>
-<h5 id="methods">Methods</h5>
-<h6 id="load">load</h6>
-<p>This method initiates loading the necessary data to load the widget (e.g. comments, user authentication info), and using the data generates the UI elements within the page.</p>
-<p>This method can be called once (calling it multiple types will have no effect).</p>
-<h6 id="adapttoheight">adaptToHeight</h6>
-<p>Calling this method with a height in pixels as parameter will adapt the UI to shrink within that height. If the current UI is smaller, it will fill the space to occupy the full height, or if the current UI is taller, a scroll will appear on the comments.</p>
-<h6 id="init">init</h6>
-<p><strong>This method is used internally, but its behavior can be overridden if desired.</strong> This method is responsible to get the initialization data (e.g. collection info, comments), and also to initialize streaming from Livefyre (e.g. a new comment added, comment deleted).<br>As a parameter it has a callback which should be called when the loading finished passing also the obtained data as parameter.</p>
-<pre><code class="lang-javascript">widget.init(callback) {
-    loadComments(function (comments) {
-        callback(comments);
-    });
-};</code></pre>
-<h6 id="loadresources">loadResources</h6>
-<p><strong>This method is used internally, but its behavior can be overridden if desired.</strong> This method is responsible to load any third party resources that are needed to load the widget. By default this method does nothing for o-comment-client widget.<br>A callback is passed as a parameter, which should be called when all resources are fully loaded.</p>
-<pre><code class="lang-javascript">widget.loadResources(callback) {
-    loadResource1();
-    loadResource2();
-    callback();
-};</code></pre>
-<h6 id="render">render</h6>
-<p><strong>This method is used internally, but its behavior can be overridden if desired.</strong> This method is responsible to render the UI using the comments available as a parameter. The second parameter is a callback, which should be called when the UI is rendered.</p>
-<pre><code class="lang-javascript">widget.render(comments, callback) {
-    renderUi(comments);
-    callback();
-}</code></pre>
-<h6 id="getwidgetel">getWidgetEl</h6>
-<p>Returns the DOM element of the widget container.</p>
-<h6 id="on">on</h6>
-<p>With this method you can listen to events generated by the widget instance.</p>
-<h6 id="off">off</h6>
-<p>With this method event handlers attached with <code>on</code> can be deleted.</p>
-<h5 id="properties">Properties</h5>
-<p>Available on any instance of Widget.</p>
-<h6 id="config">config</h6>
-<p>This is the config object passed as a parameter populated with default configuration items where those are not provided.</p>
-<h6 id="ui">ui</h6>
-<p>Instance of WidgetUi, which is linked to the widget&#39;s DOM. Any call to this instance would affect only the widget&#39;s UI.<br>Methods available:</p>
-<ul>
+<h5>Methods</h5>
+<h6>load</h6>
+<p>This method initiates loading the necessary data to load the widget (e.g. comments, user authentication info), and using the data generates the UI elements within the page.</p><p>This method can be called once (calling it multiple types will have no effect).</p><h6>adaptToHeight</h6>
+<p>Calling this method with a height in pixels as parameter will adapt the UI to shrink within that height. If the current UI is smaller, it will fill the space to occupy the full height, or if the current UI is taller, a scroll will appear on the comments.</p><h6>getWidgetEl</h6>
+<p>Returns the DOM element of the widget container.</p><h6>on</h6>
+<p>With this method you can listen to events generated by the widget instance.</p><h6>off</h6>
+<p>With this method event handlers attached with <code>on</code> can be deleted.</p><h5>Properties</h5>
+<p>Available on any instance of Widget.</p><h6>config</h6>
+<p>This is the config object passed as a parameter populated with default configuration items where those are not provided.</p><h6>ui</h6>
+<p>Instance of WidgetUi, which is linked to the widget&#39;s DOM. Any call to this instance would affect only the widget&#39;s UI.<br />Methods available:</p><ul>
 <li>scrollToWidget: scrolls the page to the widget&#39;s position.</li>
 <li>addNotAvailableMessage: adds a not available message into the container</li>
 <li>clearContainer: clears the widget&#39;s container.</li>
@@ -308,84 +362,12 @@
 <li>markCommentAsDeleteInProgressEnded: opposite of the action above, restores the normal look of the comment.</li>
 <li>getCurrentComment: returns the content of the editor.</li>
 </ul>
-<h6 id="collectionid">collectionId</h6>
-<p>Livefyre&#39;s collection ID for the current article. <strong>Populated only after the widget is loaded (<code>load</code> function)!</strong></p>
-<h6 id="timeout">timeout</h6>
-<p>Seconds after a timeout is considered when loading the widget.</p>
-<h5 id="events">Events</h5>
-<p>Handling these events is available using the <code>on</code> function of a widget instance.</p>
-<p>e.g.:</p>
-<pre><code class="lang-javascript">widget.on(&#39;eventName&#39;, function (additionalParameters) {
-    // handle the event
-});</code></pre>
-<h6 id="timeout-widget">timeout.widget</h6>
-<p>Loading timed out.</p>
-<h6 id="error-resources">error.resources</h6>
-<p>Error while loading the resources.<br>Parameters: error object/message.</p>
-<h6 id="error-init">error.init</h6>
-<p>Error while loading the initialization data and the comments.<br>Parameters: error object/message.</p>
-<h6 id="error-widget">error.widget</h6>
-<p>Error for any reason.<br>Parameters: error object/message.</p>
-<h6 id="loaded-init">loaded.init</h6>
-<p>Loaded when the initialization is finished and the necessary data is obtained.<br>Parameters: initialization data in the following form:</p>
-<pre><code class="lang-javascript">{
-    &quot;collection&quot;: {
-        &quot;unclassified&quot;: false,
-        &quot;collectionId&quot;: &quot;91440735&quot;,
-        &quot;lastEvent&quot;: 1411541039265900,
-        &quot;comments&quot;: [{
-            &quot;parentId&quot;: &quot;&quot;,
-            &quot;author&quot;: {
-                &quot;displayName&quot;: &quot;roli main&quot;,
-                &quot;tags&quot;: [&quot;FT&quot;],
-                &quot;type&quot;: 1
-            },
-            &quot;content&quot;: &quot;&lt;p&gt;comment&lt;/p&gt;&quot;,
-            &quot;timestamp&quot;: 1411541039,
-            &quot;commentId&quot;: &quot;216743299&quot;,
-            &quot;visibility&quot;: 1
-        }],
-        &quot;totalPages&quot;: &quot;6&quot;
-    }
-}</code></pre>
-<p>For more information please visit the o-comment-data module, getComments endpoint.</p>
-<h6 id="ready-widget">ready.widget</h6>
-<p>The widget has all the information needed to generate the UI.</p>
-<h6 id="loaded-auth">loaded.auth</h6>
-<p>User authentication details loaded.<br>Parameters: authentication data.</p>
-<p>For more information please visit the o-comment-data module, getAuth endpoint.</p>
-<h6 id="rendercomplete-widget">renderComplete.widget</h6>
-<p>The UI is fully generated.</p>
-<h6 id="commentposted-tracking">commentPosted.tracking</h6>
-<p>A comment is posted within the widget.<br>Parameters:</p>
-<ul>
-<li>collectionId</li>
-<li>info about the comment:<ul>
-<li>id</li>
-<li>bodyHtml: the content of the comment</li>
-<li>author:<ul>
-<li>displayName: the author&#39;s pseudonym</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h6 id="commentdeleted-tracking">commentDeleted.tracking</h6>
-<p>A comment is deleted within the widget.<br>Parameters:</p>
-<ul>
-<li>collectionId</li>
-<li>info about the comment:<ul>
-<li>id</li>
-</ul>
-</li>
-</ul>
-<h3 id="auth">auth</h3>
-<p>This submodule is responsible for handling the user&#39;s authentication status.</p>
-<h5 id="methods">Methods</h5>
-<h6 id="login">login</h6>
-<p>This method tries to obtain authentication data about the user, and decides if the user is logged in or not.</p>
-<p>Example:</p>
-<pre><code class="lang-javascript">auth.login(function (loginStatus, authData) {
+<h6>collectionId</h6>
+<p>Livefyre&#39;s collection ID for the current article. <strong>Populated only after the widget is loaded (<code>load</code> function)!</strong></p><h6>timeout</h6>
+<p>Seconds after a timeout is considered when loading the widget.</p><h3>auth</h3>
+<p>This submodule is responsible for handling the user&#39;s authentication status.</p><h5>Methods</h5>
+<h6>login</h6>
+<p>This method tries to obtain authentication data about the user, and decides if the user is logged in or not.</p><p>Example:</p><pre><code class="lang-javascript">auth.login(function (loginStatus, authData) {
     if (loginStatus) {
         // make it visible in the UI
         ui.login(authData.token, authData.displayName, authData.moderator);
@@ -395,70 +377,37 @@
             ui.hideSignInLink();
         }
     }
-});</code></pre>
-<p>The login method should be provided with a callback parameter, which will get two paramters:</p>
-<ul>
+});
+</code></pre>
+<p>The login method should be provided with a callback parameter, which will get two paramters:</p><ul>
 <li>loginStatus: true if the user is logged in, false if isn&#39;t.</li>
 <li>authData: authData </li>
 </ul>
-<h6 id="logout">logout</h6>
-<p>This method broadcasts a logout event to every module that are listening to it.</p>
-<h6 id="on">on</h6>
-<p>Using this method you can listen to the events generated by this module.</p>
-<h6 id="off">off</h6>
-<p>Using <code>off</code> the event handlers attached using <code>on</code> can be removed.</p>
-<h6 id="loginrequired">loginRequired</h6>
-<p>Using this method you can explicitly request an authenticated status. It handles different scenarios:</p>
-<ul>
+<h6>logout</h6>
+<p>This method broadcasts a logout event to every module that are listening to it.</p><h6>loginRequired</h6>
+<p>Using this method you can explicitly request an authenticated status. It handles different scenarios:</p><ul>
 <li>user already has authentication data, so it can be logged in</li>
 <li>user has no pseudonym, ask for pseudonym</li>
 <li>user has session expired, ask to log in again</li>
 <li>user is not authenticated, ask to log in</li>
 </ul>
-<p>Parameters:</p>
-<ul>
+<p>Parameters:</p><ul>
 <li>delegate: Optional. An object can be added with two functions: success and failure. If the login process ends successfully, delegate.success is called. If the login process fails or it is refused by the user, delegate.failure is called.</li>
 <li>force: Optional. If true, the local cache is ignored and the web service is directly asked for the login status.</li>
 </ul>
-<h5 id="events">Events</h5>
-<p>These are the events that can be handled using the auth object.</p>
-<h6 id="login">login</h6>
-<p>Triggered when the user is logged in.<br>Parameters:</p>
-<ul>
-<li>token</li>
-<li>pseudonym</li>
-<li>isAdmin</li>
-</ul>
-<h6 id="logout">logout</h6>
-<p>Triggered when the user is logged out.<br>No parameters.</p>
-<h6 id="loginrequired-authaction">loginRequired.authAction</h6>
-<p>If the user is not logged in, this event is generated. The login process of the page within the comment module is included is abstract, so it should be handled by the page.<br>It gets also a parameter, an object with two functions: success and failure. If the login process is successful, the success method should be called. If it fails or refused, the failure method should be called.</p>
-<pre><code class="lang-javascript">auth.on(&#39;loginRequired.authAction&#39;, function (delegate) {
-    if (logInSuccess) {
-        delegate.success();
-    }
-
-    if (logInFails || logInRefused) {
-        delegate.failure();
-    }
-});</code></pre>
 <hr>
-<h2 id="logging">Logging</h2>
-<p>Logging can be enabled for debugging purposes. It logs using the global &#39;console&#39; if available (if not, nothing happens and it degrades gracefully).<br>By default logging is disabled.</p>
-<h3 id="enablelogging">enableLogging</h3>
-<p>This method enables logging of the module.</p>
-<h3 id="disablelogging">disableLogging</h3>
-<p>This method disables logging of the module.</p>
-<h3 id="setlogginglevel">setLoggingLevel</h3>
-<p>This method sets the logging level. This could be a number from 0 to 4 (where 0 is debug, 4 is error), or a string from the available methods of &#39;console&#39; (debug, log, info, warn, error).<br>Default is 3 (warn).</p>
-</section>
+<h2>Logging</h2>
+<p>Logging can be enabled for debugging purposes. It logs using the global &#39;console&#39; if available (if not, nothing happens and it degrades gracefully).<br />By default logging is disabled.</p><h3>enableLogging</h3>
+<p>This method enables logging of the module.</p><h3>disableLogging</h3>
+<p>This method disables logging of the module.</p><h3>setLoggingLevel</h3>
+<p>This method sets the logging level. This could be a number from 0 to 4 (where 0 is debug, 4 is error), or a string from the available methods of &#39;console&#39; (debug, log, info, warn, error).<br />Default is 3 (warn).</p></section>
         </div>
       </div>
     </div>
     <footer class="footer">
       <div class="container">
-        <p>Documentation generated with<a href="https://github.com/FGRibreau/doxx">Doxx</a>created by<a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau</a></p>
-        <p>Doxx is sponsored by<a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr</a>and<a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
+        <p>Documentation generated with <a href="https://github.com/FGRibreau/doxx">Doxx </a> created by <a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau </a></p>
+        <p>Doxx is sponsored by <a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr </a> and <a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
         <p>Theme borrowed from Twitter Bootstrap</p>
       </div>
     </footer>

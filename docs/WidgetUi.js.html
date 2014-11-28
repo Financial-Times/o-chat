@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width" charset="utf-8">
-    <title>o-comment-client</title>
+    <title>o-chat</title>
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/docs.css">
@@ -63,7 +63,7 @@
     </div>
     <header id="overview" class="jumbotron subhead">
       <div class="container">
-        <h1>o-comment-client</h1>
+        <h1>o-chat</h1>
         <p class="lead"></p>
       </div>
     </header>
@@ -74,9 +74,11 @@
             <li><a href="index.html">Main</a></li>
             <li><a href="auth.js.html">auth.js</a></li>
             <li><a href="config.js.html">config.js</a></li>
+            <li><a href="globalEvents.js.html">globalEvents.js</a></li>
             <li><a href="i18n.js.html">i18n.js</a></li>
             <li><a href="main.js.html">main.js</a></li>
             <li><a href="MessageQueue.js.html">MessageQueue.js</a></li>
+            <li><a href="NewCommentNotification.js.html">NewCommentNotification.js</a></li>
             <li><a href="userDialogs.js.html">userDialogs.js</a></li>
             <li><a href="utils.js.html">utils.js</a></li>
             <li><a href="Widget.js.html">Widget.js</a></li>
@@ -91,528 +93,592 @@
           <div class="description"> </div>
           <pre><code class="language-javascript">&quot;use strict&quot;;
 
-var commentUtilities = require('comment-utilities');
-var commentUi = require('comment-ui');
+var oCommentUtilities = require('o-comment-utilities');
+var oCommentUi = require('o-comment-ui');
 var sizzle = require('sizzle');
 var oDate = require('o-date');
 
+var NewCommentNotification = require('./NewCommentNotification.js');
 var templates = require('./templates.js');
 var utils = require('./utils.js');
 var envConfig = require('./config.js');
 
 function WidgetUi (widgetContainer, config) {
-    commentUi.WidgetUi.apply(this, arguments);
-
-    config.orderType = config.orderType || &quot;normal&quot;;
-
-    var self = this;
-
-    var events = new commentUtilities.Events();
-
-    var isPagination = false;
-
-    this.on = events.on;
-    this.off = events.off;
-
-    this.render = function (commentsData, adminMode, paginationEnabled) {
-        isPagination = paginationEnabled;
-
-        widgetContainer.innerHTML = &quot;&quot;;
-
-        var addEditor = function () {
-            widgetContainer.appendChild(
-                commentUi.utils.toDOM(
-                    templates.editor.render({
-                        submitButtonLabel: &quot;Submit Comment&quot;,
-                        termMessageTemplate: commentUi.templates.termsAndGuidelinesTemplate.render(),
-                        signInTemplate: templates.signIn.render()
-                    })
-                )
-            );
-        };
-
-        var addComments = function () {
-            widgetContainer.appendChild(
-                commentUi.utils.toDOM(
-                    templates.comments.render({
-                        comments: commentsData,
-                        orderType: config.orderType,
-                        adminMode: adminMode
-                    })
-                )
-            );
-        };
-
-        if (config.orderType === 'inverted') {
-            commentsData.reverse();
-            addComments();
-            addEditor();
-        } else {
-            addEditor();
-            addComments();
-        }
-
-        try { oDate.init(); } catch(e) {}
-
-        commentUi.utils.addEventListener('click', sizzle('.signIn', widgetContainer)[0], function (event) {
-            events.trigger('signIn');
-
-            if (event.preventDefault) {
-                event.preventDefault();
-            } else {
-                event.returnValue = false;
-            }
-        });
-
-        commentUi.utils.addEventListener('click', sizzle('.comment-editor-submit &gt; button')[0], function () {
-            events.trigger('postComment');
-        });
-
-        commentUi.utils.addEventListener('click', sizzle('.comment-editor-input')[0], function (event) {
-            sizzle('.comment-editor-input textarea')[0].focus();
-            self.clearEditorError();
-
-            if (event.preventDefault) {
-                event.preventDefault();
-            } else {
-                event.returnValue = false;
-            }
-        });
-
-        if (isPagination) {
-            if (config.orderType === 'inverted') {
-                sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'block';
-            } else {
-                sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'block';
-            }
-
-            commentUi.utils.addEventListener('click', sizzle('.comment-show-more .comment-show-more-label', widgetContainer), function () {
-                events.trigger('nextPage');
-            });
-        }
-
-        if (adminMode) {
-            var commentContainer = sizzle('.comment-comments-container', widgetContainer);
-            commentUi.utils.addEventListener('click', commentContainer, function (event) {
-                if (event.target.className === 'comment-delete') {
-                    try {
-                        var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
-
-                        events.trigger('deleteComment', commentId);
-                    } catch (e) {}
-
-                    if (event.preventDefault) {
-                        event.preventDefault();
-                    } else {
-                        event.returnValue = false;
-                    }
-                }
-            });
-        }
-    };
-
-    this.adaptToHeight = function (height) {
-        var adapt = function () {
-            var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-            var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
-            var editorComputedStyle = commentUi.utils.getComputedStyle(editorContainer);
-
-            var editorContainerMarginTopValue;
-            var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
-            if (editorContainerMarginTop.indexOf('px') !== -1) {
-                editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
-            } else {
-                editorContainerMarginTopValue = 0;
-            }
-
-            var editorContainerMarginBottomValue;
-            var editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
-            if (editorContainerMarginBottom.indexOf('px') !== -1) {
-                editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
-            } else {
-                editorContainerMarginBottomValue = 0;
-            }
-
-            var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
-
-            commentArea.style.overflow = &quot;auto&quot;;
-            commentArea.style.height = (height - editorHeight) + &quot;px&quot;;
-            if (config.orderType === 'inverted') {
-                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
-            } else {
-                commentArea.scrollTop = 0;
-            }
-
-
-            if (isPagination) {
-                self.disableButtonPagination();
-
-                initScrollPagination();
-            }
-        };
-
-        // poll for the existence of container
-        var pollForContainer = setInterval(function () {
-            if (sizzle('.comment-editor-container', widgetContainer).length &gt; 0) {
-                clearInterval(pollForContainer);
-                adapt();
-            }
-        }, 200);
-    };
-
-    function initScrollPagination () {
-        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-
-        var throttleTime = 200;
-        var lastTime = new Date().getTime();
-
-        var paginationScrollHandler = function () {
-            if (new Date().getTime() - lastTime &gt; throttleTime) {
-                lastTime = new Date().getTime();
-
-                if (config.orderType === 'inverted') {
-                    if (commentArea.scrollTop &lt; 0.2 * commentArea.scrollHeight) {
-                        events.trigger('nextPage');
-                    }
-                } else {
-                    if (commentArea.scrollTop + commentArea.clientHeight &gt; 0.8 * commentArea.scrollHeight) {
-                        events.trigger('nextPage');
-                    }
-                }
-            }
-        };
-
-        commentUi.utils.addEventListener('scroll', commentArea, paginationScrollHandler);
-    }
-
-    this.disableButtonPagination = function () {
-        sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'none';
-        sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'none';
-    };
-
-    this.login = function (token, pseudonym, isAdmin) {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl &amp;&amp; authEl.length) {
-            authEl[0].innerHTML = templates.loggedIn.render({
-                token: token,
-                pseudonym: pseudonym.substring(0, 50),
-                livefyreNetwork: envConfig.get().livefyre.network,
-                isAdmin: isAdmin
-            });
-        }
-    };
-
-    this.logout = function () {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl &amp;&amp; authEl.length) {
-            authEl[0].innerHTML = templates.signIn.render();
-        }
-    };
-
-    this.getCurrentPseudonym = function () {
-        var pseudonymArea = sizzle('.comment-editor-auth .comment-pseudonym', widgetContainer);
-
-        if (pseudonymArea &amp;&amp; pseudonymArea.length) {
-            return pseudonymArea[0].innerHTML;
-        }
-
-        return &quot;&quot;;
-    };
-
-    this.hideSignInLink = function () {
-        var authEl = sizzle('.comment-editor-auth', widgetContainer);
-
-        if (authEl &amp;&amp; authEl.length) {
-            authEl[0].innerHTML = &quot;&quot;;
-        }
-    };
-
-    this.makeReadOnly = function () {
-        var commentEditorInputContainer = sizzle('.comment-editor-input', widgetContainer);
-
-        if (commentEditorInputContainer &amp;&amp; commentEditorInputContainer.length) {
-            commentEditorInputContainer = commentEditorInputContainer[0];
-
-            commentEditorInputContainer.className += &quot; disabled&quot;;
-            sizzle('textarea', commentEditorInputContainer)[0].setAttribute('disabled', 'disabled');
-            sizzle('.comment-editor-submit button', widgetContainer)[0].setAttribute('disabled', 'disabled');
-        }
-    };
-
-    this.makeEditable = function () {
-        var commentEditorInputContainer = sizzle('.comment-editor-input', widgetContainer);
-
-        if (commentEditorInputContainer &amp;&amp; commentEditorInputContainer.length) {
-            commentEditorInputContainer = commentEditorInputContainer[0];
-
-            commentEditorInputContainer.className = commentEditorInputContainer.className.replace('disabled', '');
-            sizzle('textarea', commentEditorInputContainer)[0].removeAttribute('disabled');
-            sizzle('.comment-editor-submit button', widgetContainer)[0].removeAttribute('disabled');
-        }
-    };
-
-    // content, pseudonym, id, timestamp
-    this.addComment = function (commentData, ownComment, adminMode) {
-        ownComment = typeof ownComment === 'boolean' ? ownComment : false;
-
-        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
-        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-
-        // normalize timestamp if one provided or use current time
-        var timestamp = commentData.timestamp ? commentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
-
-        var scrolledToLast;
-
-        var commentDom = commentUi.utils.toDOM(
-            templates.comment.render({
-                commentId: commentData.id,
-                content: commentData.content,
-                dateToShow: this.formatTimestamp(timestamp),
-                datetime: commentUtilities.dateHelper.toISOString(timestamp),
-                timestamp: commentUtilities.dateHelper.toTimestamp(timestamp),
-                relativeTime: this.isRelativeTime(timestamp),
-                author: {
-                    displayName: commentData.displayName.substring(0, 50)
-                },
-                adminMode: adminMode
-            })
-        );
-
-
-        var comments = sizzle('.comment-wrapper', commentContainer);
-        var i;
-        var inserted = false;
-
-        if (config.orderType === &quot;inverted&quot;) {
-            scrolledToLast = (commentArea.scrollTop === (commentArea.scrollHeight - commentArea.clientHeight));
-
-            for (i = comments.length-1; i &gt;= 0; i--) {
-                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) &lt; timestamp) {
-                    if (i === comments.length-1) {
-                        commentContainer.appendChild(commentDom);
-                    } else {
-                        commentContainer.insertBefore(commentDom, comments[i+1]);
-                    }
-                    inserted = true;
-                    break;
-                }
-            }
-
-            if (!inserted) {
-                commentContainer.insertBefore(commentDom, commentContainer.firstChild);
-            }
-
-            if (ownComment || scrolledToLast) {
-                commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
-            }
-        } else {
-            scrolledToLast = (commentContainer.scrollTop === 0);
-
-            for (i = 0; i &lt; comments.length; i++) {
-                if (parseInt(comments[i].getAttribute('data-timestamp'), 10) &lt; timestamp) {
-                    commentContainer.insertBefore(commentDom, comments[i]);
-                    inserted = true;
-                    break;
-                }
-            }
-
-            if (!inserted) {
-                commentContainer.appendChild(commentDom);
-            }
-
-            if (ownComment || scrolledToLast) {
-                commentArea.scrollTop = 0;
-            }
-        }
-
-        if (this.isRelativeTime(timestamp)) {
-            commentDom = sizzle('#commentid-' + commentData.id, widgetContainer)[0];
-
-            var timeoutToStart = 10000;
-            if (new Date().getTime() - timestamp &lt; 0) {
-                timeoutToStart += Math.abs(new Date().getTime() - timestamp);
-            }
-
-            setTimeout(function () {
-                try { oDate.init(commentDom); } catch(e) {}
-            }, timeoutToStart);
-        }
-    };
-
-    this.addNextPageComments = function (comments, adminMode) {
-        var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
-        var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-
-        var commentData;
-        var commentDom;
-
-        for (var index = 0; index &lt; comments.length; index++) {
-            commentData = comments[index];
-
-            commentDom = commentUi.utils.toDOM(
-                templates.comment.render({
-                    commentId: commentData.commentId,
-                    content: commentData.content,
-                    dateToShow: this.formatTimestamp(commentData.timestamp),
-                    datetime: commentUtilities.dateHelper.toISOString(commentData.timestamp),
-                    timestamp: commentUtilities.dateHelper.toTimestamp(commentData.timestamp),
-                    relativeTime: this.isRelativeTime(commentData.timestamp),
-                    author: {
-                        displayName: commentData.author.displayName.substring(0, 50)
-                    },
-                    adminMode: adminMode
-                })
-            );
-
-            var previousScrollHeight = commentArea.scrollHeight;
-            if (config.orderType === &quot;inverted&quot;) {
-                commentContainer.insertBefore(commentDom, commentContainer.firstChild);
-
-                commentArea.scrollTop += commentArea.scrollHeight - previousScrollHeight;
-            } else {
-                commentContainer.appendChild(commentDom);
-            }
-        }
-    };
-
-    this.removeComment = function (id) {
-        var comment = sizzle('#commentid-'+id, widgetContainer);
-        if (comment &amp;&amp; comment.length) {
-            comment[0].parentNode.removeChild(comment[0]);
-        }
-    };
-
-    this.markCommentAsDeleteInProgress = function (id) {
-        var comment = sizzle('#commentid-'+id, widgetContainer);
-        if (comment &amp;&amp; comment.length) {
-            comment[0].className += &quot; deleteInProgress&quot;;
-        }
-    };
-
-    this.markCommentAsDeleteInProgressEnded = function (id) {
-        var comment = sizzle('#commentid-'+id, widgetContainer);
-        if (comment &amp;&amp; comment.length) {
-            comment[0].className = comment[0].className.replace(&quot;deleteInProgress&quot;, &quot;&quot;);
-        }
-    };
-
-    this.getCurrentComment = function () {
-        var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
-
-        if (commentArea &amp;&amp; commentArea.length) {
-            return utils.strings.trim(commentArea[0].value).replace(/(?:\r\n|\r|\n)/g, '&lt;br /&gt;');
-        }
-
-        return &quot;&quot;;
-    };
-
-    this.emptyCommentArea = function () {
-        var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
-
-        if (commentArea &amp;&amp; commentArea.length) {
-            commentArea[0].value = &quot;&quot;;
-        }
-    };
-
-    this.repopulateCommentArea = function (text) {
-        var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
-
-        if (commentArea &amp;&amp; commentArea.length) {
-            commentArea[0].value = text.replace(/&lt;br \/&gt;/g, '\n');
-        }
-    };
-
-    this.addSettingsLink = function (options) {
-        var loginBarContainer = sizzle('.comment-editor-auth', widgetContainer);
-        if (loginBarContainer &amp;&amp; loginBarContainer.length) {
-            loginBarContainer[0].appendChild(commentUi.utils.toDOM(commentUi.templates.commentingSettingsLink.render({
-                label: &quot;Edit pseudonym&quot;,
-                withoutSeparator: true
-            })));
-        } else {
-            return;
-        }
-
-        var settingsLink = sizzle('.comment-settings-text', loginBarContainer[0]);
-        if (settingsLink &amp;&amp; settingsLink.length) {
-            commentUi.utils.addEventListener('click', settingsLink[0], function () {
-                if (options &amp;&amp; typeof options.onClick === 'function') {
-                    options.onClick();
-                }
-            });
-
-            if (options &amp;&amp; typeof options.onAdded === 'function') {
-                options.onAdded();
-            }
-        }
-    };
-
-    this.removeSettingsLink = function () {
-        var settingsLink = sizzle('.comment-settings', widgetContainer);
-        if (settingsLink &amp;&amp; settingsLink.length) {
-            settingsLink[0].parentNode.removeChild(settingsLink[0]);
-        }
-    };
-
-    this.setEditorError = function (err) {
-        var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
-
-        editorErrorContainer.innerHTML = err;
-        editorErrorContainer.style.display = 'block';
-    };
-
-    this.clearEditorError = function () {
-        var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
-
-        editorErrorContainer.style.display = 'none';
-        editorErrorContainer.innerHTML = '';
-    };
-
-    this.formatTimestamp = function (timestampOrDate) {
-        var timestamp = commentUtilities.dateHelper.toTimestamp(timestampOrDate);
-        var isRelative = this.isRelativeTime(timestampOrDate);
-
-        if (isRelative) {
-            // relative time
-            if (timestamp &gt;= new Date().getTime() - 1500) {
-                return &quot;just now&quot;;
-            } else {
-                return oDate.timeAgo(timestamp);
-            }
-        } else {
-            // absolute time
-            return oDate.format(timestamp, config.datetimeFormat.absoluteFormat);
-        }
-    };
-
-    this.isRelativeTime = function (timestampOrDate) {
-        var timestamp = commentUtilities.dateHelper.toTimestamp(timestampOrDate);
-
-        if (config.datetimeFormat.minutesUntilAbsoluteTime === -1 ||
-            new Date().getTime() - timestamp &gt; config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
-
-            return false;
-        } else {
-            return true;
-        }
-    };
+	oCommentUi.WidgetUi.apply(this, arguments);
+
+	config.orderType = config.orderType || &quot;normal&quot;;
+
+	var self = this;
+
+	var events = new oCommentUtilities.Events();
+	var newCommentNotification;
+
+	var adaptedToHeight = false;
+	var isPagination = false;
+	var isOpen = true;
+
+	this.on = events.on;
+	this.off = events.off;
+
+
+	this.open = function () {
+		if (isOpen === false) {
+			isOpen = true;
+
+			sizzle('.comment-editor-closed', widgetContainer)[0].style.display = 'none';
+			sizzle('.comment-editor-input', widgetContainer)[0].style.display = 'block';
+			sizzle('.comment-editor-footer', widgetContainer)[0].style.display = 'block';
+		}
+	};
+
+	this.close = function () {
+		if (isOpen === true) {
+			isOpen = false;
+
+			sizzle('.comment-editor-closed', widgetContainer)[0].style.display = 'block';
+			sizzle('.comment-editor-input', widgetContainer)[0].style.display = 'none';
+			sizzle('.comment-editor-footer', widgetContainer)[0].style.display = 'none';
+		}
+	};
+
+	this.render = function (commentsData, adminMode, paginationEnabled) {
+		isPagination = paginationEnabled;
+		widgetContainer.innerHTML = &quot;&quot;;
+
+		var addEditor = function () {
+			widgetContainer.appendChild(
+				oCommentUi.utils.toDOM(
+					templates.editor.render({
+						submitButtonLabel: &quot;Submit Comment&quot;,
+						termMessageTemplate: oCommentUi.templates.termsAndGuidelinesTemplate.render(),
+						signInTemplate: templates.signIn.render()
+					})
+				)
+			);
+		};
+
+		var addComments = function () {
+			widgetContainer.appendChild(
+				oCommentUi.utils.toDOM(
+					templates.comments.render({
+						comments: commentsData,
+						orderType: config.orderType,
+						adminMode: adminMode
+					})
+				)
+			);
+		};
+
+		if (config.orderType === 'inverted') {
+			commentsData.reverse();
+			addComments();
+			addEditor();
+		} else {
+			addEditor();
+			addComments();
+		}
+
+		try { oDate.init(); } catch(e) {}
+
+		sizzle('.signIn', widgetContainer)[0].addEventListener('click', function (evt) {
+			events.trigger('signIn');
+
+			if (evt.preventDefault) {
+				evt.preventDefault();
+			} else {
+				evt.returnValue = false;
+			}
+		});
+
+		sizzle('.comment-editor-submit &gt; button')[0].addEventListener('click', function () {
+			events.trigger('postComment');
+		});
+
+		sizzle('.comment-editor-input')[0].addEventListener('click', function (event) {
+			sizzle('.comment-editor-input textarea')[0].focus();
+			self.clearEditorError();
+
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
+		});
+
+		if (isPagination) {
+			if (config.orderType === 'inverted') {
+				sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'block';
+			} else {
+				sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'block';
+			}
+
+			sizzle('.comment-show-more .comment-show-more-label', widgetContainer)[0].addEventListener('click', function () {
+				events.trigger('nextPage');
+			});
+		}
+
+		var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+
+		if (adminMode) {
+			commentContainer.addEventListener('click', function (event) {
+				if (event.target.className === 'comment-delete') {
+					try {
+						var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
+
+						events.trigger('deleteComment', commentId);
+					} catch (e) {}
+
+					if (event.preventDefault) {
+						event.preventDefault();
+					} else {
+						event.returnValue = false;
+					}
+				}
+			});
+		}
+	};
+
+	this.adaptToHeight = function (height) {
+		var adapt = function () {
+			if (!adaptedToHeight) {
+				if (isPagination) {
+					self.disableButtonPagination();
+
+					initScrollPagination();
+				}
+			}
+
+			var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+			var editorContainer = sizzle('.comment-editor-container', widgetContainer)[0];
+			var editorComputedStyle = oCommentUi.utils.getComputedStyle(editorContainer);
+
+			var editorContainerMarginTopValue;
+			var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
+			if (editorContainerMarginTop.indexOf('px') !== -1) {
+				editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
+			} else {
+				editorContainerMarginTopValue = 0;
+			}
+
+			var editorContainerMarginBottomValue;
+			var editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
+			if (editorContainerMarginBottom.indexOf('px') !== -1) {
+				editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
+			} else {
+				editorContainerMarginBottomValue = 0;
+			}
+
+			var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
+			commentArea.style.overflow = &quot;auto&quot;;
+			commentArea.style.height = (height - editorHeight) + &quot;px&quot;;
+
+			if (!adaptedToHeight) {
+				adaptedToHeight = true;
+
+				oCommentUtilities.logger.debug(&quot;adapt to height, scroll to last&quot;);
+				scrollToLastComment();
+
+				initNotification();
+			}
+		};
+
+		// poll for the existence of container
+		var pollForContainer = setInterval(function () {
+			if (sizzle('.comment-editor-container', widgetContainer).length &gt; 0) {
+				clearInterval(pollForContainer);
+				adapt();
+			}
+		}, 200);
+	};
+
+
+	// Specific functions for the widget that was shrinked to a fixed height
+
+		function initScrollPagination () {
+			var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+			new oCommentUtilities.dom.ScrollMonitor(commentArea, function (scrollPos) {
+				if (config.orderType === 'inverted') {
+					if (scrollPos &lt; 0.2 * commentArea.scrollHeight) {
+						events.trigger('nextPage');
+					}
+				} else {
+					if (scrollPos + commentArea.clientHeight &gt; 0.8 * commentArea.scrollHeight) {
+						events.trigger('nextPage');
+					}
+				}
+			});
+		}
+
+		function initNotification () {
+			var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+			newCommentNotification = new NewCommentNotification(self, commentArea, (config.orderType === &quot;inverted&quot; ? 'bottom' : 'top'));
+		}
+
+
+		function scrollToLastComment () {
+			var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+
+			if (config.orderType === &quot;inverted&quot;) {
+				commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight + 1;
+			} else {
+				commentArea.scrollTop = 0;
+			}
+		}
+
+		function notifyNewComment () {
+			setTimeout(function () {
+				newCommentNotification.newComment();
+			}, 100);
+		}
+
+	this.disableButtonPagination = function () {
+		sizzle('.comment-show-more-before', widgetContainer)[0].style.display = 'none';
+		sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'none';
+	};
+
+	this.login = function (token, pseudonym, isAdmin) {
+		var authEl = sizzle('.comment-editor-auth', widgetContainer);
+
+		if (authEl &amp;&amp; authEl.length) {
+			authEl[0].innerHTML = templates.loggedIn.render({
+				token: token,
+				pseudonym: pseudonym.substring(0, 50),
+				livefyreNetwork: envConfig.get().livefyre.network,
+				isAdmin: isAdmin
+			});
+		}
+	};
+
+	this.logout = function () {
+		var authEl = sizzle('.comment-editor-auth', widgetContainer);
+
+		if (authEl &amp;&amp; authEl.length) {
+			authEl[0].innerHTML = templates.signIn.render();
+		}
+	};
+
+	this.getCurrentPseudonym = function () {
+		var pseudonymArea = sizzle('.comment-editor-auth .comment-pseudonym', widgetContainer);
+
+		if (pseudonymArea &amp;&amp; pseudonymArea.length) {
+			return pseudonymArea[0].innerHTML;
+		}
+
+		return &quot;&quot;;
+	};
+
+	this.hideSignInLink = function () {
+		var authEl = sizzle('.comment-editor-auth', widgetContainer);
+
+		if (authEl &amp;&amp; authEl.length) {
+			authEl[0].innerHTML = &quot;&quot;;
+		}
+	};
+
+	this.makeReadOnly = function () {
+		var commentEditorInputContainer = sizzle('.comment-editor-input', widgetContainer);
+
+		if (commentEditorInputContainer &amp;&amp; commentEditorInputContainer.length) {
+			commentEditorInputContainer = commentEditorInputContainer[0];
+
+			commentEditorInputContainer.className += &quot; disabled&quot;;
+			sizzle('textarea', commentEditorInputContainer)[0].setAttribute('disabled', 'disabled');
+			sizzle('.comment-editor-submit button', widgetContainer)[0].setAttribute('disabled', 'disabled');
+		}
+	};
+
+	this.makeEditable = function () {
+		var commentEditorInputContainer = sizzle('.comment-editor-input', widgetContainer);
+
+		if (commentEditorInputContainer &amp;&amp; commentEditorInputContainer.length) {
+			commentEditorInputContainer = commentEditorInputContainer[0];
+
+			commentEditorInputContainer.className = commentEditorInputContainer.className.replace('disabled', '');
+			sizzle('textarea', commentEditorInputContainer)[0].removeAttribute('disabled');
+			sizzle('.comment-editor-submit button', widgetContainer)[0].removeAttribute('disabled');
+		}
+	};
+
+	// content, pseudonym, id, timestamp
+	this.addComment = function (commentData, ownComment, adminMode) {
+		ownComment = typeof ownComment === 'boolean' ? ownComment : false;
+
+		var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+		var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+
+		// normalize timestamp if one provided or use current time
+		var timestamp = commentData.timestamp ? oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
+
+		var scrolledToLast;
+
+		var commentDom = oCommentUi.utils.toDOM(
+			templates.comment.render({
+				commentId: commentData.id,
+				content: commentData.content,
+				dateToShow: this.formatTimestamp(timestamp),
+				datetime: oCommentUtilities.dateHelper.toISOString(timestamp),
+				timestamp: oCommentUtilities.dateHelper.toTimestamp(timestamp),
+				relativeTime: this.isRelativeTime(timestamp),
+				author: {
+					displayName: commentData.displayName.substring(0, 50)
+				},
+				adminMode: adminMode
+			})
+		);
+
+
+		var comments = sizzle('.comment-wrapper', commentContainer);
+		var i;
+		var inserted = false;
+
+		if (config.orderType === &quot;inverted&quot;) {
+			oCommentUtilities.logger.debug(&quot;new comment&quot;);
+			scrolledToLast = (commentArea.scrollTop &gt;= (commentArea.scrollHeight - commentArea.clientHeight - 3));
+
+			oCommentUtilities.logger.debug(&quot;scrolledToLast&quot;, scrolledToLast);
+
+			for (i = comments.length-1; i &gt;= 0; i--) {
+				if (parseInt(comments[i].getAttribute('data-timestamp'), 10) &lt; timestamp) {
+					if (i === comments.length-1) {
+						commentContainer.appendChild(commentDom);
+					} else {
+						commentContainer.insertBefore(commentDom, comments[i+1]);
+					}
+					inserted = true;
+					break;
+				}
+			}
+
+			if (!inserted) {
+				commentContainer.insertBefore(commentDom, commentContainer.firstChild);
+			}
+
+			if (ownComment || scrolledToLast) {
+				scrollToLastComment();
+			}
+		} else {
+			scrolledToLast = (commentArea.scrollTop &lt;= 3);
+
+			for (i = 0; i &lt; comments.length; i++) {
+				if (parseInt(comments[i].getAttribute('data-timestamp'), 10) &lt; timestamp) {
+					commentContainer.insertBefore(commentDom, comments[i]);
+					inserted = true;
+					break;
+				}
+			}
+
+			if (!inserted) {
+				commentContainer.appendChild(commentDom);
+			}
+
+			if (ownComment || scrolledToLast) {
+				scrollToLastComment();
+			}
+		}
+
+		if (this.isRelativeTime(timestamp)) {
+			commentDom = sizzle('#commentid-' + commentData.id, widgetContainer)[0];
+
+			var timeoutToStart = 10000;
+			if (new Date().getTime() - timestamp &lt; 0) {
+				timeoutToStart += Math.abs(new Date().getTime() - timestamp);
+			}
+
+			setTimeout(function () {
+				try { oDate.init(commentDom); } catch(e) {}
+			}, timeoutToStart);
+		}
+
+		notifyNewComment();
+	};
+
+	this.addNextPageComments = function (comments, adminMode) {
+		var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
+		var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
+
+		var commentData;
+		var commentDom;
+
+		for (var index = 0; index &lt; comments.length; index++) {
+			commentData = comments[index];
+
+			commentDom = oCommentUi.utils.toDOM(
+				templates.comment.render({
+					commentId: commentData.commentId,
+					content: commentData.content,
+					dateToShow: this.formatTimestamp(commentData.timestamp),
+					datetime: oCommentUtilities.dateHelper.toISOString(commentData.timestamp),
+					timestamp: oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp),
+					relativeTime: this.isRelativeTime(commentData.timestamp),
+					author: {
+						displayName: commentData.author.displayName.substring(0, 50)
+					},
+					adminMode: adminMode
+				})
+			);
+
+			var previousScrollHeight = commentArea.scrollHeight;
+			if (config.orderType === &quot;inverted&quot;) {
+				commentContainer.insertBefore(commentDom, commentContainer.firstChild);
+
+				commentArea.scrollTop += commentArea.scrollHeight - previousScrollHeight;
+			} else {
+				commentContainer.appendChild(commentDom);
+			}
+		}
+	};
+
+	this.removeComment = function (id) {
+		var comment = sizzle('#commentid-'+id, widgetContainer);
+		if (comment &amp;&amp; comment.length) {
+			comment[0].parentNode.removeChild(comment[0]);
+		}
+	};
+
+	this.updateComment = function (id, newContent) {
+		var commentContentEl = sizzle('#commentid-' + id + ' .comment-content', widgetContainer);
+		if (commentContentEl &amp;&amp; commentContentEl.length) {
+			commentContentEl[0].innerHTML = newContent;
+		}
+	};
+
+	this.markCommentAsDeleteInProgress = function (id) {
+		var comment = sizzle('#commentid-'+id, widgetContainer);
+		if (comment &amp;&amp; comment.length) {
+			comment[0].className += &quot; comment-delete-progress&quot;;
+		}
+	};
+
+	this.markCommentAsDeleteInProgressEnded = function (id) {
+		var comment = sizzle('#commentid-'+id, widgetContainer);
+		if (comment &amp;&amp; comment.length) {
+			comment[0].className = comment[0].className.replace(&quot;comment-delete-progress&quot;, &quot;&quot;);
+		}
+	};
+
+	this.getCurrentComment = function () {
+		var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
+
+		if (commentArea &amp;&amp; commentArea.length) {
+			return utils.strings.trim(commentArea[0].value).replace(/(?:\r\n|\r|\n)/g, '&lt;br /&gt;');
+		}
+
+		return &quot;&quot;;
+	};
+
+	this.emptyCommentArea = function () {
+		var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
+
+		if (commentArea &amp;&amp; commentArea.length) {
+			commentArea[0].value = &quot;&quot;;
+		}
+	};
+
+	this.repopulateCommentArea = function (text) {
+		var commentArea = sizzle('.comment-editor-input textarea', widgetContainer);
+
+		if (commentArea &amp;&amp; commentArea.length &amp;&amp; text &amp;&amp; text.length) {
+			commentArea[0].value = text.replace(/&lt;br \/&gt;/g, '\n');
+		}
+	};
+
+	this.addSettingsLink = function (options) {
+		var loginBarContainer = sizzle('.comment-editor-auth', widgetContainer);
+		if (loginBarContainer &amp;&amp; loginBarContainer.length) {
+			loginBarContainer[0].appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.commentingSettingsLink.render({
+				label: &quot;Edit pseudonym&quot;,
+				withoutSeparator: true
+			})));
+		} else {
+			return;
+		}
+
+		var settingsLink = sizzle('.comment-settings-text', loginBarContainer[0]);
+		if (settingsLink &amp;&amp; settingsLink.length) {
+			settingsLink[0].addEventListener('click', function () {
+				if (options &amp;&amp; typeof options.onClick === 'function') {
+					options.onClick();
+				}
+			});
+
+			if (options &amp;&amp; typeof options.onAdded === 'function') {
+				options.onAdded();
+			}
+		}
+	};
+
+	this.addNotAvailableMessage = function () {
+		widgetContainer.innerHTML = oCommentUi.templates.unavailableTemplate.render({
+			message: oCommentUi.i18n.texts.unavailable,
+			fontSize: &quot;12px&quot;,
+			style: &quot;padding: 10px 0 20px 0;&quot;
+		});
+	};
+
+	this.removeSettingsLink = function () {
+		var settingsLink = sizzle('.comment-settings', widgetContainer);
+		if (settingsLink &amp;&amp; settingsLink.length) {
+			settingsLink[0].parentNode.removeChild(settingsLink[0]);
+		}
+	};
+
+	this.setEditorError = function (err) {
+		var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
+
+		editorErrorContainer.innerHTML = err;
+		editorErrorContainer.style.display = 'block';
+	};
+
+	this.clearEditorError = function () {
+		var editorErrorContainer = sizzle('.comment-editor-error', widgetContainer)[0];
+
+		editorErrorContainer.style.display = 'none';
+		editorErrorContainer.innerHTML = '';
+	};
+
+	this.formatTimestamp = function (timestampOrDate) {
+		var timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
+		var isRelative = this.isRelativeTime(timestampOrDate);
+
+		if (isRelative) {
+			// relative time
+			if (timestamp &gt;= new Date().getTime() - 1500) {
+				return &quot;just now&quot;;
+			} else {
+				return oDate.timeAgo(timestamp);
+			}
+		} else {
+			// absolute time
+			return oDate.format(timestamp, config.datetimeFormat.absoluteFormat);
+		}
+	};
+
+	this.isRelativeTime = function (timestampOrDate) {
+		var timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
+
+		if (config.datetimeFormat.minutesUntilAbsoluteTime === -1 ||
+			new Date().getTime() - timestamp &gt; config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
+
+			return false;
+		} else {
+			return true;
+		}
+	};
 }
 
 WidgetUi.__extend = function(child) {
-    if (typeof Object.create === 'function') {
-        child.prototype = Object.create(WidgetUi.prototype);
-        child.prototype = Object.create(WidgetUi.prototype);
-    } else {
-        var Tmp = function () {};
-        Tmp.prototype = WidgetUi.prototype;
-        child.prototype = new Tmp();
-        child.prototype.constructor = child;
-    }
+	if (typeof Object.create === 'function') {
+		child.prototype = Object.create(WidgetUi.prototype);
+		child.prototype = Object.create(WidgetUi.prototype);
+	} else {
+		var Tmp = function () {};
+		Tmp.prototype = WidgetUi.prototype;
+		child.prototype = new Tmp();
+		child.prototype.constructor = child;
+	}
 };
 
-commentUi.WidgetUi.__extend(WidgetUi);
+oCommentUi.WidgetUi.__extend(WidgetUi);
 
 module.exports = WidgetUi;</code></pre>
         </div>
@@ -620,8 +686,8 @@ module.exports = WidgetUi;</code></pre>
     </div>
     <footer class="footer">
       <div class="container">
-        <p>Documentation generated with<a href="https://github.com/FGRibreau/doxx">Doxx</a>created by<a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau</a></p>
-        <p>Doxx is sponsored by<a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr</a>and<a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
+        <p>Documentation generated with <a href="https://github.com/FGRibreau/doxx">Doxx </a> created by <a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau </a></p>
+        <p>Doxx is sponsored by <a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr </a> and <a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
         <p>Theme borrowed from Twitter Bootstrap</p>
       </div>
     </footer>

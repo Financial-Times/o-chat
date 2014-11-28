@@ -14,11 +14,19 @@ The script exposes a global variable named `oChat`.
 ### Bower
 As a bower dependency:
 
+**Javascript:**
+
 ```javascript
 var oChat = require('o-chat');
 ```
 
-The module should be built using `browserify` (with `debowerify` transform).
+**SCSS:**
+
+```ccs
+@import 'o-chat/main';
+```
+
+The module should be built using `browserify` (with `debowerify` and `textrequireify` transform).
 
 ## Configuration
 **The methods which are meant to configure the module are the following:**
@@ -140,7 +148,7 @@ var widgetInstance = new oChat.Widget({
 Listen the events the widget triggers (optional):
 
 ```javascript
-widgetInstance.on(commentPosted.tracking, function (siteId, eventData) {
+widgetInstance.on(tracking.postComment, function (evt) {
     // a comment is posted, do something, track it
 });
 ```
@@ -171,7 +179,7 @@ If you need a reference of the JavaScript object created, you can listen the eve
 
 ```javascript
 var widgetInstance;
-document.body.addEventListener('oComments.domConstruct', function (evt) {
+document.body.addEventListener('oChat.domConstruct', function (evt) {
     if (evt.detail.id === 'commentWidget') {
         widgetInstance = evt.detail.instance;
     }
@@ -184,10 +192,163 @@ where evt.detail.id is the ID of the DOM element (in this example `commentWidget
 When done with the configuration of the widget, adding event listeners, etc., execute the following to initiate the widget generation:
 
 ```javascript
-oComments.initDomConstruct();
+oChat.initDomConstruct();
 ```
 
 **You don't have to wait until the document is fully loaded, call it whenever you are done with the configurations.**
+
+---
+
+##### Events
+### Widget level events
+Widget level events are triggered on the container of the widget. They have the following format:
+`oChat.nameOfTheEvent`, where 'nameOfTheEvent' is one of the following mentioned below.
+
+All events has also a payload data to identify the widget from which the event is coming from, and also specific event data if there's some, which has the following format:
+
+```javascript
+{
+    detail: {
+        id: "idOfTheWidget",
+        widget: widgetInstance,
+        data: {...} //data specific to the event
+    }
+}
+```
+
+
+There's also an easier way to listen to widget level events, with the following function:
+
+```javascript
+widgetInstance.on('nameOfTheEvent', function (evt) {
+    // event handler
+});
+```
+
+*Please note that you should omit the namespace (oChat.) before the event name.*
+
+Using the `off` method event handlers can be removed.
+
+The list of events are:
+
+##### widget.timeout
+Triggered when loading the widget exceeded a given time.
+
+###### error.resources
+Error while loading the resources.
+Event detail data: error object/message.
+
+###### error.init
+Error while loading the initialization data and the comments.
+Event detail data: error object/message.
+
+###### error.widget
+Triggered when any error appear (triggered together with the above mentioned error events).
+Event detail data: error object/message.
+
+##### data.init
+Loaded when the initialization is finished and the necessary data is obtained.
+Event detail data: initialization data in the following form:
+
+```javascript
+{
+    "collection": {
+        "unclassified": false,
+        "collectionId": "91440735",
+        "lastEvent": 1411541039265900,
+        "comments": [{
+            "parentId": "",
+            "author": {
+                "displayName": "roli main",
+                "tags": ["FT"],
+                "type": 1
+            },
+            "content": "<p>comment</p>",
+            "timestamp": 1411541039,
+            "commentId": "216743299",
+            "visibility": 1
+        }],
+        "totalPages": "6"
+    }
+}
+```
+
+##### data.auth
+The first time the auth object is loaded, it is broadcasted using this event. Event detail data: authentication and user detail data in the following form:
+
+```javascript
+{
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJkb21haW4iOiJmdC0xLmZ5cmUuY28iLCJleHBpcmVzIjoxNDE3MTE2Nzk5LCJ1c2VyX2lkIjoiODk0ODc0MzkiLCJkaXNwbGF5X25hbWUiOiJyb2xpIG1haW4ifQ.maN1bKWvDQLA-mvgNp9lSKdI9Izj9rmX3XrEaVwUTNY",
+    "expires": 1417116799,
+    "displayName": "user pseudonym",
+    "settings": {
+        "emailcomments": "never",
+        "emailreplies": "never",
+        "emaillikes": "never",
+        "emailautofollow": "off"
+    }
+}
+```
+
+##### widget.ready
+The widget is ready to be rendered, the initialization process has finished.
+
+##### widget.renderComplete
+The UI is fully rendered.
+
+##### tracking.postComment
+A comment is posted.
+Event detail data:
+ - collectionId
+ - info about the comment:
+     + id
+     + bodyHtml: the content of the comment
+     + author:
+         * displayName: the author's pseudonym
+
+##### tracking.deleteComment
+A comment is deleted within the widget.
+Event detail data:
+ - collectionId
+ - info about the comment:
+     + id
+
+### Module level events
+These events are triggered on the `body` element. They have the same format as the widget level events: `oChat.nameOfTheEvent`, where nameOfTheEvent is one of the following below.
+
+The payload data consists only of event specific data:
+
+```javascript
+{
+    detail: {...} // event specific data
+}
+```
+
+The events are the following:
+##### auth.login
+Triggered when a user is successfully logged in.
+Payload is the jwt token with which the user is logged in.
+
+##### auth.logout
+Triggered when a user is logged out.
+
+##### auth.loginRequired
+Triggered on any activity which explicitly requires a logged in status. This could mean from the product perspective that the user is not logged in, or his/her login status expired (e.g. session expire).
+
+The payload data contains two functions: success and failure. Based on the outcome of the login process, one of these should be called by the handler.
+**Important: if the log in needs a page reload, don't call the failure function!**
+
+```javascript
+oChat.auth.on('auth.loginRequired', function (evt) {
+    if (logInSuccess) {
+        evt.detail.success();
+    }
+
+    if (logInFails || logInRefused) {
+        evt.detail.failure();
+    }
+});
+```
 
 ---
 
@@ -228,40 +389,6 @@ This method can be called once (calling it multiple types will have no effect).
 
 ###### adaptToHeight
 Calling this method with a height in pixels as parameter will adapt the UI to shrink within that height. If the current UI is smaller, it will fill the space to occupy the full height, or if the current UI is taller, a scroll will appear on the comments.
-
-###### init
-**This method is used internally, but its behavior can be overridden if desired.** This method is responsible to get the initialization data (e.g. collection info, comments), and also to initialize streaming from Livefyre (e.g. a new comment added, comment deleted).
-As a parameter it has a callback which should be called when the loading finished passing also the obtained data as parameter.
-
-```javascript
-widget.init(callback) {
-    loadComments(function (comments) {
-        callback(comments);
-    });
-};
-```
-
-###### loadResources
-**This method is used internally, but its behavior can be overridden if desired.** This method is responsible to load any third party resources that are needed to load the widget. By default this method does nothing for o-chat widget.
-A callback is passed as a parameter, which should be called when all resources are fully loaded.
-
-```javascript
-widget.loadResources(callback) {
-    loadResource1();
-    loadResource2();
-    callback();
-};
-```
-
-###### render
-**This method is used internally, but its behavior can be overridden if desired.** This method is responsible to render the UI using the comments available as a parameter. The second parameter is a callback, which should be called when the UI is rendered.
-
-```javascript
-widget.render(comments, callback) {
-    renderUi(comments);
-    callback();
-}
-```
 
 ###### getWidgetEl
 Returns the DOM element of the widget container.
@@ -316,91 +443,6 @@ Livefyre's collection ID for the current article. **Populated only after the wid
 Seconds after a timeout is considered when loading the widget.
 
 
-##### Events
-Handling these events is available using the `on` function of a widget instance.
-
-e.g.:
-
-```javascript
-widget.on('eventName', function (additionalParameters) {
-    // handle the event
-});
-```
-
-###### timeout.widget
-Loading timed out.
-
-###### error.resources
-Error while loading the resources.
-Parameters: error object/message.
-
-###### error.init
-Error while loading the initialization data and the comments.
-Parameters: error object/message.
-
-###### error.widget
-Error for any reason.
-Parameters: error object/message.
-
-###### loaded.init
-Loaded when the initialization is finished and the necessary data is obtained.
-Parameters: initialization data in the following form:
-
-```javascript
-{
-    "collection": {
-        "unclassified": false,
-        "collectionId": "91440735",
-        "lastEvent": 1411541039265900,
-        "comments": [{
-            "parentId": "",
-            "author": {
-                "displayName": "roli main",
-                "tags": ["FT"],
-                "type": 1
-            },
-            "content": "<p>comment</p>",
-            "timestamp": 1411541039,
-            "commentId": "216743299",
-            "visibility": 1
-        }],
-        "totalPages": "6"
-    }
-}
-```
-
-For more information please visit the o-comment-data module, getComments endpoint.
-
-###### ready.widget
-The widget has all the information needed to generate the UI.
-
-###### loaded.auth
-User authentication details loaded.
-Parameters: authentication data.
-
-For more information please visit the o-comment-data module, getAuth endpoint.
-
-###### renderComplete.widget
-The UI is fully generated.
-
-###### commentPosted.tracking
-A comment is posted within the widget.
-Parameters:
- - collectionId
- - info about the comment:
-     + id
-     + bodyHtml: the content of the comment
-     + author:
-         * displayName: the author's pseudonym
-
-###### commentDeleted.tracking
-A comment is deleted within the widget.
-Parameters:
- - collectionId
- - info about the comment:
-     + id
-
-
 ### auth
 This submodule is responsible for handling the user's authentication status.
 
@@ -431,12 +473,6 @@ The login method should be provided with a callback parameter, which will get tw
 ###### logout
 This method broadcasts a logout event to every module that are listening to it.
 
-###### on
-Using this method you can listen to the events generated by this module.
-
-###### off
-Using `off` the event handlers attached using `on` can be removed.
-
 ###### loginRequired
 Using this method you can explicitly request an authenticated status. It handles different scenarios:
 
@@ -448,36 +484,6 @@ Using this method you can explicitly request an authenticated status. It handles
 Parameters:
  - delegate: Optional. An object can be added with two functions: success and failure. If the login process ends successfully, delegate.success is called. If the login process fails or it is refused by the user, delegate.failure is called.
  - force: Optional. If true, the local cache is ignored and the web service is directly asked for the login status.
-
-##### Events
-These are the events that can be handled using the auth object.
-
-###### login
-Triggered when the user is logged in.
-Parameters:
- - token
- - pseudonym
- - isAdmin
-
-###### logout
-Triggered when the user is logged out.
-No parameters.
-
-###### loginRequired.authAction
-If the user is not logged in, this event is generated. The login process of the page within the comment module is included is abstract, so it should be handled by the page.
-It gets also a parameter, an object with two functions: success and failure. If the login process is successful, the success method should be called. If it fails or refused, the failure method should be called.
-
-```javascript
-auth.on('loginRequired.authAction', function (delegate) {
-    if (logInSuccess) {
-        delegate.success();
-    }
-
-    if (logInFails || logInRefused) {
-        delegate.failure();
-    }
-});
-```
 
 ---
 

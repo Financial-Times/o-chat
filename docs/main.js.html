@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width" charset="utf-8">
-    <title>o-comment-client</title>
+    <title>o-chat</title>
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/docs.css">
@@ -63,7 +63,7 @@
     </div>
     <header id="overview" class="jumbotron subhead">
       <div class="container">
-        <h1>o-comment-client</h1>
+        <h1>o-chat</h1>
         <p class="lead"></p>
       </div>
     </header>
@@ -74,9 +74,11 @@
             <li><a href="index.html">Main</a></li>
             <li><a href="auth.js.html">auth.js</a></li>
             <li><a href="config.js.html">config.js</a></li>
+            <li><a href="globalEvents.js.html">globalEvents.js</a></li>
             <li><a href="i18n.js.html">i18n.js</a></li>
             <li class="active"><a href="main.js.html">main.js</a></li>
             <li><a href="MessageQueue.js.html">MessageQueue.js</a></li>
+            <li><a href="NewCommentNotification.js.html">NewCommentNotification.js</a></li>
             <li><a href="userDialogs.js.html">userDialogs.js</a></li>
             <li><a href="utils.js.html">utils.js</a></li>
             <li><a href="Widget.js.html">Widget.js</a></li>
@@ -84,6 +86,16 @@
           </ul>
           <div class="scrollspy">
             <ul class="nav nav-list bs-docs-sidenav affix-top">
+              <li><a href="#init"><i class="alert alert-info"></i><span>init</span></a>
+              </li>
+              <li><a href="#Widget"><i class="alert alert-success"></i><span>Widget</span></a>
+              </li>
+              <li><a href="#enableLogging"><i class="alert alert-info"></i><span>enableLogging</span></a>
+              </li>
+              <li><a href="#disableLogging"><i class="alert alert-info"></i><span>disableLogging</span></a>
+              </li>
+              <li><a href="#setLoggingLevel"><i class="alert alert-info"></i><span>setLoggingLevel</span></a>
+              </li>
             </ul>
           </div>
         </div>
@@ -91,9 +103,16 @@
           <div class="description"><p>Default config (prod) is set.</p> </div>
           <pre><code class="language-javascript">config.set(defaultConfig);</code></pre>
           <div class="description"><p>Enable data caching.</p> </div>
-          <pre><code class="language-javascript">oCommentData.init('cache', true);
+          <pre><code class="language-javascript">oCommentApi.init('cache', true);
 
 module.exports = {</code></pre>
+          <section id="init">
+            <h1>init</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>init()</span>
+            </p>
+          </section>
           <table class="table table-bordered table-striped">
             <thead>
               <tr>
@@ -115,76 +134,110 @@ module.exports = {</code></pre>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Adds or overrides configuration options. It also supports overriding or adding configs to dependencies.<br />For this you have to write the following:</p>
-
-<div class="highlight"><pre lang="">"dependencies": {
-      "o-comment-data": {
-          "ccs": {
-              "baseUrl": "<a href='http://test.comment-creation-service.webservices.ft.com'>http://test.comment-creation-service.webservices.ft.com</a>"
+          <div class="description"><p>Adds or overrides configuration options. It also supports overriding or adding configs to dependencies.<br />For this you have to write the following:</p><pre><code>&quot;dependencies&quot;: {
+      &quot;o-comment-api&quot;: {
+          &quot;ccs&quot;: {
+              &quot;baseUrl&quot;: &quot;http://test.comment-creation-service.webservices.ft.com&quot;
           }
       }
   }
-</pre></div> </div>
+</code></pre> </div>
           <pre><code class="language-javascript">init: function (keyOrObject, value) {
-        if (typeof keyOrObject === 'string') {
-            config.set(keyOrObject, value);
+	if (typeof keyOrObject === 'string') {
+		config.set(keyOrObject, value);
 
-            if (keyOrObject === 'sessionId') {
-                oCommentData.init(keyOrObject, value);
-            }
-        } else if (typeof keyOrObject === 'object') {
-            if (keyOrObject.hasOwnProperty('dependencies') &amp;&amp; keyOrObject.dependencies.hasOwnProperty('o-comment-data')) {
-                oCommentData.init(keyOrObject.dependencies['o-comment-data']);
+		if (keyOrObject === 'sessionId') {
+			oCommentApi.init(keyOrObject, value);
+		}
+	} else if (typeof keyOrObject === 'object') {
+		if (keyOrObject.hasOwnProperty('dependencies') &amp;&amp; keyOrObject.dependencies.hasOwnProperty('o-comment-api')) {
+			oCommentApi.init(keyOrObject.dependencies['o-comment-api']);
 
-                delete keyOrObject.dependencies;
-            }
+			delete keyOrObject.dependencies;
+		}
 
-            config.set(keyOrObject, value);
+		config.set(keyOrObject, value);
 
-            if (keyOrObject.hasOwnProperty('sessionId')) {
-                oCommentData.init('sessionId', keyOrObject.sessionId);
-            }
-        }
-    },</code></pre>
+		if (keyOrObject.hasOwnProperty('sessionId')) {
+			oCommentApi.init('sessionId', keyOrObject.sessionId);
+		}
+	}
+},</code></pre>
+          <section id="Widget">
+            <h1>Widget</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-success radius ctx-type">property</div><span>Widget</span>
+            </p>
+          </section>
           <div class="description"><p>Widget.js exposed.</p> </div>
           <pre><code class="language-javascript">Widget: Widget,
 
-    WidgetUi: require('./src/javascripts/WidgetUi.js'),
+WidgetUi: require('./src/javascripts/WidgetUi.js'),
 
-    userDialogs: require('./src/javascripts/userDialogs.js'),
+userDialogs: require('./src/javascripts/userDialogs.js'),
 
-    templates: require('./src/javascripts/templates.js'),
+templates: require('./src/javascripts/templates.js'),
 
-    auth: require('./src/javascripts/auth.js'),
+auth: require('./src/javascripts/auth.js'),
 
-    MessageQueue: require('./src/javascripts/MessageQueue.js'),
+MessageQueue: require('./src/javascripts/MessageQueue.js'),
 
-    utilities: commentUtilities,
-    dataService: oCommentData,
+utilities: oCommentUtilities,
+dataService: oCommentApi,
 
-    initDomConstruct: function () {
-        commentUtilities.initDomConstruct(Widget, 'o-comment-client');
-    },</code></pre>
+initDomConstruct: function () {
+	oCommentUtilities.initDomConstruct({
+		Widget: Widget,
+		baseClass: 'o-chat',
+		namespace: 'oChat',
+		module: self
+	});
+},</code></pre>
+          <section id="enableLogging">
+            <h1>enableLogging</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>enableLogging()</span>
+            </p>
+          </section>
           <div class="description"><p>Enables logging.</p> </div>
           <pre><code class="language-javascript">enableLogging: function () {
-        commentUtilities.logger.enable.apply(this, arguments);
-    },</code></pre>
+	oCommentUtilities.logger.enable.apply(this, arguments);
+},</code></pre>
+          <section id="disableLogging">
+            <h1>disableLogging</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>disableLogging()</span>
+            </p>
+          </section>
           <div class="description"><p>Disables logging.</p> </div>
           <pre><code class="language-javascript">disableLogging: function () {
-        commentUtilities.logger.disable.apply(this, arguments);
-    },</code></pre>
+	oCommentUtilities.logger.disable.apply(this, arguments);
+},</code></pre>
+          <section id="setLoggingLevel">
+            <h1>setLoggingLevel</h1>
+            <h5 class="subheader"></h5>
+            <p>
+              <div class="label label-info radius ctx-type">method</div><span>setLoggingLevel()</span>
+            </p>
+          </section>
           <div class="description"><p>Sets logging level.</p> </div>
           <pre><code class="language-javascript">setLoggingLevel: function () {
-        commentUtilities.logger.setLevel.apply(this, arguments);
-    }
-};</code></pre>
+	oCommentUtilities.logger.setLevel.apply(this, arguments);
+}
+};
+
+module.exports.on = globalEvents.on;
+module.exports.off = globalEvents.off;</code></pre>
         </div>
       </div>
     </div>
     <footer class="footer">
       <div class="container">
-        <p>Documentation generated with<a href="https://github.com/FGRibreau/doxx">Doxx</a>created by<a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau</a></p>
-        <p>Doxx is sponsored by<a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr</a>and<a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
+        <p>Documentation generated with <a href="https://github.com/FGRibreau/doxx">Doxx </a> created by <a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau </a></p>
+        <p>Doxx is sponsored by <a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr </a> and <a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
         <p>Theme borrowed from Twitter Bootstrap</p>
       </div>
     </footer>

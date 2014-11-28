@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width" charset="utf-8">
-    <title>o-comment-client</title>
+    <title>o-chat</title>
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
     <link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/docs.css">
@@ -63,7 +63,7 @@
     </div>
     <header id="overview" class="jumbotron subhead">
       <div class="container">
-        <h1>o-comment-client</h1>
+        <h1>o-chat</h1>
         <p class="lead"></p>
       </div>
     </header>
@@ -74,9 +74,11 @@
             <li><a href="index.html">Main</a></li>
             <li><a href="auth.js.html">auth.js</a></li>
             <li><a href="config.js.html">config.js</a></li>
+            <li><a href="globalEvents.js.html">globalEvents.js</a></li>
             <li><a href="i18n.js.html">i18n.js</a></li>
             <li><a href="main.js.html">main.js</a></li>
             <li><a href="MessageQueue.js.html">MessageQueue.js</a></li>
+            <li><a href="NewCommentNotification.js.html">NewCommentNotification.js</a></li>
             <li><a href="userDialogs.js.html">userDialogs.js</a></li>
             <li><a href="utils.js.html">utils.js</a></li>
             <li class="active"><a href="Widget.js.html">Widget.js</a></li>
@@ -141,49 +143,42 @@
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Incorporates the communication with the content creation service,<br />Livefyre authentication, live streaming, and creation of the markup<br />of the commenting widget.</p>
-
-<p>The Widget is configurable and customizable.</p>
-
-<h4>Configuration:</h4>
-
+          <div class="description"><p>Incorporates the communication with the content creation service,<br />Livefyre authentication, live streaming, and creation of the markup<br />of the commenting widget.</p><p>The Widget is configurable and customizable.</p><h4>Configuration:</h4>
 <h5>Mandatory fields:</h5>
-
 <ul>
 <li>elId: ID of the HTML element in which the widget should be loaded</li>
 <li>articleId: ID of the article, any string</li>
 <li>url: canonical URL of the page</li>
 <li>title: Title of the page</li>
 </ul>
-
 <h5>Optional fields:</h5>
-
 <ul>
-<li>order: This specifies how the widget is built. It can have two values:
-<ul><li>normal: the commenting box is placed on top of the comment stream, and the comments are ordered as newest on top.</li>
-<li>inverted: the commenting box is placed at the bottom of the comment stream, and the comments are ordered newest on bottom.
-<br/>Default value is 'normal'.</li></ul></li>
-<li>layout: Specifies the layout style of the widget. It can have two values:
-<ul><li>normal: When placed in the main area of the page.</li>
-<li>side: When placed in the side area of the page.
-<br/>Default value is 'normal'.</li></ul></li>
-<li>datetimeFormat: How to format the timestamps. This is an object and has two fields:
-<ul><li>minutesUntilAbsoluteTime: specifies after how many minutes to switch from relative time to absolute.
-If -1 is specified, the timestamps will be in the absolute format immediately.
-By default it is set to 14 days.</li>
-<li>absoluteFormat: specifies the format with which the absolute timestamp is rendered.
-For more information about the possible values please visit:
-<a href='https://github.com/Financial-Times/o-date#o-dateformatdate-tpl'>https://github.com/Financial-Times/o-date#o-dateformatdate-tpl</a></li></ul></li>
-</ul> </div>
+<li>order: This specifies how the widget is built. It can have two values:<ul>
+<li>normal: the commenting box is placed on top of the comment stream, and the comments are ordered as newest on top.</li>
+<li>inverted: the commenting box is placed at the bottom of the comment stream, and the comments are ordered newest on bottom.<br /><br/>Default value is &#39;normal&#39;.</li>
+</ul>
+</li>
+<li>layout: Specifies the layout style of the widget. It can have two values:<ul>
+<li>normal: When placed in the main area of the page.</li>
+<li>side: When placed in the side area of the page.<br /><br/>Default value is &#39;normal&#39;.</li>
+</ul>
+</li>
+<li>datetimeFormat: How to format the timestamps. This is an object and has two fields:<ul>
+<li>minutesUntilAbsoluteTime: specifies after how many minutes to switch from relative time to absolute.<br />If -1 is specified, the timestamps will be in the absolute format immediately.<br />By default it is set to 14 days.</li>
+<li>absoluteFormat: specifies the format with which the absolute timestamp is rendered.<br />For more information about the possible values please visit:<br /><a href="https://github.com/Financial-Times/o-date#o-dateformatdate-tpl">https://github.com/Financial-Times/o-date#o-dateformatdate-tpl</a></li>
+</ul>
+</li>
+</ul>
+ </div>
           <pre><code class="language-javascript">var Widget = function () {
-    commentUi.Widget.apply(this, arguments);
+	oCommentUi.Widget.apply(this, arguments);
 
-    var self = this;
+	var self = this;
 
-    this.config.order = this.config.order || &quot;normal&quot;;
+	this.config.order = this.config.order || &quot;normal&quot;;
 
-    // add appropriate classes to the widget container
-    this.getWidgetEl().className += ' o-comment-client comment-order-' + this.config.order;</code></pre>
+	// add appropriate classes to the widget container
+	this.getWidgetEl().className += ' o-chat comment-order-' + this.config.order;</code></pre>
           <section id="collectionId">
             <h1>collectionId</h1>
             <h5 class="subheader"></h5>
@@ -203,40 +198,41 @@ For more information about the possible values please visit:
           <div class="description"><p>Message queue which is responsible to save comments when a page reload is needed<br />to authenticate (when posting a comment).</p> </div>
           <pre><code class="language-javascript">this.messageQueue = null;
 
-    var defaultDatetimeFormat = {
-        minutesUntilAbsoluteTime: 20160,
-        absoluteFormat: 'date'
-    };
+var defaultDatetimeFormat = {
+	minutesUntilAbsoluteTime: 20160,
+	absoluteFormat: 'date'
+};
 
-    if (!this.config.datetimeFormat) {
-        if (this.config.datetimeformat) {
-            this.config.datetimeFormat = this.config.datetimeformat;
-        }
-    }
+if (!this.config.datetimeFormat) {
+	if (this.config.datetimeformat) {
+		this.config.datetimeFormat = this.config.datetimeformat;
+	}
+}
 
-    // merge user date preferences with the default preferences
-    if (this.config.datetimeFormat) {
-        if (typeof this.config.datetimeFormat === 'string') {
-            defaultDatetimeFormat.absoluteFormat = this.config.datetimeFormat;
-        } else if (typeof this.config.datetimeFormat === 'object') {
-            if (this.config.datetimeFormat.hasOwnProperty('minutesUntilAbsoluteTime')) {
-                defaultDatetimeFormat.minutesUntilAbsoluteTime = this.config.datetimeFormat.minutesUntilAbsoluteTime;
-            }
+// merge user date preferences with the default preferences
+if (this.config.datetimeFormat) {
+	if (typeof this.config.datetimeFormat === 'string') {
+		defaultDatetimeFormat.absoluteFormat = this.config.datetimeFormat;
+	} else if (typeof this.config.datetimeFormat === 'object') {
+		if (this.config.datetimeFormat.hasOwnProperty('minutesUntilAbsoluteTime')) {
+			defaultDatetimeFormat.minutesUntilAbsoluteTime = this.config.datetimeFormat.minutesUntilAbsoluteTime;
+		}
 
-            if (this.config.datetimeFormat.hasOwnProperty('absoluteFormat')) {
-                defaultDatetimeFormat.absoluteFormat = this.config.datetimeFormat.absoluteFormat;
-            }
-        }
-    }
-    this.config.datetimeFormat = defaultDatetimeFormat;
+		if (this.config.datetimeFormat.hasOwnProperty('absoluteFormat')) {
+			defaultDatetimeFormat.absoluteFormat = this.config.datetimeFormat.absoluteFormat;
+		}
+	}
+}
+this.config.datetimeFormat = defaultDatetimeFormat;
 
-    var nextPageNumber;
-    var isMorePageAvailable = false;
-    var nextPageFetchInProgress = false;
-    var loginStatus = false;
-    var userIsAdmin = false;
+var nextPageNumber;
+var isMorePageAvailable = false;
+var nextPageFetchInProgress = false;
+var loginStatus = false;
+var userIsAdmin = false;
+var renderComplete = false;
 
-    var commentIds = [];</code></pre>
+var commentIds = [];</code></pre>
           <section id="hasCommentId">
             <h1>hasCommentId</h1>
             <h5 class="subheader"></h5>
@@ -262,17 +258,17 @@ For more information about the possible values please visit:
           </table>
           <div class="description"><p>Comment IDs are saved to avoid duplicates. This returns if an ID already exists.</p> </div>
           <pre><code class="language-javascript">var hasCommentId = function (id) {
-        if (Array.prototype.indexOf) {
-            return commentIds.indexOf(id) !== -1 ? true : false;
-        } else {
-             for (var i = 0; i &lt; commentIds.length; i++) {
-                if (commentIds[i] === id) {
-                    return true;
-                }
-             }
-             return false;
-        }
-    };</code></pre>
+	if (Array.prototype.indexOf) {
+		return commentIds.indexOf(id) !== -1 ? true : false;
+	} else {
+		for (var i = 0; i &lt; commentIds.length; i++) {
+			if (commentIds[i] === id) {
+				return true;
+			}
+		}
+		return false;
+	}
+};</code></pre>
           <section id="removeCommentId">
             <h1>removeCommentId</h1>
             <h5 class="subheader"></h5>
@@ -298,24 +294,24 @@ For more information about the possible values please visit:
           </table>
           <div class="description"><p>Removes a comment ID from the list of existing comments IDs.</p> </div>
           <pre><code class="language-javascript">var removeCommentId = function (id) {
-        var index;
-        if (Array.prototype.indexOf) {
-            index = commentIds.indexOf(id);
-            if (index !== -1) {
-                commentIds.splice(index, 1);
-                return true;
-            }
-            return false;
-        } else {
-             for (index = 0; index &lt; commentIds.length; index++) {
-                if (commentIds[index] === id) {
-                    commentIds.splice(index, 1);
-                    return true;
-                }
-             }
-             return false;
-        }
-    };</code></pre>
+	var index;
+	if (Array.prototype.indexOf) {
+		index = commentIds.indexOf(id);
+		if (index !== -1) {
+			commentIds.splice(index, 1);
+			return true;
+		}
+		return false;
+	} else {
+		for (index = 0; index &lt; commentIds.length; index++) {
+			if (commentIds[index] === id) {
+				commentIds.splice(index, 1);
+				return true;
+			}
+		}
+		return false;
+	}
+};</code></pre>
           <section id="ui">
             <h1>ui</h1>
             <h5 class="subheader"></h5>
@@ -325,9 +321,9 @@ For more information about the possible values please visit:
           </section>
           <div class="description"><p>Instance of WidgetUi. This can handle the UI part of the widget.</p> </div>
           <pre><code class="language-javascript">this.ui = new WidgetUi(this.getWidgetEl(), {
-        datetimeFormat: this.config.datetimeFormat,
-        orderType: self.config.order
-    });</code></pre>
+	datetimeFormat: this.config.datetimeFormat,
+	orderType: self.config.order
+});</code></pre>
           <section id="loadResources">
             <h1>loadResources</h1>
             <h5 class="subheader"></h5>
@@ -351,10 +347,10 @@ For more information about the possible values please visit:
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Does nothing, but it is a mandatory override of commentUi.Widget.</p> </div>
+          <div class="description"><p>Does nothing, but it is a mandatory override of oCommentUi.Widget.</p> </div>
           <pre><code class="language-javascript">this.loadResources = function (callback) {
-        callback();
-    };</code></pre>
+	callback();
+};</code></pre>
           <section id="init">
             <h1>init</h1>
             <h5 class="subheader"></h5>
@@ -374,46 +370,46 @@ For more information about the possible values please visit:
               <tr>
                 <td>callback</td>
                 <td>Function</td>
-                <td>function(err, data), where data contains collectionId and comments. See o-comment-data.api.getComments</td>
+                <td>function(err, data), where data contains collectionId and comments. See o-comment-api.api.getComments</td>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Override of commentUi.Widget.init function.<br />This is responsible to load the comments and the article related data.<br />This function also initiates live stream from Livefyre.</p> </div>
+          <div class="description"><p>Override of oCommentUi.Widget.init function.<br />This is responsible to load the comments and the article related data.<br />This function also initiates live stream from Livefyre.</p> </div>
           <pre><code class="language-javascript">this.init = function (callback) {
-        oCommentData.api.getComments({
-            articleId: self.config.articleId,
-            url: self.config.url,
-            title: self.config.title,
-            stream: true
-        }, function (err, data) {
-            if (err) {
-                callback(err);
-                return;
-            }
+	oCommentApi.api.getComments({
+		articleId: self.config.articleId,
+		url: self.config.url,
+		title: self.config.title,
+		stream: true
+	}, function (err, data) {
+		if (err) {
+			callback(err);
+			return;
+		}
 
-            if (data.hasOwnProperty('collection')) {
-                // initial collection info
-                
-                if (typeof data.collection.nextPage === 'number') {
-                    nextPageNumber = data.collection.nextPage;
-                    isMorePageAvailable = true;
-                } else {
-                    isMorePageAvailable = false;
-                }
-                
-                callback(null, data.collection);
-            } else if (data.hasOwnProperty('comment')) {
-                // streaming info
-                if (data.comment.deleted === true) {
-                    // comment deleted
-                    commentDeleted(data.comment.commentId);
-                } else {
-                    // new comment
-                    newCommentReceived(data.comment);
-                }
-            }
-        });
-    };</code></pre>
+		if (data.hasOwnProperty('collection')) {
+			// initial collection info
+
+			if (typeof data.collection.nextPage === 'number') {
+				nextPageNumber = data.collection.nextPage;
+				isMorePageAvailable = true;
+			} else {
+				isMorePageAvailable = false;
+			}
+
+			callback(null, data.collection);
+		} else if (data.hasOwnProperty('stream')) {
+			// streaming info
+			if (renderComplete) {
+				handleStream(data.stream);
+			} else {
+				self.on('widget.renderComplete', function () {
+					handleStream(data.stream);
+				});
+			}
+		}
+	});
+};</code></pre>
           <section id="onError">
             <h1>onError</h1>
             <h5 class="subheader"></h5>
@@ -439,12 +435,12 @@ For more information about the possible values please visit:
           </table>
           <div class="description"><p>Decides what happens when an error occurs. It clears the container.<br />If the article is flagged as unclassified, no message appears.<br />If any other error occurs, show a generic not available message.</p> </div>
           <pre><code class="language-javascript">this.onError = function (err) {
-        self.ui.clearContainer();
+	self.ui.clearContainer();
 
-        if (typeof err !== 'object' || !err || err.unclassifiedArticle !== true) {
-            self.ui.addNotAvailableMessage();
-        }
-    };</code></pre>
+	if (typeof err !== 'object' || !err || err.unclassifiedArticle !== true) {
+		self.ui.addNotAvailableMessage();
+	}
+};</code></pre>
           <section id="render">
             <h1>render</h1>
             <h5 class="subheader"></h5>
@@ -475,78 +471,78 @@ For more information about the possible values please visit:
           </table>
           <div class="description"><p>Handle the comments, render them, and initiate the login process as well.</p> </div>
           <pre><code class="language-javascript">this.render = function (commentsData, callback) {
-        if (commentsData) {
-            if (commentsData.unclassifiedArticle !== true) {
-                self.collectionId = commentsData.collectionId;
-                self.messageQueue = new MessageQueue(self.collectionId);
-                self.trigger('ready.widget');
+	if (commentsData) {
+		if (commentsData.unclassifiedArticle !== true) {
+			self.collectionId = commentsData.collectionId;
+			self.messageQueue = new MessageQueue(self.collectionId);
+			self.trigger('widget.ready');
 
-                auth.login(function (status, authData) {
-                    if (!authData) {
-                        authData = null;
-                    }
+			auth.login(function (loggedIn, authData) {
+				if (!authData) {
+					authData = null;
+				}
 
-                    self.trigger('loaded.auth', authData);
+				self.trigger('data.auth', authData);
 
-                    if (authData) {
-                        if (authData.admin || authData.moderator) {
-                            userIsAdmin = true;
-                        }
-                    }
+				if (authData) {
+					if (authData.admin || authData.moderator) {
+						userIsAdmin = true;
+					}
+				}
 
-                    // normalize the comments data
-                    commentsData.comments = preprocessCommentData(commentsData.comments);
+				// normalize the comments data
+				commentsData.comments = preprocessCommentData(commentsData.comments);
 
-                    // render the widget in the DOM
-                    self.ui.render(commentsData.comments, userIsAdmin, isMorePageAvailable);
+				// render the widget in the DOM
+				self.ui.render(commentsData.comments, userIsAdmin, isMorePageAvailable);
 
-                    // all fine, no errors with the rendering
-                    callback();
-                    self.trigger('renderComplete.widget');
+				// all fine, no errors with the rendering
+				callback();
+				self.trigger('widget.renderComplete');
+				renderComplete = true;
 
-                    // determine if there are messages to post before being logged in.
-                    // in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
-                    if (self.messageQueue.hasComment()) {
-                        commentUtilities.logger.log(&quot;Force flag set.&quot;);
+				// determine if there are messages to post before being logged in.
+				// in this case a flag is set and the user is forced to finish the login process (e.g. no pseudonym)
+				if (self.messageQueue.hasComment()) {
+					oCommentUtilities.logger.log(&quot;Force flag set.&quot;);
 
-                        self.forceMode = true;
-                    }
+					self.forceMode = true;
+				}
 
-                    if (!status) {
-                        if (authData) {
-                            if (authData.pseudonym === false) {
-                                // the user is forced to finish the login process
-                                // ask to set a pseudonym instantly
-                                if (self.forceMode === true) {
-                                    auth.loginRequiredPseudonymMissing({
-                                        success: function () {},
-                                        failure: function () {
-                                            var messageInTheQueue = self.messageQueue.getComment();
-                                            self.ui.repopulateCommentArea(messageInTheQueue);
-                                            self.messageQueue.clear();
-                                        }
-                                    });
-                                }
+				if (!loggedIn) {
+					if (authData) {
+						if (authData.pseudonym === false) {
+							// the user is forced to finish the login process
+							// ask to set a pseudonym instantly
+							if (self.forceMode === true) {
+								auth.loginRequiredPseudonymMissing({
+									success: function () {},
+									failure: function () {
+										var messageInTheQueue = self.messageQueue.getComment();
+										self.ui.repopulateCommentArea(messageInTheQueue);
+										self.messageQueue.clear();
+									}
+								});
+							}
 
-                                self.ui.hideSignInLink();
-                            } else if (authData.serviceUp === false) {
-                                self.ui.makeReadOnly();
-                                self.ui.hideSignInLink();
-                            }
-                        } else if (self.forceMode === true) {
-                            var messageInTheQueue = self.messageQueue.getComment();
-                            self.ui.repopulateCommentArea(messageInTheQueue);
-                            self.messageQueue.clear();
-                        }
-                    }
-                });
-            } else {
-                callback({
-                    unclassifiedArticle: true
-                });
-            }
-        }
-    };</code></pre>
+							self.ui.hideSignInLink();
+						} else if (authData.serviceUp === false) {
+							self.ui.makeReadOnly();
+							self.ui.hideSignInLink();
+						}
+					} else if (self.forceMode === true) {
+						var messageInTheQueue = self.messageQueue.getComment();
+						self.ui.repopulateCommentArea(messageInTheQueue);
+					}
+				}
+			});
+		} else {
+			callback({
+				unclassifiedArticle: true
+			});
+		}
+	}
+};</code></pre>
           <section id="adaptToHeight">
             <h1>adaptToHeight</h1>
             <h5 class="subheader"></h5>
@@ -572,14 +568,14 @@ For more information about the possible values please visit:
           </table>
           <div class="description"><p>Calling this method with a height in pixels as parameter will adapt the UI<br />to shrink within that height. If the current UI is smaller, it will fill the<br />space to occupy the full height, or if the current UI is taller, a scroll<br />will appear on the comments.</p> </div>
           <pre><code class="language-javascript">this.adaptToHeight = function (height) {
-        if (height) {
-            self.ui.adaptToHeight(height);
-        }
-    };
+	if (height) {
+		self.ui.adaptToHeight(height);
+	}
+};
 
-    if (self.config.height) {
-        this.adaptToHeight(self.config.height);
-    }</code></pre>
+if (self.config.height) {
+	this.adaptToHeight(self.config.height);
+}</code></pre>
           <section id="processOneComment">
             <h1>processOneComment</h1>
             <h5 class="subheader"></h5>
@@ -599,30 +595,29 @@ For more information about the possible values please visit:
               <tr>
                 <td>aComment</td>
                 <td>Object</td>
-                <td>A comment object, which respects the format the oCommentData.api.getComments returns.</td>
+                <td>A comment object, which respects the format the oCommentApi.api.getComments returns.</td>
               </tr>
             </tbody>
           </table>
-          <div class="description"><p>Adds the following parameters to an existing comment object:</p>
-
-<ul>
+          <div class="description"><p>Adds the following parameters to an existing comment object:</p><ul>
 <li>dateToShow: date in the format that is rendered in the UI</li>
 <li>datetime: date in ISO format</li>
 <li>relativeTime: if dateToShow is in relative time format</li>
 <li>timestamp: normalized timestamp (in milliseconds)</li>
 <li>author.displayName truncated to 50 characters</li>
-</ul> </div>
+</ul>
+ </div>
           <pre><code class="language-javascript">function processOneComment (aComment) {
-        aComment.dateToShow = self.ui.formatTimestamp(aComment.timestamp);
-        aComment.datetime = commentUtilities.dateHelper.toISOString(aComment.timestamp);
-        if (self.ui.isRelativeTime(aComment.timestamp)) {
-            aComment.relativeTime = true;
-        }
-        aComment.timestamp = commentUtilities.dateHelper.toTimestamp(aComment.timestamp);
-        aComment.author.displayName = aComment.author.displayName.substring(0, 50);
+	aComment.dateToShow = self.ui.formatTimestamp(aComment.timestamp);
+	aComment.datetime = oCommentUtilities.dateHelper.toISOString(aComment.timestamp);
+	if (self.ui.isRelativeTime(aComment.timestamp)) {
+		aComment.relativeTime = true;
+	}
+	aComment.timestamp = oCommentUtilities.dateHelper.toTimestamp(aComment.timestamp);
+	aComment.author.displayName = aComment.author.displayName.substring(0, 50);
 
-        return aComment;
-    }</code></pre>
+	return aComment;
+}</code></pre>
           <section id="preprocessCommentData">
             <h1>preprocessCommentData</h1>
             <h5 class="subheader"></h5>
@@ -642,26 +637,26 @@ For more information about the possible values please visit:
               <tr>
                 <td>comments</td>
                 <td>Array</td>
-                <td>Array with comments objects, which respects the format the oCommentData.api.getComments returns.</td>
+                <td>Array with comments objects, which respects the format the oCommentApi.api.getComments returns.</td>
               </tr>
             </tbody>
           </table>
           <div class="description"><p>Iterates over an array of comments and applies the modifications made by the<br />processOneComment function.</p> </div>
           <pre><code class="language-javascript">function preprocessCommentData (comments) {
-        if (comments) {
-            if (typeof comments.length === 'number') {
-                for (var index = 0; index &lt; comments.length; index++) {
-                    comments[index] = processOneComment(comments[index]);
-                }
+	if (comments) {
+		if (typeof comments.length === 'number') {
+			for (var index = 0; index &lt; comments.length; index++) {
+				comments[index] = processOneComment(comments[index]);
+			}
 
-                return comments;
-            } else {
-                return processOneComment(comments);
-            }
-        }
+			return comments;
+		} else {
+			return processOneComment(comments);
+		}
+	}
 
-        return comments;
-    }</code></pre>
+	return comments;
+}</code></pre>
           <section id="newCommentReceived">
             <h1>newCommentReceived</h1>
             <h5 class="subheader"></h5>
@@ -687,135 +682,168 @@ For more information about the possible values please visit:
           </table>
           <div class="description"><p>New comment received over the stream, this function handles it.</p> </div>
           <pre><code class="language-javascript">function newCommentReceived (commentData) {
-        if (!hasCommentId(commentData.commentId)) {
-            commentIds.push(commentData.commentId);
-            self.ui.addComment({
-                id: commentData.commentId,
-                content: commentData.content,
-                timestamp: commentData.timestamp,
-                displayName: commentData.author.displayName
-            }, (commentData.author.displayName.substring(0, 50) === self.ui.getCurrentPseudonym()), userIsAdmin);
-        }
-    }
+	if (!hasCommentId(commentData.commentId)) {
+		commentIds.push(commentData.commentId);
+		self.ui.addComment({
+			id: commentData.commentId,
+			content: commentData.content,
+			timestamp: commentData.timestamp,
+			displayName: commentData.author.displayName
+		}, (commentData.author.displayName.substring(0, 50) === self.ui.getCurrentPseudonym()), userIsAdmin);
+	}
+}
 
-    function commentDeleted (commentId) {
-        removeCommentId(commentId);
-        self.ui.removeComment(commentId);
-    }
+function commentDeleted (commentId) {
+	removeCommentId(commentId);
+	self.ui.removeComment(commentId);
+}
 
-
-    function login (authData) {
-        loginStatus = true;
-
-        self.ui.login(authData.token, authData.displayName, authData.admin || authData.moderator);
-        self.ui.addSettingsLink({
-            onClick: function () {
-                var showSettingsDialog = function () {
-                    oCommentData.api.getAuth(function (err, currentAuthData) {
-                        if (!err &amp;&amp; currentAuthData) {
-                            userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
-                                success: function (newAuthData) {
-                                    if (newAuthData &amp;&amp; newAuthData.token) {
-                                        auth.logout();
-                                        auth.login();
-                                    }
-                                }
-                            });
-                        }
-                    });
-                };
-
-                oCommentData.api.getAuth(function (err, currentAuthData) {
-                    if (err || !currentAuthData) {
-                        auth.loginRequired({
-                            success: function () {
-                                showSettingsDialog();
-                            }
-                        });
-                        return;
-                    }
-
-                    showSettingsDialog();
-                });
-            }
-        });
+function commentUpdated (comment) {
+	self.ui.updateComment(comment.commentId, comment.content);
+}
 
 
-        // after login, post the comments from the message queue
-        if (self.forceMode) {
-            self.messageQueue.postComment(function (commentInfo) {
-                commentIds.push(commentInfo.commentId);
+function handleStream (streamData) {
+	if (streamData.comment) {
+		// comment related
+		if (streamData.comment.deleted === true) {
+			// comment deleted
+			commentDeleted(streamData.comment.commentId);
+		} else if (streamData.comment.updated === true) {
+			commentUpdated({
+				commentId: streamData.comment.commentId,
+				content: streamData.comment.content
+			});
+		} else if (streamData.comment.commentId) {
+			// new comment
+			newCommentReceived(streamData.comment);
+		}
+	}
 
-                triggerCommentPostedEvent({
-                    commentId: commentInfo.commentId,
-                    commentBody: commentInfo.commentBody,
-                    author: {
-                        displayName: authData.displayName
-                    }
-                });
-            });
-        }
-    }
-    auth.on('login.auth', login);
+	if (streamData.collection) {
+		// collection related
 
-    function logout () {
-        loginStatus = false;
-        self.ui.logout();
-        self.ui.removeSettingsLink();
-    }
-    auth.on('logout.auth', logout);
+		if (streamData.collection.hasOwnProperty('commentsEnabled')) {
+			if (streamData.collection.commentsEnabled === false) {
+				self.ui.close();
+			} else if (streamData.collection.commentsEnabled === true) {
+				self.ui.open();
+			}
+		}
+	}
+}
 
 
+function login (evt) {
+	loginStatus = true;
+	var authData = evt.detail;
 
-    // sign in button pressed
-    self.ui.on('signIn', function () {
-        auth.loginRequired();
-    });
+	self.ui.login(authData.token, authData.displayName, authData.admin || authData.moderator);
+	self.ui.addSettingsLink({
+		onClick: function () {
+			var showSettingsDialog = function () {
+				oCommentApi.api.getAuth(function (err, currentAuthData) {
+					if (!err &amp;&amp; currentAuthData) {
+						userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
+							success: function (newAuthData) {
+								if (newAuthData &amp;&amp; newAuthData.token) {
+									auth.logout();
+									auth.login();
+								}
+							}
+						});
+					}
+				});
+			};
 
-    self.ui.on('nextPage', function () {
-        if (isMorePageAvailable &amp;&amp; !nextPageFetchInProgress) {
-            // fetch next page
-            commentUtilities.logger.log('fetch next page');
+			oCommentApi.api.getAuth(function (err, currentAuthData) {
+				if (err || !currentAuthData) {
+					auth.loginRequired({
+						success: function () {
+							showSettingsDialog();
+						}
+					});
+					return;
+				}
 
-            nextPageFetchInProgress = true;
-            oCommentData.api.getComments({
-                articleId: self.config.articleId,
-                url: self.config.url,
-                title: self.config.title,
-                page: nextPageNumber
-            }, function (err, data) {
-                if (err) {
-                    isMorePageAvailable = false;
-                    self.ui.disableButtonPagination();
-                    return;
-                }
+				showSettingsDialog();
+			});
+		}
+	});
 
-                if (typeof data.collection.nextPage === 'number') {
-                    nextPageNumber = data.collection.nextPage;
-                } else {
-                    isMorePageAvailable = false;
-                    self.ui.disableButtonPagination();
-                }
 
-                self.ui.addNextPageComments(preprocessCommentData(data.collection.comments), userIsAdmin);
+	// after login, post the comments from the message queue
+	if (self.forceMode &amp;&amp; self.messageQueue.hasComment()) {
+		var messageInTheQueue = self.messageQueue.getComment();
+		self.messageQueue.clear();
 
-                // wait until the DOM rendering has finished
-                setTimeout(function () {
-                    nextPageFetchInProgress = false;
-                }, 200);
-            });
-        }
-    });
+		self.ui.repopulateCommentArea(messageInTheQueue);
+		postComment(messageInTheQueue);
+	}
+}
+globalEvents.on('auth.login', login);
 
-    function triggerCommentPostedEvent (commentInfo) {
-        self.trigger('commentPosted.tracking', [self.collectionId, {
-            bodyHtml: commentInfo.commentBody,
-            id: commentInfo.commentId,
-            author: {
-                displayName: commentInfo.author.displayName
-            }
-        }]);
-    }</code></pre>
+function logout () {
+	loginStatus = false;
+	self.ui.logout();
+	self.ui.removeSettingsLink();
+}
+globalEvents.on('auth.logout', logout);
+
+
+
+// sign in button pressed
+self.ui.on('signIn', function () {
+	auth.loginRequired();
+});
+
+self.ui.on('nextPage', function () {
+	if (isMorePageAvailable &amp;&amp; !nextPageFetchInProgress) {
+		// fetch next page
+		oCommentUtilities.logger.log('fetch next page');
+
+		nextPageFetchInProgress = true;
+		oCommentApi.api.getComments({
+			articleId: self.config.articleId,
+			url: self.config.url,
+			title: self.config.title,
+			page: nextPageNumber
+		}, function (err, data) {
+			if (err) {
+				isMorePageAvailable = false;
+				self.ui.disableButtonPagination();
+				return;
+			}
+
+			if (typeof data.collection.nextPage === 'number') {
+				nextPageNumber = data.collection.nextPage;
+			} else {
+				isMorePageAvailable = false;
+				self.ui.disableButtonPagination();
+			}
+
+			self.ui.addNextPageComments(preprocessCommentData(data.collection.comments), userIsAdmin);
+
+			// wait until the DOM rendering has finished
+			setTimeout(function () {
+				nextPageFetchInProgress = false;
+			}, 200);
+		});
+	}
+});
+
+function triggerCommentPostedEvent (commentInfo) {
+	self.trigger('tracking.postComment', {
+		collectionId: self.collectionId,
+		comment: {
+			bodyHtml: commentInfo.commentBody,
+			id: commentInfo.commentId,
+			author: {
+				displayName: commentInfo.author.displayName
+			}
+		}
+	});
+}</code></pre>
           <section id="postComment">
             <h1>postComment</h1>
             <h5 class="subheader"></h5>
@@ -823,214 +851,229 @@ For more information about the possible values please visit:
               <div class="label label-info radius ctx-type">function</div><span>postComment()</span> -><span>[type]</span>
             </p>
           </section>
-          <div class="description"><p>Post a comment.<br />Known fact is that the user is logged in and the comment body is not blank.</p>
+          <div class="description"><p>Post a comment.<br />Known fact is that the user is logged in and the comment body is not blank.</p><p>Insert the comment in the DOM instantly, and try to post the comment with the API.<br />If successful, leave the comment in the DOM and change the ID with the real comment ID.<br />If unsuccessful, remove the comment from the DOM, repopulate the comment area with the comment and show the error message.</p> </div>
+          <pre><code class="language-javascript">var postComment = function (commentBody, secondStepOfTryingToPost) {
+	oCommentApi.api.postComment({
+		collectionId: self.collectionId,
+		commentBody: commentBody
+	}, function (err, postCommentResult) {
+		self.ui.makeEditable();
 
-<p>Insert the comment in the DOM instantly, and try to post the comment with the API.<br />If successful, leave the comment in the DOM and change the ID with the real comment ID.<br />If unsuccessful, remove the comment from the DOM, repopulate the comment area with the comment and show the error message.</p> </div>
-          <pre><code class="language-javascript">var postComment = function (secondStepOfTryingToPost) {
-        var commentBody = self.ui.getCurrentComment();
+		if (err) {
+			oCommentUtilities.logger.debug('postComment error:', err);
 
-        oCommentData.api.postComment({
-            collectionId: self.collectionId,
-            commentBody: commentBody
-        }, function (err, postCommentResult) {
-            self.ui.makeEditable();
+			self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
 
-            if (err) {
-                commentUtilities.logger.debug('postComment error:', err);
+			return;
+		}
 
-                self.ui.setEditorError(commentUi.i18n.texts.genericError);
+		oCommentUtilities.logger.debug('postComment result:', postCommentResult);
 
-                return;
-            }
+		if (postCommentResult) {
+			if (postCommentResult.success === true) {
+				self.ui.emptyCommentArea();
 
-            commentUtilities.logger.debug('postComment result:', postCommentResult);
+				oCommentApi.api.getAuth(function (err, authData) {
+					if (authData) {
+						triggerCommentPostedEvent({
+							commentId: postCommentResult.commentId,
+							commentBody: postCommentResult.bodyHtml,
+							author: {
+								displayName: authData.displayName
+							}
+						});
 
-            if (postCommentResult) {
-                if (postCommentResult.success === true) {
-                    self.ui.emptyCommentArea();
+						if (!hasCommentId(postCommentResult.commentId)) {
+							commentIds.push(postCommentResult.commentId);
+							self.ui.addComment({
+								id: postCommentResult.commentId,
+								content: postCommentResult.bodyHtml,
+								timestamp: postCommentResult.createdAt,
+								displayName: authData.displayName
+							}, true, userIsAdmin);
+						}
+					}
+				});
+			} else if (postCommentResult.invalidSession === true &amp;&amp; secondStepOfTryingToPost !== true) {
+				loginRequiredToPostComment(commentBody, true);
+			} else {
+				if (postCommentResult.errorMessage) {
+					var match;
+					var errMsg = postCommentResult.errorMessage;
 
-                    oCommentData.api.getAuth(function (err, authData) {
-                        if (authData) {
-                            triggerCommentPostedEvent({
-                                commentId: postCommentResult.commentId,
-                                commentBody: postCommentResult.bodyHtml,
-                                author: {
-                                    displayName: authData.displayName
-                                }
-                            });
+					for (var msgToOverride in oCommentUi.i18n.serviceMessageOverrides) {
+						if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(msgToOverride)) {
+							match = postCommentResult.errorMessage.match(new RegExp(msgToOverride));
+							if (match &amp;&amp; match.length) {
+								errMsg = oCommentUi.i18n.serviceMessageOverrides[msgToOverride];
+							}
+						}
+					}
 
-                            if (!hasCommentId(postCommentResult.commentId)) {
-                                commentIds.push(postCommentResult.commentId);
-                                self.ui.addComment({
-                                    id: postCommentResult.commentId,
-                                    content: postCommentResult.bodyHtml,
-                                    timestamp: postCommentResult.createdAt,
-                                    displayName: authData.displayName
-                                }, true, userIsAdmin);
-                            }
-                        }
-                    });
-                } else if (postCommentResult.invalidSession === true &amp;&amp; secondStepOfTryingToPost !== true) {
-                    loginRequiredToPostComment(commentBody, true);
-                } else {
-                    if (postCommentResult.errorMessage) {
-                        self.ui.setEditorError(postCommentResult.errorMessage);
-                    } else {
-                        self.ui.setEditorError(commentUi.i18n.texts.genericError);
-                    }
+					self.ui.setEditorError(errMsg);
+				} else {
+					self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
+				}
 
-                    return;
-                }
-            } else {
-                self.ui.setEditorError(commentUi.i18n.texts.genericError);
-            }
-        });
-    };
-
-
-    function loginRequiredToPostComment (commentBody, secondStepOfTryingToPost) {
-        self.messageQueue.save(commentBody);
-        commentUtilities.logger.log('user not actively logged in, save comment to the storage');
-
-        var force = false;
-        if (secondStepOfTryingToPost) {
-            force = true;
-        }
-
-        auth.loginRequired({
-            success: function () {
-                self.messageQueue.clear();
-                postComment(commentBody, secondStepOfTryingToPost);
-            },
-            failure: function () {
-                self.messageQueue.clear();
-            }
-        }, force);
-    }
-
-    // the 'Submit comment' button is pressed
-    self.ui.on('postComment', function () {
-        var commentBody = self.ui.getCurrentComment();
-
-        commentUtilities.logger.debug('postComment', 'comment: &quot;'+ commentBody +'&quot;');
-        
-        if (!commentBody) {
-            self.ui.setEditorError(i18n.errors.emptyComment);
-            return;
-        }
-
-        self.ui.makeReadOnly();
-
-        oCommentData.api.getAuth(function (err, authData) {
-            if (!authData || !authData.token) {
-                self.ui.makeEditable();
-                loginRequiredToPostComment(commentBody);
-            } else {
-                if (!loginStatus) {
-                    auth.login();
-                }
-                postComment(commentBody);
-            }
-        });
-    });
-
-
-
-
-
-    function deleteComment (commentId, secondStepOfTryingToDelete) {
-        oCommentData.api.deleteComment({
-            collectionId: self.collectionId,
-            commentId: commentId
-        }, function (err, deleteCommentResult) {
-            if (err) {
-                userDialogs.showMessage(&quot;Delete comment&quot;, commentUi.i18n.texts.genericError);
-                commentUtilities.logger.log(&quot;delete comment call error: &quot;, err);
-                return;
-            }
-
-            if (deleteCommentResult) {
-                if (deleteCommentResult.success === true) {
-                    self.ui.removeComment(commentId);
-                    self.trigger('commentDeleted.tracking', [self.collectionId, {
-                        id: commentId
-                    }]);
-                } else if (deleteCommentResult.invalidSession === true &amp;&amp; secondStepOfTryingToDelete !== true) {
-                    loginRequiredToDeleteComment(commentId, true);
-                } else {
-                    self.ui.markCommentAsDeleteInProgressEnded(commentId);
-
-                    if (deleteCommentResult.errorMessage) {
-                        var match;
-                        var errMsg = deleteCommentResult.errorMessage;
-
-                        for (var msgToOverride in commentUi.i18n.serviceMessageOverrides) {
-                            if (commentUi.i18n.serviceMessageOverrides.hasOwnProperty(msgToOverride)) {
-                                match = deleteCommentResult.errorMessage.match(new RegExp(msgToOverride));
-                                if (match &amp;&amp; match.length) {
-                                    errMsg = commentUi.i18n.serviceMessageOverrides[msgToOverride];
-                                }
-                            }
-                        }
-                         
-                        userDialogs.showMessage(&quot;Delete comment&quot;, errMsg);
-                    } else {
-                        userDialogs.showMessage(&quot;Delete comment&quot;, commentUi.i18n.texts.genericError);
-                    }
-
-                    return;
-                }
-            } else {
-                self.ui.markCommentAsDeleteInProgressEnded(commentId);
-
-                userDialogs.showMessage(&quot;Delete comment&quot;, commentUi.i18n.texts.genericError);
-            }
-        });
-    }
-
-    function loginRequiredToDeleteComment (commentId, secondStepOfTryingToDelete) {
-        var force = false;
-        if (secondStepOfTryingToDelete) {
-            force = true;
-        }
-
-        auth.loginRequired({
-            success: function () {
-                deleteComment(commentId, secondStepOfTryingToDelete);
-            },
-            failure: function () {
-                self.ui.markCommentAsDeleteInProgressEnded(commentId);
-            }
-        }, force);
-    }
-
-    self.ui.on('deleteComment', function (commentId) {
-        self.ui.markCommentAsDeleteInProgress(commentId);
-
-        oCommentData.api.getAuth(function (err, authData) {
-            if (!authData || !authData.token) {
-                loginRequiredToDeleteComment(commentId);
-            } else {
-                if (!loginStatus) {
-                    auth.login();
-                }
-                deleteComment(commentId);
-            }
-        });
-    });
+				return;
+			}
+		} else {
+			self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
+		}
+	});
 };
-commentUi.Widget.__extend(Widget);
 
-Widget.__extend = function(child) {
-    if (typeof Object.create === 'function') {
-        child.prototype = Object.create( Widget.prototype );
-        child.prototype = Object.create(Widget.prototype);
-    } else {
-        var Tmp = function () {};
-        Tmp.prototype = Widget.prototype;
-        child.prototype = new Tmp();
-        child.prototype.constructor = child;
-    }
+
+function loginRequiredToPostComment (commentBody, secondStepOfTryingToPost) {
+	self.messageQueue.save(commentBody);
+	oCommentUtilities.logger.log('user not actively logged in, save comment to the storage');
+
+	var force = false;
+	if (secondStepOfTryingToPost) {
+		force = true;
+	}
+
+	auth.loginRequired({
+		success: function () {
+			self.messageQueue.clear();
+			postComment(commentBody, secondStepOfTryingToPost);
+		},
+		failure: function () {
+			self.messageQueue.clear();
+		}
+	}, force);
+}
+
+// the 'Submit comment' button is pressed
+self.ui.on('postComment', function () {
+	var commentBody = self.ui.getCurrentComment();
+
+	oCommentUtilities.logger.debug('postComment', 'comment: &quot;'+ commentBody +'&quot;');
+
+	if (!commentBody) {
+		self.ui.setEditorError(i18n.errors.emptyComment);
+		return;
+	}
+
+	self.ui.makeReadOnly();
+
+	oCommentApi.api.getAuth(function (err, authData) {
+		if (!authData || !authData.token) {
+			self.ui.makeEditable();
+			loginRequiredToPostComment(commentBody);
+		} else {
+			if (!loginStatus) {
+				auth.login();
+			}
+			postComment(commentBody);
+		}
+	});
+});
+
+
+
+
+
+function deleteComment (commentId, secondStepOfTryingToDelete) {
+	oCommentApi.api.deleteComment({
+		collectionId: self.collectionId,
+		commentId: commentId
+	}, function (err, deleteCommentResult) {
+		if (err) {
+			userDialogs.showMessage(&quot;Delete comment&quot;, oCommentUi.i18n.texts.genericError);
+			oCommentUtilities.logger.log(&quot;delete comment call error: &quot;, err);
+			return;
+		}
+
+		if (deleteCommentResult) {
+			if (deleteCommentResult.success === true) {
+				self.ui.removeComment(commentId);
+				self.trigger('tracking.deleteComment', {
+					collectionId: self.collectionId,
+					comment: {
+						id: commentId
+					}
+				});
+			} else if (deleteCommentResult.invalidSession === true &amp;&amp; secondStepOfTryingToDelete !== true) {
+				loginRequiredToDeleteComment(commentId, true);
+			} else {
+				self.ui.markCommentAsDeleteInProgressEnded(commentId);
+
+				if (deleteCommentResult.errorMessage) {
+					var match;
+					var errMsg = deleteCommentResult.errorMessage;
+
+					for (var msgToOverride in oCommentUi.i18n.serviceMessageOverrides) {
+						if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(msgToOverride)) {
+							match = deleteCommentResult.errorMessage.match(new RegExp(msgToOverride));
+							if (match &amp;&amp; match.length) {
+								errMsg = oCommentUi.i18n.serviceMessageOverrides[msgToOverride];
+							}
+						}
+					}
+
+					userDialogs.showMessage(&quot;Delete comment&quot;, errMsg);
+				} else {
+					userDialogs.showMessage(&quot;Delete comment&quot;, oCommentUi.i18n.texts.genericError);
+				}
+
+				return;
+			}
+		} else {
+			self.ui.markCommentAsDeleteInProgressEnded(commentId);
+
+			userDialogs.showMessage(&quot;Delete comment&quot;, oCommentUi.i18n.texts.genericError);
+		}
+	});
+}
+
+function loginRequiredToDeleteComment (commentId, secondStepOfTryingToDelete) {
+	var force = false;
+	if (secondStepOfTryingToDelete) {
+		force = true;
+	}
+
+	auth.loginRequired({
+		success: function () {
+			deleteComment(commentId, secondStepOfTryingToDelete);
+		},
+		failure: function () {
+			self.ui.markCommentAsDeleteInProgressEnded(commentId);
+		}
+	}, force);
+}
+
+self.ui.on('deleteComment', function (commentId) {
+	self.ui.markCommentAsDeleteInProgress(commentId);
+
+	oCommentApi.api.getAuth(function (err, authData) {
+		if (!authData || !authData.token) {
+			loginRequiredToDeleteComment(commentId);
+		} else {
+			if (!loginStatus) {
+				auth.login();
+			}
+			deleteComment(commentId);
+		}
+	});
+});
+};
+oCommentUi.Widget.__extend(Widget, 'oChat');
+
+Widget.__extend = function(child, eventNamespace) {
+if (typeof Object.create === 'function') {
+	child.prototype = Object.create( Widget.prototype );
+	child.prototype = Object.create(Widget.prototype);
+} else {
+	var Tmp = function () {};
+	Tmp.prototype = Widget.prototype;
+	child.prototype = new Tmp();
+	child.prototype.constructor = child;
+}
+
+if (eventNamespace) {
+	child.prototype.eventNamespace = eventNamespace;
+}
 };
 
 module.exports = Widget;</code></pre>
@@ -1039,8 +1082,8 @@ module.exports = Widget;</code></pre>
     </div>
     <footer class="footer">
       <div class="container">
-        <p>Documentation generated with<a href="https://github.com/FGRibreau/doxx">Doxx</a>created by<a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau</a></p>
-        <p>Doxx is sponsored by<a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr</a>and<a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
+        <p>Documentation generated with <a href="https://github.com/FGRibreau/doxx">Doxx </a> created by <a href="https://twitter.com/FGRibreau" data-show-count="false" class="twitter-follow-button">Francois-Guillaume Ribreau </a></p>
+        <p>Doxx is sponsored by <a href="http://bringr.net/?btt" title="Outil d'analyse des réseaux sociaux" class="bringr">Bringr </a> and <a href="https://redsmin.com/?btt" title="Full Redis GUI" class="redsmin">Redsmin</a></p>
         <p>Theme borrowed from Twitter Bootstrap</p>
       </div>
     </footer>
