@@ -39,7 +39,7 @@ function NewCommentNotification (widgetUi, container, position) {
 
 	var verifyNotificationStatus = function (scrollPos) {
 		if (position === "bottom") {
-			if (scrollPos === container.scrollHeight - container.clientHeight) {
+			if (scrollPos >= container.scrollHeight - container.clientHeight - 3) {
 				if (active === true) {
 					self.reset();
 				}
@@ -48,7 +48,7 @@ function NewCommentNotification (widgetUi, container, position) {
 				active = true;
 			}
 		} else {
-			if (scrollPos === 0) {
+			if (scrollPos <= 3) {
 				if (active === true) {
 					self.reset();
 				}
