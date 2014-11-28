@@ -226,7 +226,7 @@ function WidgetUi (widgetContainer, config) {
 			var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
 
 			if (config.orderType === "inverted") {
-				commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight;
+				commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight + 1;
 			} else {
 				commentArea.scrollTop = 0;
 			}
@@ -340,7 +340,7 @@ function WidgetUi (widgetContainer, config) {
 
 		if (config.orderType === "inverted") {
 			oCommentUtilities.logger.debug("new comment");
-			scrolledToLast = (commentArea.scrollTop === (commentArea.scrollHeight - commentArea.clientHeight));
+			scrolledToLast = (commentArea.scrollTop >= (commentArea.scrollHeight - commentArea.clientHeight - 3));
 
 			oCommentUtilities.logger.debug("scrolledToLast", scrolledToLast);
 
@@ -364,7 +364,7 @@ function WidgetUi (widgetContainer, config) {
 				scrollToLastComment();
 			}
 		} else {
-			scrolledToLast = (commentArea.scrollTop === 0);
+			scrolledToLast = (commentArea.scrollTop <= 3);
 
 			for (i = 0; i < comments.length; i++) {
 				if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
