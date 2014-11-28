@@ -119,7 +119,7 @@ function Auth () {
 			if (authData && authData.pseudonym === false) {
 				loginRequiredPseudonymMissing(delegate);
 			} else if (!authData || !authData.token) {
-				globalEvents.trigger('authAction.loginRequired', {
+				globalEvents.trigger('auth.loginRequired', {
 					success: function () {
 						loginRequiredAfterASuccess(delegate);
 					},

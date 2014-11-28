@@ -421,8 +421,9 @@ var Widget = function () {
 	}
 
 
-	function login (authData) {
+	function login (evt) {
 		loginStatus = true;
+		var authData = evt.detail;
 
 		self.ui.login(authData.token, authData.displayName, authData.admin || authData.moderator);
 		self.ui.addSettingsLink({

@@ -87,21 +87,21 @@ function WidgetUi (widgetContainer, config) {
 
 		try { oDate.init(); } catch(e) {}
 
-		oCommentUi.utils.addEventListener('click', sizzle('.signIn', widgetContainer)[0], function (event) {
+		sizzle('.signIn', widgetContainer)[0].addEventListener('click', function (evt) {
 			events.trigger('signIn');
 
-			if (event.preventDefault) {
-				event.preventDefault();
+			if (evt.preventDefault) {
+				evt.preventDefault();
 			} else {
-				event.returnValue = false;
+				evt.returnValue = false;
 			}
 		});
 
-		oCommentUi.utils.addEventListener('click', sizzle('.comment-editor-submit > button')[0], function () {
+		sizzle('.comment-editor-submit > button')[0].addEventListener('click', function () {
 			events.trigger('postComment');
 		});
 
-		oCommentUi.utils.addEventListener('click', sizzle('.comment-editor-input')[0], function (event) {
+		sizzle('.comment-editor-input')[0].addEventListener('click', function (event) {
 			sizzle('.comment-editor-input textarea')[0].focus();
 			self.clearEditorError();
 
@@ -119,7 +119,7 @@ function WidgetUi (widgetContainer, config) {
 				sizzle('.comment-show-more-after', widgetContainer)[0].style.display = 'block';
 			}
 
-			oCommentUi.utils.addEventListener('click', sizzle('.comment-show-more .comment-show-more-label', widgetContainer), function () {
+			sizzle('.comment-show-more .comment-show-more-label', widgetContainer)[0].addEventListener('click', function () {
 				events.trigger('nextPage');
 			});
 		}
@@ -127,7 +127,7 @@ function WidgetUi (widgetContainer, config) {
 		var commentContainer = sizzle('.comment-comments-container', widgetContainer)[0];
 
 		if (adminMode) {
-			oCommentUi.utils.addEventListener('click', commentContainer, function (event) {
+			commentContainer.addEventListener('click', function (event) {
 				if (event.target.className === 'comment-delete') {
 					try {
 						var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
@@ -502,7 +502,7 @@ function WidgetUi (widgetContainer, config) {
 
 		var settingsLink = sizzle('.comment-settings-text', loginBarContainer[0]);
 		if (settingsLink && settingsLink.length) {
-			oCommentUi.utils.addEventListener('click', settingsLink[0], function () {
+			settingsLink[0].addEventListener('click', function () {
 				if (options && typeof options.onClick === 'function') {
 					options.onClick();
 				}
