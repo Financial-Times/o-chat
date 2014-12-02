@@ -443,17 +443,10 @@ var Widget = function () {
 					});
 				};
 
-				oCommentApi.api.getAuth(function (err, currentAuthData) {
-					if (err || !currentAuthData) {
-						auth.loginRequired({
-							success: function () {
-								showSettingsDialog();
-							}
-						});
-						return;
+				auth.loginRequired({
+					success: function () {
+						showSettingsDialog();
 					}
-
-					showSettingsDialog();
 				});
 			}
 		});
