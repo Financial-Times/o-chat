@@ -70,7 +70,7 @@ function Auth () {
 		userDialogs.showSetPseudonymDialog({
 			success: function (authData) {
 				if (authData && authData.token) {
-					self.login(authData.token, authData.displayName, authData.isAdmin || authData.isModerator);
+					self.login();
 				}
 
 				if (delegate && delegate.success) {
@@ -130,7 +130,7 @@ function Auth () {
 					}
 				});
 			} else {
-				self.login(authData.token, authData.displayName, authData.isAdmin || authData.isModerator);
+				self.login();
 
 				if (delegate && delegate.success) {
 					delegate.success();
