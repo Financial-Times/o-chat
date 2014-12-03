@@ -58,5 +58,9 @@ function MessageQueue (collectionId) {
 	this.clear = function () {
 		oCommentUtilities.storageWrapper.sessionStorage.removeItem(storageBaseName + collectionId);
 	};
+
+	this.destroy = function () {
+
+	};
 }
 module.exports = MessageQueue;

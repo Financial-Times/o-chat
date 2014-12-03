@@ -739,12 +739,37 @@ var Widget = function () {
 			}
 		});
 	});
+
+	var __superDestroy = this.destroy;
+	this.destroy = function () {
+		self.ui.off();
+
+		nextPageNumber = null;
+		isMorePageAvailable = null;
+		nextPageFetchInProgress = null;
+		loginStatus = null;
+		userIsAdmin = null;
+		renderComplete = null;
+		commentIds = null;
+
+		self.collectionId = null;
+
+		self.messageQueue.destroy();
+		self.messageQueue = null;
+
+		globalEvents.off('auth.login', login);
+		globalEvents.off('auth.logout', logout);
+
+		__superDestroy();
+		__superDestroy = null;
+
+		self = null;
+	};
 };
 oCommentUi.Widget.__extend(Widget, 'oChat');
 
 Widget.__extend = function(child, eventNamespace) {
 	if (typeof Object.create === 'function') {
-		child.prototype = Object.create( Widget.prototype );
 		child.prototype = Object.create(Widget.prototype);
 	} else {
 		var Tmp = function () {};

@@ -23,6 +23,7 @@ function WidgetUi (widgetContainer, config) {
 	var adaptedToHeight = false;
 	var isPagination = false;
 	var isOpen = true;
+	var scrollMonitor;
 
 	this.on = events.on;
 	this.off = events.off;
@@ -203,7 +204,7 @@ function WidgetUi (widgetContainer, config) {
 
 		function initScrollPagination () {
 			var commentArea = sizzle('.comment-comments-area', widgetContainer)[0];
-			new oCommentUtilities.dom.ScrollMonitor(commentArea, function (scrollPos) {
+			scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(commentArea, function (scrollPos) {
 				if (config.orderType === 'inverted') {
 					if (scrollPos < 0.2 * commentArea.scrollHeight) {
 						events.trigger('nextPage');
@@ -571,11 +572,33 @@ function WidgetUi (widgetContainer, config) {
 			return true;
 		}
 	};
+
+	var __superDestroy = this.destroy;
+	this.destroy = function () {
+		self.off();
+
+		events.destroy();
+		events = null;
+
+		scrollMonitor.destroy();
+		scrollMonitor = null;
+
+		newCommentNotification.destroy();
+		newCommentNotification = null;
+
+		adaptedToHeight = null;
+		isPagination = null;
+		isOpen = null;
+
+		__superDestroy();
+		__superDestroy = null;
+
+		self = null;
+	};
 }
 
 WidgetUi.__extend = function(child) {
 	if (typeof Object.create === 'function') {
-		child.prototype = Object.create(WidgetUi.prototype);
 		child.prototype = Object.create(WidgetUi.prototype);
 	} else {
 		var Tmp = function () {};

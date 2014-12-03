@@ -24,7 +24,7 @@ function NewCommentNotification (widgetUi, container, position) {
 	var notificationButton = sizzle('.o-chat-notification-button', notificationElement)[0];
 
 
-	var onClick = function () {
+	var onClickButton = function () {
 		self.reset();
 		if (position === "bottom") {
 			container.scrollTop = container.scrollHeight - container.clientHeight;
@@ -32,10 +32,12 @@ function NewCommentNotification (widgetUi, container, position) {
 			container.scrollTop = 0;
 		}
 	};
-	oCommentUtilities.dom.eventListener.addEventListener('click', notificationButton, onClick);
-	oCommentUtilities.dom.eventListener.addEventListener('click', notificationElement, function () {
+	notificationButton.addEventListener('click', onClickButton);
+
+	var onClickElement = function () {
 		container.focus();
-	});
+	};
+	notificationElement.addEventListener('click', onClickElement);
 
 	var verifyNotificationStatus = function (scrollPos) {
 		if (position === "bottom") {
@@ -76,8 +78,22 @@ function NewCommentNotification (widgetUi, container, position) {
 	};
 
 	this.destroy = function () {
-		scrollMonitorForNotification.stop();
+		scrollMonitorForNotification.destroy();
+
+		notificationId = null;
+		active = null;
+
+		notificationButton.removeEventListener('click', onClickButton);
+		onClickButton = null;
+
+		notificationElement.removeEventListener('click', onClickElement);
+		onClickElement = null;
+
 		notificationElement.parentNode.removeChild(notificationElement);
+		notificationElement = null;
+		notificationButton = null;
+
+		self = null;
 	};
 }
 
