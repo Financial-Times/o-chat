@@ -19,21 +19,6 @@
 		border-radius: 5px;
 		font-size: 13px;
 	}
-
-	.o-chat-notification-button-arrow {
-		display: inline-block;
-		width: 9px;
-		height: 10px;
-		background: url(oAssetsResolve("src/images/notification_arrows.png", o-chat)) no-repeat;
-	}
-
-	.o-chat-notification-button-arrow-top {
-		background-position: 0px 0px;
-	}
-
-	.o-chat-notification-button-arrow-bottom {
-		background-position: -9px 0px;
-	}
 }
 
 .o-chat-notification-fade-top {

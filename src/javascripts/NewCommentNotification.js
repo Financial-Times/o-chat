@@ -18,7 +18,8 @@ function NewCommentNotification (widgetUi, container, position) {
 
 	container.parentNode.appendChild(oCommentUi.utils.toDOM(templates.notification.render({
 		id: notificationId,
-		position: position
+		position: position,
+		arrowIconClass: (position === 'bottom' ? 'downwards' : 'upwards')
 	})));
 	var notificationElement = sizzle('#o-chat-notification-' + notificationId)[0];
 	var notificationButton = sizzle('.o-chat-notification-button', notificationElement)[0];

@@ -1,4 +1,7 @@
-@import 'o-comment-ui/main.scss';
+@import 'o-comment-ui/main';
+
+$o-ft-icons-is-silent: false;
+@import "o-ft-icons/main";
 
 @import './src/stylesheets/generic';
 @import './src/stylesheets/comments';
