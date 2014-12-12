@@ -1,21 +1,21 @@
-<li class="comment-wrapper" {{#commentId}}id="commentid-{{commentId}}"{{/commentId}} data-timestamp="{{timestamp}}">
-	<span class="comment-timestamp">
+<li class="o-chat--wrapper" {{#commentId}}id="commentid-{{commentId}}"{{/commentId}} data-timestamp="{{timestamp}}">
+	<span class="o-chat--timestamp">
 		<time class="{{#relativeTime}}o-date{{/relativeTime}}" datetime="{{datetime}}">
 			{{dateToShow}}&nbsp;
 		</time>
 	</span>
 
-	<div class="comment-author">
+	<div class="o-chat--author">
 		{{author.displayName}}:
 	</div>
 
-	<div class="comment-content">
+	<div class="o-chat--content">
 		{{{content}}}
 	</div>
 
 	{{#adminMode}}
-		<a href="#" class="comment-delete">Delete</a>
+		<a href="#" class="o-chat--delete">Delete</a>
 	{{/adminMode}}
 	
-	<div class="comment-clear"></div>
+	<div class="o-comment-ui--clear"></div>
 </li>

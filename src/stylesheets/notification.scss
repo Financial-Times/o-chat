@@ -1,4 +1,4 @@
-.o-chat-notification {
+.o-chat--notification {
 	font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
 
 	display: none;
@@ -10,7 +10,7 @@
 	padding: 15px 0;
 	text-align: center;
 
-	.o-chat-notification-button {
+	.o-chat--notification-button {
 		display: inline-block;
 		background-color: oColorsGetPaletteColor(blue);
 		color: oColorsGetPaletteColor(white);
@@ -21,7 +21,7 @@
 	}
 }
 
-.o-chat-notification-fade-top {
+.o-chat--notification-fade-top {
 	$notificatoinFadeColorStart: rgba(246, 233, 216, 1);
 	$notificatoinFadeColorStop: rgba(246, 233, 216, 0);
 
@@ -35,7 +35,7 @@
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFF6E9D8', endColorstr='#00F6E9D8',GradientType=0); /* ie6-9 */
 }
 
-.o-chat-notification-fade-bottom {
+.o-chat--notification-fade-bottom {
 	$notificatoinFadeColorStart: rgba(246, 233, 216, 1);
 	$notificatoinFadeColorStop: rgba(246, 233, 216, 0);
 

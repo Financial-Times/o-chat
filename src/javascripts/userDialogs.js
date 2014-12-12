@@ -2,6 +2,7 @@
 
 var oCommentUi = require('o-comment-ui');
 var oCommentApi = require('o-comment-api');
+var oOverlay = require('o-overlay');
 
 /**
  * Shows a dialog for setting the initial pseudonym (shown when the user doesn't have a pseudonym set).
@@ -128,9 +129,14 @@ exports.showInactivityMessage = oCommentUi.userDialogs.showInactivityMessage;
  * @param  {String} message The content of the dialog (the message).
  */
 exports.showMessage = function (title, message) {
-	var dialog = new oCommentUi.dialog.Dialog(message, {
-		modal: false,
-		title: title
+	var idOfTheOverlay = "oChat_showMessage";
+	var overlay = new Overlay(idOfTheOverlay, {
+		html: message,
+		heading: {
+			title: title
+		},
+		modal: false
 	});
-	dialog.open();
+
+	overlay.open();
 };

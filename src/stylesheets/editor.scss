@@ -1,16 +1,16 @@
 .o-chat {
-	&.comment-order-normal .comment-editor-container {
+	&.o-chat--order-normal .o-chat--editor-container {
 		margin-bottom: 10px;
 	}
 
-	&.comment-order-inverted .comment-editor-container {
+	&.o-chat--order-inverted .o-chat--editor-container {
 		margin-top: 10px;
 	}
 
-	.comment-editor-container {
+	.o-chat--editor-container {
 		font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
 
-		.comment-editor-closed {
+		.o-chat--editor-closed {
 			display: none;
 
 			background: oColorsGetPaletteColor(white);
@@ -22,51 +22,51 @@
 			font-weight: bold;
 		}
 
-		.comment-editor-header {
+		.o-chat--editor-header {
 			margin-bottom: 4px;
+		}
 
-			.comment-loggedin {
-				float: left;
-				position: relative;
+		.o-chat--loggedin {
+			float: left;
+			position: relative;
 
-				.comment-pseudonym {
-					cursor: default;
-				}
+			.o-chat--pseudonym {
+				cursor: default;
+			}
 
-				.comment-admin-links {
-					display: none;
+			.o-chat--admin-links {
+				display: none;
 
-					background: white;
-					padding: 5px;
-					position: absolute;
-					top: 100%;
-					left: 0;
-					z-index: 1000;
-					border: 1px solid oColorsGetPaletteColor(pink-tint4);
+				background: white;
+				padding: 5px;
+				position: absolute;
+				top: 100%;
+				left: 0;
+				z-index: 1000;
+				border: 1px solid oColorsGetPaletteColor(pink-tint4);
 
-					li {
-						border-bottom: 1px solid  oColorsGetPaletteColor(pink-tint4);
-						white-space: nowrap;
+				li {
+					border-bottom: 1px solid  oColorsGetPaletteColor(pink-tint4);
+					white-space: nowrap;
 
-						&:last-child {
-							border: 0;
-						}
-					}
-				}
-
-				&:hover {
-					.comment-admin-links {
-						display: block;
+					&:last-child {
+						border: 0;
 					}
 				}
 			}
 
-			.comment-settings {
-				float: right;
+			&:hover {
+				.o-chat--admin-links {
+					display: block;
+				}
 			}
 		}
 
-		.comment-editor-input {
+		.o-comment-ui--settings {
+			float: right;
+		}
+
+		.o-chat--editor-input {
 			border: 1px solid oColorsGetPaletteColor(pink-tint2);
 			padding: 5px 10px;
 			background: oColorsGetPaletteColor(white);
@@ -94,7 +94,7 @@
 				}
 			}
 
-			.comment-editor-error {
+			.o-chat--editor-error {
 				position: absolute;
 				bottom: 0;
 				right: 0;
@@ -107,11 +107,11 @@
 			}
 		}
 
-		.comment-editor-footer {
+		.o-chat--editor-footer {
 			border: 1px solid oColorsGetPaletteColor(pink-tint2);
 			border-top: 0;
 
-			.comment-editor-submit {
+			.o-chat--editor-submit {
 				float: right;
 
 				button {
@@ -127,7 +127,7 @@
 		}
 	}
 
-	.comment-editor-terms {
+	.o-chat--editor-terms {
 		padding-bottom: 16px;
 	}
 }

@@ -33,9 +33,9 @@ function WidgetUi (widgetContainer, config) {
 		if (isOpen === false) {
 			isOpen = true;
 
-			sizzle('.comment-editor-closed', self.widgetContainer)[0].style.display = 'none';
-			sizzle('.comment-editor-input', self.widgetContainer)[0].style.display = 'block';
-			sizzle('.comment-editor-footer', self.widgetContainer)[0].style.display = 'block';
+			sizzle('.o-chat--editor-closed', self.widgetContainer)[0].style.display = 'none';
+			sizzle('.o-chat--editor-input', self.widgetContainer)[0].style.display = 'block';
+			sizzle('.o-chat--editor-footer', self.widgetContainer)[0].style.display = 'block';
 		}
 	};
 
@@ -43,9 +43,9 @@ function WidgetUi (widgetContainer, config) {
 		if (isOpen === true) {
 			isOpen = false;
 
-			sizzle('.comment-editor-closed', self.widgetContainer)[0].style.display = 'block';
-			sizzle('.comment-editor-input', self.widgetContainer)[0].style.display = 'none';
-			sizzle('.comment-editor-footer', self.widgetContainer)[0].style.display = 'none';
+			sizzle('.o-chat--editor-closed', self.widgetContainer)[0].style.display = 'block';
+			sizzle('.o-chat--editor-input', self.widgetContainer)[0].style.display = 'none';
+			sizzle('.o-chat--editor-footer', self.widgetContainer)[0].style.display = 'none';
 		}
 	};
 
@@ -88,7 +88,7 @@ function WidgetUi (widgetContainer, config) {
 
 		try { oDate.init(); } catch(e) {}
 
-		sizzle('.signIn', self.widgetContainer)[0].addEventListener('click', function (evt) {
+		sizzle('.o-chat--signIn', self.widgetContainer)[0].addEventListener('click', function (evt) {
 			events.trigger('signIn');
 
 			if (evt.preventDefault) {
@@ -98,12 +98,12 @@ function WidgetUi (widgetContainer, config) {
 			}
 		});
 
-		sizzle('.comment-editor-submit > button')[0].addEventListener('click', function () {
+		sizzle('.o-chat--editor-submit > button')[0].addEventListener('click', function () {
 			events.trigger('postComment');
 		});
 
-		sizzle('.comment-editor-input')[0].addEventListener('click', function (event) {
-			sizzle('.comment-editor-input textarea')[0].focus();
+		sizzle('.o-chat--editor-input')[0].addEventListener('click', function (event) {
+			sizzle('.o-chat--editor-input textarea')[0].focus();
 			self.clearEditorError();
 
 			if (event.preventDefault) {
@@ -115,21 +115,21 @@ function WidgetUi (widgetContainer, config) {
 
 		if (isPagination) {
 			if (config.orderType === 'inverted') {
-				sizzle('.comment-show-more-before', self.widgetContainer)[0].style.display = 'block';
+				sizzle('.o-chat--show-more-before', self.widgetContainer)[0].style.display = 'block';
 			} else {
-				sizzle('.comment-show-more-after', self.widgetContainer)[0].style.display = 'block';
+				sizzle('.o-chat--show-more-after', self.widgetContainer)[0].style.display = 'block';
 			}
 
-			sizzle('.comment-show-more .comment-show-more-label', self.widgetContainer)[0].addEventListener('click', function () {
+			sizzle('.o-chat--show-more .o-chat--show-more-label', self.widgetContainer)[0].addEventListener('click', function () {
 				events.trigger('nextPage');
 			});
 		}
 
-		var commentContainer = sizzle('.comment-comments-container', self.widgetContainer)[0];
+		var commentContainer = sizzle('.o-chat--comments-container', self.widgetContainer)[0];
 
 		if (adminMode) {
 			commentContainer.addEventListener('click', function (event) {
-				if (event.target.className === 'comment-delete') {
+				if (event.target.className === 'o-chat-comment-delete') {
 					try {
 						var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
 
@@ -156,8 +156,8 @@ function WidgetUi (widgetContainer, config) {
 				}
 			}
 
-			var commentArea = sizzle('.comment-comments-area', self.widgetContainer)[0];
-			var editorContainer = sizzle('.comment-editor-container', self.widgetContainer)[0];
+			var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
+			var editorContainer = sizzle('.o-chat--editor-container', self.widgetContainer)[0];
 			var editorComputedStyle = oCommentUi.utils.getComputedStyle(editorContainer);
 
 			var editorContainerMarginTopValue;
@@ -192,7 +192,7 @@ function WidgetUi (widgetContainer, config) {
 
 		// poll for the existence of container
 		var pollForContainer = setInterval(function () {
-			if (sizzle('.comment-editor-container', self.widgetContainer).length > 0) {
+			if (sizzle('.o-chat--editor-container', self.widgetContainer).length > 0) {
 				clearInterval(pollForContainer);
 				adapt();
 			}
@@ -203,7 +203,7 @@ function WidgetUi (widgetContainer, config) {
 	// Specific functions for the widget that was shrinked to a fixed height
 
 		function initScrollPagination () {
-			var commentArea = sizzle('.comment-comments-area', self.widgetContainer)[0];
+			var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
 			scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(commentArea, function (scrollPos) {
 				if (config.orderType === 'inverted') {
 					if (scrollPos < 0.2 * commentArea.scrollHeight) {
@@ -218,13 +218,13 @@ function WidgetUi (widgetContainer, config) {
 		}
 
 		function initNotification () {
-			var commentArea = sizzle('.comment-comments-area', self.widgetContainer)[0];
+			var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
 			newCommentNotification = new NewCommentNotification(self, commentArea, (config.orderType === "inverted" ? 'bottom' : 'top'));
 		}
 
 
 		function scrollToLastComment () {
-			var commentArea = sizzle('.comment-comments-area', self.widgetContainer)[0];
+			var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
 
 			if (config.orderType === "inverted") {
 				commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight + 1;
@@ -240,12 +240,12 @@ function WidgetUi (widgetContainer, config) {
 		}
 
 	this.disableButtonPagination = function () {
-		sizzle('.comment-show-more-before', self.widgetContainer)[0].style.display = 'none';
-		sizzle('.comment-show-more-after', self.widgetContainer)[0].style.display = 'none';
+		sizzle('.o-chat--show-more-before', self.widgetContainer)[0].style.display = 'none';
+		sizzle('.o-chat--show-more-after', self.widgetContainer)[0].style.display = 'none';
 	};
 
 	this.login = function (token, pseudonym, isAdmin) {
-		var authEl = sizzle('.comment-editor-auth', self.widgetContainer);
+		var authEl = sizzle('.o-chat--editor-auth', self.widgetContainer);
 
 		if (authEl && authEl.length) {
 			authEl[0].innerHTML = templates.loggedIn.render({
@@ -258,7 +258,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.logout = function () {
-		var authEl = sizzle('.comment-editor-auth', self.widgetContainer);
+		var authEl = sizzle('.o-chat--editor-auth', self.widgetContainer);
 
 		if (authEl && authEl.length) {
 			authEl[0].innerHTML = templates.signIn.render();
@@ -266,7 +266,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.getCurrentPseudonym = function () {
-		var pseudonymArea = sizzle('.comment-editor-auth .comment-pseudonym', self.widgetContainer);
+		var pseudonymArea = sizzle('.o-chat--editor-auth .o-chat--pseudonym', self.widgetContainer);
 
 		if (pseudonymArea && pseudonymArea.length) {
 			return pseudonymArea[0].innerHTML;
@@ -276,7 +276,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.hideSignInLink = function () {
-		var authEl = sizzle('.comment-editor-auth', self.widgetContainer);
+		var authEl = sizzle('.o-chat--editor-auth', self.widgetContainer);
 
 		if (authEl && authEl.length) {
 			authEl[0].innerHTML = "";
@@ -284,26 +284,26 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.makeReadOnly = function () {
-		var commentEditorInputContainer = sizzle('.comment-editor-input', self.widgetContainer);
+		var commentEditorInputContainer = sizzle('.o-chat--editor-input', self.widgetContainer);
 
 		if (commentEditorInputContainer && commentEditorInputContainer.length) {
 			commentEditorInputContainer = commentEditorInputContainer[0];
 
 			commentEditorInputContainer.className += " disabled";
 			sizzle('textarea', commentEditorInputContainer)[0].setAttribute('disabled', 'disabled');
-			sizzle('.comment-editor-submit button', self.widgetContainer)[0].setAttribute('disabled', 'disabled');
+			sizzle('.o-chat--editor-submit button', self.widgetContainer)[0].setAttribute('disabled', 'disabled');
 		}
 	};
 
 	this.makeEditable = function () {
-		var commentEditorInputContainer = sizzle('.comment-editor-input', self.widgetContainer);
+		var commentEditorInputContainer = sizzle('.o-chat--editor-input', self.widgetContainer);
 
 		if (commentEditorInputContainer && commentEditorInputContainer.length) {
 			commentEditorInputContainer = commentEditorInputContainer[0];
 
 			commentEditorInputContainer.className = commentEditorInputContainer.className.replace('disabled', '');
 			sizzle('textarea', commentEditorInputContainer)[0].removeAttribute('disabled');
-			sizzle('.comment-editor-submit button', self.widgetContainer)[0].removeAttribute('disabled');
+			sizzle('.o-chat--editor-submit button', self.widgetContainer)[0].removeAttribute('disabled');
 		}
 	};
 
@@ -311,8 +311,8 @@ function WidgetUi (widgetContainer, config) {
 	this.addComment = function (commentData, ownComment, adminMode) {
 		ownComment = typeof ownComment === 'boolean' ? ownComment : false;
 
-		var commentContainer = sizzle('.comment-comments-container', self.widgetContainer)[0];
-		var commentArea = sizzle('.comment-comments-area', self.widgetContainer)[0];
+		var commentContainer = sizzle('.o-chat--comments-container', self.widgetContainer)[0];
+		var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
 
 		// normalize timestamp if one provided or use current time
 		var timestamp = commentData.timestamp ? oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
@@ -335,7 +335,7 @@ function WidgetUi (widgetContainer, config) {
 		);
 
 
-		var comments = sizzle('.comment-wrapper', commentContainer);
+		var comments = sizzle('.o-chat--wrapper', commentContainer);
 		var i;
 		var inserted = false;
 
@@ -401,8 +401,8 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.addNextPageComments = function (comments, adminMode) {
-		var commentContainer = sizzle('.comment-comments-container', self.widgetContainer)[0];
-		var commentArea = sizzle('.comment-comments-area', self.widgetContainer)[0];
+		var commentContainer = sizzle('.o-chat--comments-container', self.widgetContainer)[0];
+		var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
 
 		var commentData;
 		var commentDom;
@@ -444,7 +444,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.updateComment = function (id, newContent) {
-		var commentContentEl = sizzle('#commentid-' + id + ' .comment-content', self.widgetContainer);
+		var commentContentEl = sizzle('#commentid-' + id + ' .o-chat--content', self.widgetContainer);
 		if (commentContentEl && commentContentEl.length) {
 			commentContentEl[0].innerHTML = newContent;
 		}
@@ -453,19 +453,19 @@ function WidgetUi (widgetContainer, config) {
 	this.markCommentAsDeleteInProgress = function (id) {
 		var comment = sizzle('#commentid-'+id, self.widgetContainer);
 		if (comment && comment.length) {
-			comment[0].className += " comment-delete-progress";
+			comment[0].className += " o-chat--delete-progress";
 		}
 	};
 
 	this.markCommentAsDeleteInProgressEnded = function (id) {
 		var comment = sizzle('#commentid-'+id, self.widgetContainer);
 		if (comment && comment.length) {
-			comment[0].className = comment[0].className.replace("comment-delete-progress", "");
+			comment[0].className = comment[0].className.replace("o-chat--delete-progress", "");
 		}
 	};
 
 	this.getCurrentComment = function () {
-		var commentArea = sizzle('.comment-editor-input textarea', self.widgetContainer);
+		var commentArea = sizzle('.o-chat--editor-input textarea', self.widgetContainer);
 
 		if (commentArea && commentArea.length) {
 			return utils.strings.trim(commentArea[0].value).replace(/(?:\r\n|\r|\n)/g, '<br />');
@@ -475,7 +475,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.emptyCommentArea = function () {
-		var commentArea = sizzle('.comment-editor-input textarea', self.widgetContainer);
+		var commentArea = sizzle('.o-chat--editor-input textarea', self.widgetContainer);
 
 		if (commentArea && commentArea.length) {
 			commentArea[0].value = "";
@@ -483,7 +483,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.repopulateCommentArea = function (text) {
-		var commentArea = sizzle('.comment-editor-input textarea', self.widgetContainer);
+		var commentArea = sizzle('.o-chat--editor-input textarea', self.widgetContainer);
 
 		if (commentArea && commentArea.length && text && text.length) {
 			commentArea[0].value = text.replace(/<br \/>/g, '\n');
@@ -491,7 +491,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.addSettingsLink = function (options) {
-		var loginBarContainer = sizzle('.comment-editor-auth', self.widgetContainer);
+		var loginBarContainer = sizzle('.o-chat--editor-auth', self.widgetContainer);
 		if (loginBarContainer && loginBarContainer.length) {
 			loginBarContainer[0].appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.commentingSettingsLink.render({
 				label: "Edit pseudonym",
@@ -501,7 +501,7 @@ function WidgetUi (widgetContainer, config) {
 			return;
 		}
 
-		var settingsLink = sizzle('.comment-settings-text', loginBarContainer[0]);
+		var settingsLink = sizzle('.o-comment-ui--settings-text', loginBarContainer[0]);
 		if (settingsLink && settingsLink.length) {
 			settingsLink[0].addEventListener('click', function () {
 				if (options && typeof options.onClick === 'function') {
@@ -524,21 +524,21 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.removeSettingsLink = function () {
-		var settingsLink = sizzle('.comment-settings', self.widgetContainer);
+		var settingsLink = sizzle('.o-comment-ui--settings', self.widgetContainer);
 		if (settingsLink && settingsLink.length) {
 			settingsLink[0].parentNode.removeChild(settingsLink[0]);
 		}
 	};
 
 	this.setEditorError = function (err) {
-		var editorErrorContainer = sizzle('.comment-editor-error', self.widgetContainer)[0];
+		var editorErrorContainer = sizzle('.o-chat--editor-error', self.widgetContainer)[0];
 
 		editorErrorContainer.innerHTML = err;
 		editorErrorContainer.style.display = 'block';
 	};
 
 	this.clearEditorError = function () {
-		var editorErrorContainer = sizzle('.comment-editor-error', self.widgetContainer)[0];
+		var editorErrorContainer = sizzle('.o-chat--editor-error', self.widgetContainer)[0];
 
 		editorErrorContainer.style.display = 'none';
 		editorErrorContainer.innerHTML = '';

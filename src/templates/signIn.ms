@@ -1,1 +1,1 @@
-<a href="#" class="signIn">Sign in</a>
+<a href="#" class="o-chat--signIn">Sign in</a>
