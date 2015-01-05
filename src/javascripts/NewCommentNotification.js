@@ -21,8 +21,8 @@ function NewCommentNotification (widgetUi, container, position) {
 		position: position,
 		arrowIconClass: (position === 'bottom' ? 'downwards' : 'upwards')
 	})));
-	var notificationElement = sizzle('#o-chat-notification-' + notificationId)[0];
-	var notificationButton = sizzle('.o-chat-notification-button', notificationElement)[0];
+	var notificationElement = sizzle('#o-chat--notification-' + notificationId)[0];
+	var notificationButton = sizzle('.o-chat--notification-button', notificationElement)[0];
 
 
 	var onClickButton = function () {

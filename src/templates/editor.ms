@@ -3,7 +3,7 @@
 		<div class="o-chat--editor-auth">
 			{{{signInTemplate}}}
 		</div>
-		<div class="o-chat--clear"></div>
+		<div class="o-comment-ui--clear"></div>
 	</div>
 
 	<div class="o-chat--editor-closed">

@@ -130,7 +130,7 @@ exports.showInactivityMessage = oCommentUi.userDialogs.showInactivityMessage;
  */
 exports.showMessage = function (title, message) {
 	var idOfTheOverlay = "oChat_showMessage";
-	var overlay = new Overlay(idOfTheOverlay, {
+	var overlay = new oOverlay(idOfTheOverlay, {
 		html: message,
 		heading: {
 			title: title

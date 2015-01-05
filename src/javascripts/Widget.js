@@ -52,7 +52,7 @@ var Widget = function () {
 	this.config.order = this.config.order || "normal";
 
 	// add appropriate classes to the widget container
-	this.getWidgetEl().className += ' o-chat comment-order-' + this.config.order;
+	this.getWidgetEl().className += ' o-chat o-chat--order-' + this.config.order;
 
 	/**
 	 * Collection ID.

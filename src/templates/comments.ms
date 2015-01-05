@@ -29,7 +29,7 @@
 				</li>
 			{{/comments}}
 		</ul>
-		<div class="o-chat--show-more comment-show-more-after">
+		<div class="o-chat--show-more o-chat--show-more-after">
 			<div class="o-chat--show-more-line"></div>
 			<span class="o-chat--show-more-label">Show more comments</span>
 		</div>
