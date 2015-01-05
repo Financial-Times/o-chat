@@ -7,7 +7,7 @@
   ],
   "dependencies": {
     "o-comment-api": "^0.7.0",
-    "o-comment-ui": "http://git.svc.ft.com:8080/scm/strat_p/o-comment-ui.git#integrate_o_overlay",
+    "o-comment-ui": "^0.4.0",
     "o-comment-utilities": "^0.4.0",
     "o-ft-icons": "^2.3.2",
     "o-fonts": "^1.4.1",
