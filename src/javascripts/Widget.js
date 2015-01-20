@@ -270,13 +270,14 @@ var Widget = function () {
 								// the user is forced to finish the login process
 								// ask to set a pseudonym instantly
 								if (self.forceMode === true) {
-									auth.loginRequiredPseudonymMissing({
-										success: function () {},
-										failure: function () {
-											var messageInTheQueue = self.messageQueue.getComment();
-											self.ui.repopulateCommentArea(messageInTheQueue);
-											self.messageQueue.clear();
+									auth.loginRequiredPseudonymMissing(function (err, newAuthData) {
+										if (err) {
+											return;
 										}
+
+										var messageInTheQueue = self.messageQueue.getComment();
+										self.ui.repopulateCommentArea(messageInTheQueue);
+										self.messageQueue.clear();
 									});
 								}
 
@@ -429,24 +430,28 @@ var Widget = function () {
 		self.ui.addSettingsLink({
 			onClick: function () {
 				var showSettingsDialog = function () {
-					oCommentApi.api.getAuth(function (err, currentAuthData) {
-						if (!err && currentAuthData) {
-							userDialogs.showChangePseudonymDialog(currentAuthData.displayName, {
-								success: function (newAuthData) {
-									if (newAuthData && newAuthData.token) {
-										auth.logout();
-										auth.login();
-									}
+					oCommentApi.api.getAuth(function (authErr, currentAuthData) {
+						if (!authErr && currentAuthData) {
+							userDialogs.showChangePseudonymDialog(currentAuthData.displayName, function (err, newAuthData) {
+								if (err) {
+									return;
+								}
+
+								if (newAuthData && newAuthData.token) {
+									auth.logout();
+									auth.login();
 								}
 							});
 						}
 					});
 				};
 
-				auth.loginRequired({
-					success: function () {
-						showSettingsDialog();
+				auth.loginRequired(function (err, authData) {
+					if (err) {
+						return;
 					}
+
+					showSettingsDialog();
 				});
 			}
 		});
@@ -555,7 +560,7 @@ var Widget = function () {
 				if (postCommentResult.success === true) {
 					self.ui.emptyCommentArea();
 
-					oCommentApi.api.getAuth(function (err, authData) {
+					oCommentApi.api.getAuth(function (authErr, authData) {
 						if (authData) {
 							triggerCommentPostedEvent({
 								commentId: postCommentResult.commentId,

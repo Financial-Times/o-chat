@@ -112,21 +112,21 @@ oChat.init({
 Listen on the 'login required' event, and try to log in the user within the page:
 
 ```javascript
-oChat.auth.on('loginRequired.authAction', function (delegate) {
+oChat.auth.on('loginRequired.authAction', function (evt) {
     // the user is not logged in, but an action was performed within the comment widget that requires the user to be logged in
 
     login();
     if (loggedIn) {
-        delegate.success();
+        evt.detail.callback();
     } else if (loginRefused) {
-        delegate.failure();
+        evt.detail.callback(new Error("Refused")); // provide an error as parameter
     } else if (loginFailure) {
-        delegate.failure();
+        evt.detail.callback(new Error("Failed")); // provide an error as parameter
     }
 });
 ```
 
-**Important: if the log in needs a page reload, don't call the failure function!**
+**Important: if the log in needs a page reload, don't call the callback at all (there's no success/failure, it's still pending)!**
 
 ### Integration - programatically
 Create an instance of the Widget with the parameters that are available:
@@ -347,17 +347,17 @@ Triggered when a user is logged out.
 ##### auth.loginRequired
 Triggered on any activity which explicitly requires a logged in status. This could mean from the product perspective that the user is not logged in, or his/her login status expired (e.g. session expire).
 
-The payload data contains two functions: success and failure. Based on the outcome of the login process, one of these should be called by the handler.
-**Important: if the log in needs a page reload, don't call the failure function!**
+The payload data contains an object with a callback function. Based on the outcome of the login process, one of these should be called by the handler.
+**Important: if the log in needs a page reload, don't call the callback at all (there's no success/failure, it's still pending)!**
 
 ```javascript
 oChat.auth.on('auth.loginRequired', function (evt) {
     if (logInSuccess) {
-        evt.detail.success();
+        evt.detail.callback();
     }
 
     if (logInFails || logInRefused) {
-        evt.detail.failure();
+        evt.detail.callback(new Error("Failed or cancelled."));
     }
 });
 ```
@@ -494,7 +494,7 @@ Using this method you can explicitly request an authenticated status. It handles
  - user is not authenticated, ask to log in
 
 Parameters:
- - delegate: Optional. An object can be added with two functions: success and failure. If the login process ends successfully, delegate.success is called. If the login process fails or it is refused by the user, delegate.failure is called.
+ - callback: Optional. A function which will be called if the login succeded or failed. The parameters that it will get: err, authData. If the login process fails or it is refused by the user, the function is called with an error. If the login process ends successfully, callback is called with the authentication data: callback(null, {...}).
  - force: Optional. If true, the local cache is ignored and the web service is directly asked for the login status.
 
 ---

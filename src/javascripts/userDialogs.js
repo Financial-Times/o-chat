@@ -6,15 +6,10 @@ var oOverlay = require('o-overlay');
 
 /**
  * Shows a dialog for setting the initial pseudonym (shown when the user doesn't have a pseudonym set).
- * @param  {Function} callbacks Optional. Two possible fields: success and failure. Success will get the new authentication data as parameter.
+ * @param  {Function} callback Optional. function (err, authData)
  */
-exports.showSetPseudonymDialog = function (callbacks) {
-	if (!callbacks || typeof callbacks !== 'object') {
-		callbacks = {};
-	}
-
-	callbacks.success = callbacks.success || function () {};
-	callbacks.failure = callbacks.failure || function () {};
+exports.showSetPseudonymDialog = function (callback) {
+	callback = callback || function () {};
 
 	oCommentUi.userDialogs.showSetPseudonymDialog({
 		submit: function (formData, responseCallback) {
@@ -42,11 +37,11 @@ exports.showSetPseudonymDialog = function (callbacks) {
 					}, function (err, authData) {
 						if (err) {
 							responseCallback(oCommentUi.i18n.texts.changePseudonymError);
-							callbacks.failure();
+							callback(err);
 							return;
 						}
 
-						callbacks.success(authData);
+						callback(null, authData);
 						responseCallback();
 					});
 				});
@@ -55,7 +50,7 @@ exports.showSetPseudonymDialog = function (callbacks) {
 			}
 		},
 		close: function () {
-			callbacks.failure();
+			callback(new Error("Closed or cancelled"));
 		}
 	});
 };
@@ -63,15 +58,10 @@ exports.showSetPseudonymDialog = function (callbacks) {
 /**
  * Settings dialog where the user can change its pseudonym or email preferences.
  * @param  {Object} currentPseudonym Required. Current pseudonym of the user.
- * @param  {Function} callbacks Optional. Two possible fields: success and failure. Success will get the new authentication data as parameter.
+ * @param  {Function} callback Optional. function (err, authData)
  */
-exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
-	if (!callbacks || typeof callbacks !== 'object') {
-		callbacks = {};
-	}
-
-	callbacks.success = callbacks.success || function () {};
-	callbacks.failure = callbacks.failure || function () {};
+exports.showChangePseudonymDialog = function (currentPseudonym, callback) {
+	callback = callback || function () {};
 
 	oCommentUi.userDialogs.showChangePseudonymDialog(currentPseudonym, {
 		submit: function (formData, responseCallback) {
@@ -95,12 +85,12 @@ exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
 						force: true
 					}, function (err, authData) {
 						if (err) {
-							callbacks.failure();
+							callback(err);
 							responseCallback(oCommentUi.i18n.texts.genericError);
 							return;
 						}
 
-						callbacks.success(authData);
+						callback(null, authData);
 						responseCallback();
 					});
 				});
@@ -109,7 +99,7 @@ exports.showChangePseudonymDialog = function (currentPseudonym, callbacks) {
 			}
 		},
 		close: function () {
-			callbacks.failure();
+			callback(new Error("Closed or cancelled."));
 		}
 	});
 };
