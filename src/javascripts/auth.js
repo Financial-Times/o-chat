@@ -66,6 +66,10 @@ function Auth () {
 	 * @param  {Function} callback function (err, authData)
 	 */
 	function loginRequiredPseudonymMissing (callback) {
+		if (typeof callback !== 'function') {
+			callback = function () {};
+		}
+
 		oCommentUtilities.logger.log('pseudonymMissing');
 
 		userDialogs.showSetPseudonymDialog(function (err, authData) {
@@ -89,6 +93,10 @@ function Auth () {
 	 * @param  {Function} callback function (err, authData)
 	 */
 	function loginRequiredAfterASuccess (callback) {
+		if (typeof callback !== 'function') {
+			callback = function () {};
+		}
+
 		oCommentApi.api.getAuth({
 			force: true
 		}, function (err, authData) {
@@ -108,6 +116,10 @@ function Auth () {
 	 * @param  {Function} callback function (err, authData)
 	 */
 	this.loginRequired = function (callback, force) {
+		if (typeof callback !== 'function') {
+			callback = function () {};
+		}
+
 		oCommentApi.api.getAuth({
 			force: force
 		}, function (err, authData) {
