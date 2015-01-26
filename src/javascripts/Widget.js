@@ -248,6 +248,8 @@ var Widget = function () {
 					// normalize the comments data
 					commentsData.comments = preprocessCommentData(commentsData.comments);
 
+					// clear container
+					self.ui.clearContainer();
 					// render the widget in the DOM
 					self.ui.render(commentsData.comments, userIsAdmin, isMorePageAvailable);
 
