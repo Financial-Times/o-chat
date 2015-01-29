@@ -129,7 +129,7 @@ function WidgetUi (widgetContainer, config) {
 
 		if (adminMode) {
 			commentContainer.addEventListener('click', function (event) {
-				if (event.target.className === 'o-chat-comment-delete') {
+				if (event.target.className === 'o-chat--delete') {
 					try {
 						var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
 
