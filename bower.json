@@ -1,6 +1,6 @@
 {
   "name": "o-chat",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "main": [
     "main.js",
     "main.scss"
@@ -14,8 +14,7 @@
     "o-date": "^1.1.0",
     "o-overlay": "^1.1.2",
 
-    "hogan": "git+https://github.com/twitter/hogan.js.git#3.0.0",
-    "sizzle": "https://github.com/jquery/sizzle.git#^2.0.0"
+    "hogan": "git+https://github.com/twitter/hogan.js.git#3.0.0"
   },
   "ignore": [
     "node_modules",

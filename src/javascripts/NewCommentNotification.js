@@ -2,7 +2,6 @@
 
 var templates = require('./templates.js');
 var oCommentUi = require('o-comment-ui');
-var sizzle = require('sizzle');
 var oCommentUtilities = require('o-comment-utilities');
 
 function NewCommentNotification (widgetUi, container, position) {
@@ -21,8 +20,8 @@ function NewCommentNotification (widgetUi, container, position) {
 		position: position,
 		arrowIconClass: (position === 'bottom' ? 'downwards' : 'upwards')
 	})));
-	var notificationElement = sizzle('#o-chat--notification-' + notificationId)[0];
-	var notificationButton = sizzle('.o-chat--notification-button', notificationElement)[0];
+	var notificationElement = document.querySelector('#o-chat--notification-' + notificationId);
+	var notificationButton = document.querySelector('.o-chat--notification-button', notificationElement);
 
 
 	var onClickButton = function () {

@@ -2,7 +2,6 @@
 
 var oCommentUtilities = require('o-comment-utilities');
 var oCommentUi = require('o-comment-ui');
-var sizzle = require('sizzle');
 var oDate = require('o-date');
 
 var NewCommentNotification = require('./NewCommentNotification.js');
@@ -29,13 +28,16 @@ function WidgetUi (widgetContainer, config) {
 	this.off = events.off;
 
 
+	var elements = {};
+
+
 	this.open = function () {
 		if (isOpen === false) {
 			isOpen = true;
 
-			sizzle('.o-chat--editor-closed', self.widgetContainer)[0].style.display = 'none';
-			sizzle('.o-chat--editor-input', self.widgetContainer)[0].style.display = 'block';
-			sizzle('.o-chat--editor-footer', self.widgetContainer)[0].style.display = 'block';
+			self.widgetContainer.querySelector('.o-chat--editor-closed').style.display = 'none';
+			self.widgetContainer.querySelector('.o-chat--editor-input').style.display = 'block';
+			self.widgetContainer.querySelector('.o-chat--editor-footer').style.display = 'block';
 		}
 	};
 
@@ -43,9 +45,9 @@ function WidgetUi (widgetContainer, config) {
 		if (isOpen === true) {
 			isOpen = false;
 
-			sizzle('.o-chat--editor-closed', self.widgetContainer)[0].style.display = 'block';
-			sizzle('.o-chat--editor-input', self.widgetContainer)[0].style.display = 'none';
-			sizzle('.o-chat--editor-footer', self.widgetContainer)[0].style.display = 'none';
+			self.widgetContainer.querySelector('.o-chat--editor-closed').style.display = 'block';
+			self.widgetContainer.querySelector('.o-chat--editor-input').style.display = 'none';
+			self.widgetContainer.querySelector('.o-chat--editor-footer').style.display = 'none';
 		}
 	};
 
@@ -88,7 +90,26 @@ function WidgetUi (widgetContainer, config) {
 
 		try { oDate.init(); } catch(e) {}
 
-		sizzle('.o-chat--signIn', self.widgetContainer)[0].addEventListener('click', function (evt) {
+
+		// save DOM elements
+		elements.commentContainer = self.widgetContainer.querySelector('.o-chat--comments-container');
+		elements.commentArea = self.widgetContainer.querySelector('.o-chat--comments-area');
+		elements.editorContainer = self.widgetContainer.querySelector('.o-chat--editor-container');
+		elements.signIn = self.widgetContainer.querySelector('.o-chat--signIn');
+		elements.postCommentButton = self.widgetContainer.querySelector('.o-chat--editor-submit > button');
+		elements.editorInput = self.widgetContainer.querySelector('.o-chat--editor-input');
+		elements.editorInputTextarea = elements.editorInput.querySelector('textarea');
+		elements.editorErrorContainer = self.widgetContainer.querySelector('.o-chat--editor-error');
+		elements.showMore = {
+			before: self.widgetContainer.querySelector('.o-chat--show-more-before'),
+			after: self.widgetContainer.querySelector('.o-chat--show-more-after'),
+			label: self.widgetContainer.querySelector('.o-chat--show-more .o-chat--show-more-label')
+		};
+
+
+
+
+		elements.signIn.addEventListener('click', function (evt) {
 			events.trigger('signIn');
 
 			if (evt.preventDefault) {
@@ -98,12 +119,12 @@ function WidgetUi (widgetContainer, config) {
 			}
 		});
 
-		sizzle('.o-chat--editor-submit > button')[0].addEventListener('click', function () {
+		elements.postCommentButton.addEventListener('click', function () {
 			events.trigger('postComment');
 		});
 
-		sizzle('.o-chat--editor-input')[0].addEventListener('click', function (event) {
-			sizzle('.o-chat--editor-input textarea')[0].focus();
+		elements.editorInput.addEventListener('click', function (event) {
+			elements.editorInputTextarea.focus();
 			self.clearEditorError();
 
 			if (event.preventDefault) {
@@ -115,20 +136,18 @@ function WidgetUi (widgetContainer, config) {
 
 		if (isPagination) {
 			if (config.orderType === 'inverted') {
-				sizzle('.o-chat--show-more-before', self.widgetContainer)[0].style.display = 'block';
+				elements.showMore.before.style.display = 'block';
 			} else {
-				sizzle('.o-chat--show-more-after', self.widgetContainer)[0].style.display = 'block';
+				elements.showMore.after.style.display = 'block';
 			}
 
-			sizzle('.o-chat--show-more .o-chat--show-more-label', self.widgetContainer)[0].addEventListener('click', function () {
+			elements.showMore.label.addEventListener('click', function () {
 				events.trigger('nextPage');
 			});
 		}
 
-		var commentContainer = sizzle('.o-chat--comments-container', self.widgetContainer)[0];
-
 		if (adminMode) {
-			commentContainer.addEventListener('click', function (event) {
+			elements.commentContainer.addEventListener('click', function (event) {
 				if (event.target.className === 'o-chat--delete') {
 					try {
 						var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
@@ -156,9 +175,7 @@ function WidgetUi (widgetContainer, config) {
 				}
 			}
 
-			var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
-			var editorContainer = sizzle('.o-chat--editor-container', self.widgetContainer)[0];
-			var editorComputedStyle = oCommentUi.utils.getComputedStyle(editorContainer);
+			var editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorContainer);
 
 			var editorContainerMarginTopValue;
 			var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
@@ -176,9 +193,9 @@ function WidgetUi (widgetContainer, config) {
 				editorContainerMarginBottomValue = 0;
 			}
 
-			var editorHeight = editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
-			commentArea.style.overflow = "auto";
-			commentArea.style.height = (height - editorHeight) + "px";
+			var editorHeight = elements.editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
+			elements.commentArea.style.overflow = "auto";
+			elements.commentArea.style.height = (height - editorHeight) + "px";
 
 			if (!adaptedToHeight) {
 				adaptedToHeight = true;
@@ -192,7 +209,7 @@ function WidgetUi (widgetContainer, config) {
 
 		// poll for the existence of container
 		var pollForContainer = setInterval(function () {
-			if (sizzle('.o-chat--editor-container', self.widgetContainer).length > 0) {
+			if (self.widgetContainer.querySelector('.o-chat--editor-container')) {
 				clearInterval(pollForContainer);
 				adapt();
 			}
@@ -203,14 +220,13 @@ function WidgetUi (widgetContainer, config) {
 	// Specific functions for the widget that was shrinked to a fixed height
 
 		function initScrollPagination () {
-			var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
-			scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(commentArea, function (scrollPos) {
+			scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(elements.commentArea, function (scrollPos) {
 				if (config.orderType === 'inverted') {
-					if (scrollPos < 0.2 * commentArea.scrollHeight) {
+					if (scrollPos < 0.2 * elements.commentArea.scrollHeight) {
 						events.trigger('nextPage');
 					}
 				} else {
-					if (scrollPos + commentArea.clientHeight > 0.8 * commentArea.scrollHeight) {
+					if (scrollPos + elements.commentArea.clientHeight > 0.8 * elements.commentArea.scrollHeight) {
 						events.trigger('nextPage');
 					}
 				}
@@ -218,18 +234,15 @@ function WidgetUi (widgetContainer, config) {
 		}
 
 		function initNotification () {
-			var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
-			newCommentNotification = new NewCommentNotification(self, commentArea, (config.orderType === "inverted" ? 'bottom' : 'top'));
+			newCommentNotification = new NewCommentNotification(self, elements.commentArea, (config.orderType === "inverted" ? 'bottom' : 'top'));
 		}
 
 
 		function scrollToLastComment () {
-			var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
-
 			if (config.orderType === "inverted") {
-				commentArea.scrollTop = commentArea.scrollHeight - commentArea.clientHeight + 1;
+				elements.commentArea.scrollTop = elements.commentArea.scrollHeight - elements.commentArea.clientHeight + 1;
 			} else {
-				commentArea.scrollTop = 0;
+				elements.commentArea.scrollTop = 0;
 			}
 		}
 
@@ -240,15 +253,15 @@ function WidgetUi (widgetContainer, config) {
 		}
 
 	this.disableButtonPagination = function () {
-		sizzle('.o-chat--show-more-before', self.widgetContainer)[0].style.display = 'none';
-		sizzle('.o-chat--show-more-after', self.widgetContainer)[0].style.display = 'none';
+		elements.showMore.before.style.display = 'none';
+		elements.showMore.after.style.display = 'none';
 	};
 
 	this.login = function (token, pseudonym, isAdmin) {
-		var authEl = sizzle('.o-chat--editor-auth', self.widgetContainer);
+		var authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
 
-		if (authEl && authEl.length) {
-			authEl[0].innerHTML = templates.loggedIn.render({
+		if (authEl) {
+			authEl.innerHTML = templates.loggedIn.render({
 				token: token,
 				pseudonym: pseudonym.substring(0, 50),
 				livefyreNetwork: envConfig.get().livefyre.network,
@@ -258,61 +271,50 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.logout = function () {
-		var authEl = sizzle('.o-chat--editor-auth', self.widgetContainer);
+		var authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
 
-		if (authEl && authEl.length) {
-			authEl[0].innerHTML = templates.signIn.render();
+		if (authEl) {
+			authEl.innerHTML = templates.signIn.render();
 		}
 	};
 
 	this.getCurrentPseudonym = function () {
-		var pseudonymArea = sizzle('.o-chat--editor-auth .o-chat--pseudonym', self.widgetContainer);
+		var pseudonymArea = self.widgetContainer.querySelector('.o-chat--editor-auth .o-chat--pseudonym');
 
-		if (pseudonymArea && pseudonymArea.length) {
-			return pseudonymArea[0].innerHTML;
+		if (pseudonymArea) {
+			return pseudonymArea.innerHTML;
 		}
 
 		return "";
 	};
 
 	this.hideSignInLink = function () {
-		var authEl = sizzle('.o-chat--editor-auth', self.widgetContainer);
+		var authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
 
-		if (authEl && authEl.length) {
-			authEl[0].innerHTML = "";
+		if (authEl) {
+			authEl.innerHTML = "";
 		}
 	};
 
 	this.makeReadOnly = function () {
-		var commentEditorInputContainer = sizzle('.o-chat--editor-input', self.widgetContainer);
-
-		if (commentEditorInputContainer && commentEditorInputContainer.length) {
-			commentEditorInputContainer = commentEditorInputContainer[0];
-
-			commentEditorInputContainer.className += " disabled";
-			sizzle('textarea', commentEditorInputContainer)[0].setAttribute('disabled', 'disabled');
-			sizzle('.o-chat--editor-submit button', self.widgetContainer)[0].setAttribute('disabled', 'disabled');
+		if (elements.editorInput) {
+			elements.editorInput.className += " disabled";
+			elements.editorInputTextarea.setAttribute('disabled', 'disabled');
+			elements.postCommentButton.setAttribute('disabled', 'disabled');
 		}
 	};
 
 	this.makeEditable = function () {
-		var commentEditorInputContainer = sizzle('.o-chat--editor-input', self.widgetContainer);
-
-		if (commentEditorInputContainer && commentEditorInputContainer.length) {
-			commentEditorInputContainer = commentEditorInputContainer[0];
-
-			commentEditorInputContainer.className = commentEditorInputContainer.className.replace('disabled', '');
-			sizzle('textarea', commentEditorInputContainer)[0].removeAttribute('disabled');
-			sizzle('.o-chat--editor-submit button', self.widgetContainer)[0].removeAttribute('disabled');
+		if (elements.editorInput) {
+			elements.editorInput.className = elements.editorInput.className.replace(' disabled', '');
+			elements.editorInputTextarea.removeAttribute('disabled');
+			elements.postCommentButton.removeAttribute('disabled');
 		}
 	};
 
 	// content, pseudonym, id, timestamp
 	this.addComment = function (commentData, ownComment, adminMode) {
 		ownComment = typeof ownComment === 'boolean' ? ownComment : false;
-
-		var commentContainer = sizzle('.o-chat--comments-container', self.widgetContainer)[0];
-		var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
 
 		// normalize timestamp if one provided or use current time
 		var timestamp = commentData.timestamp ? oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
@@ -335,22 +337,22 @@ function WidgetUi (widgetContainer, config) {
 		);
 
 
-		var comments = sizzle('.o-chat--wrapper', commentContainer);
+		var comments = elements.commentContainer.querySelectorAll('.o-chat--wrapper');
 		var i;
 		var inserted = false;
 
 		if (config.orderType === "inverted") {
 			oCommentUtilities.logger.debug("new comment");
-			scrolledToLast = (commentArea.scrollTop >= (commentArea.scrollHeight - commentArea.clientHeight - 3));
+			scrolledToLast = (elements.commentArea.scrollTop >= (elements.commentArea.scrollHeight - elements.commentArea.clientHeight - 3));
 
 			oCommentUtilities.logger.debug("scrolledToLast", scrolledToLast);
 
 			for (i = comments.length-1; i >= 0; i--) {
 				if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
 					if (i === comments.length-1) {
-						commentContainer.appendChild(commentDom);
+						elements.commentContainer.appendChild(commentDom);
 					} else {
-						commentContainer.insertBefore(commentDom, comments[i+1]);
+						elements.commentContainer.insertBefore(commentDom, comments[i+1]);
 					}
 					inserted = true;
 					break;
@@ -358,25 +360,25 @@ function WidgetUi (widgetContainer, config) {
 			}
 
 			if (!inserted) {
-				commentContainer.insertBefore(commentDom, commentContainer.firstChild);
+				elements.commentContainer.insertBefore(commentDom, elements.commentContainer.firstChild);
 			}
 
 			if (ownComment || scrolledToLast) {
 				scrollToLastComment();
 			}
 		} else {
-			scrolledToLast = (commentArea.scrollTop <= 3);
+			scrolledToLast = (elements.commentArea.scrollTop <= 3);
 
 			for (i = 0; i < comments.length; i++) {
 				if (parseInt(comments[i].getAttribute('data-timestamp'), 10) < timestamp) {
-					commentContainer.insertBefore(commentDom, comments[i]);
+					elements.commentContainer.insertBefore(commentDom, comments[i]);
 					inserted = true;
 					break;
 				}
 			}
 
 			if (!inserted) {
-				commentContainer.appendChild(commentDom);
+				elements.commentContainer.appendChild(commentDom);
 			}
 
 			if (ownComment || scrolledToLast) {
@@ -385,7 +387,7 @@ function WidgetUi (widgetContainer, config) {
 		}
 
 		if (this.isRelativeTime(timestamp)) {
-			commentDom = sizzle('#commentid-' + commentData.id, self.widgetContainer)[0];
+			commentDom = self.widgetContainer.querySelector('#commentid-' + commentData.id);
 
 			var timeoutToStart = 10000;
 			if (new Date().getTime() - timestamp < 0) {
@@ -401,9 +403,6 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.addNextPageComments = function (comments, adminMode) {
-		var commentContainer = sizzle('.o-chat--comments-container', self.widgetContainer)[0];
-		var commentArea = sizzle('.o-chat--comments-area', self.widgetContainer)[0];
-
 		var commentData;
 		var commentDom;
 
@@ -425,75 +424,70 @@ function WidgetUi (widgetContainer, config) {
 				})
 			);
 
-			var previousScrollHeight = commentArea.scrollHeight;
+			var previousScrollHeight = elements.commentArea.scrollHeight;
 			if (config.orderType === "inverted") {
-				commentContainer.insertBefore(commentDom, commentContainer.firstChild);
+				elements.commentContainer.insertBefore(commentDom, elements.commentContainer.firstChild);
 
-				commentArea.scrollTop += commentArea.scrollHeight - previousScrollHeight;
+				elements.commentArea.scrollTop += elements.commentArea.scrollHeight - previousScrollHeight;
 			} else {
-				commentContainer.appendChild(commentDom);
+				elements.commentContainer.appendChild(commentDom);
 			}
 		}
 	};
 
 	this.removeComment = function (id) {
-		var comment = sizzle('#commentid-'+id, self.widgetContainer);
-		if (comment && comment.length) {
-			comment[0].parentNode.removeChild(comment[0]);
+		var comment = self.widgetContainer.querySelector('#commentid-'+id);
+		if (comment) {
+			comment.parentNode.removeChild(comment);
 		}
 	};
 
 	this.updateComment = function (id, newContent) {
-		var commentContentEl = sizzle('#commentid-' + id + ' .o-chat--content', self.widgetContainer);
-		if (commentContentEl && commentContentEl.length) {
-			commentContentEl[0].innerHTML = newContent;
+		var commentContentEl = self.widgetContainer.querySelector('#commentid-' + id + ' .o-chat--content');
+		if (commentContentEl) {
+			commentContentEl.innerHTML = newContent;
 		}
 	};
 
 	this.markCommentAsDeleteInProgress = function (id) {
-		var comment = sizzle('#commentid-'+id, self.widgetContainer);
-		if (comment && comment.length) {
-			comment[0].className += " o-chat--delete-progress";
+		var comment = self.widgetContainer.querySelector('#commentid-'+id);
+		if (comment) {
+			comment.className += " o-chat--delete-progress";
 		}
 	};
 
 	this.markCommentAsDeleteInProgressEnded = function (id) {
-		var comment = sizzle('#commentid-'+id, self.widgetContainer);
-		if (comment && comment.length) {
-			comment[0].className = comment[0].className.replace("o-chat--delete-progress", "");
+		var comment = self.widgetContainer.querySelector('#commentid-'+id);
+		if (comment) {
+			comment.className = comment.className.replace("o-chat--delete-progress", "");
 		}
 	};
 
 	this.getCurrentComment = function () {
-		var commentArea = sizzle('.o-chat--editor-input textarea', self.widgetContainer);
-
-		if (commentArea && commentArea.length) {
-			return utils.strings.trim(commentArea[0].value).replace(/(?:\r\n|\r|\n)/g, '<br />');
+		if (elements.editorInputTextarea) {
+			return utils.strings.trim(elements.editorInputTextarea.value).replace(/(?:\r\n|\r|\n)/g, '<br />');
 		}
 
 		return "";
 	};
 
 	this.emptyCommentArea = function () {
-		var commentArea = sizzle('.o-chat--editor-input textarea', self.widgetContainer);
-
-		if (commentArea && commentArea.length) {
-			commentArea[0].value = "";
+		if (elements.editorInputTextarea) {
+			elements.editorInputTextarea.value = "";
 		}
 	};
 
 	this.repopulateCommentArea = function (text) {
-		var commentArea = sizzle('.o-chat--editor-input textarea', self.widgetContainer);
-
-		if (commentArea && commentArea.length && text && text.length) {
-			commentArea[0].value = text.replace(/<br \/>/g, '\n');
+		if (elements.editorInputTextarea && text && text.length) {
+			elements.editorInputTextarea.value = text.replace(/<br \/>/g, '\n');
 		}
 	};
 
 	this.addSettingsLink = function (options) {
-		var loginBarContainer = sizzle('.o-chat--editor-auth', self.widgetContainer);
-		if (loginBarContainer && loginBarContainer.length) {
-			loginBarContainer[0].appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.commentingSettingsLink.render({
+		var loginBarContainer = self.widgetContainer.querySelector('.o-chat--editor-auth');
+
+		if (loginBarContainer) {
+			loginBarContainer.appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.commentingSettingsLink.render({
 				label: "Edit pseudonym",
 				withoutSeparator: true
 			})));
@@ -501,9 +495,9 @@ function WidgetUi (widgetContainer, config) {
 			return;
 		}
 
-		var settingsLink = sizzle('.o-comment-ui--settings-text', loginBarContainer[0]);
-		if (settingsLink && settingsLink.length) {
-			settingsLink[0].addEventListener('click', function () {
+		var settingsLink = loginBarContainer.querySelector('.o-comment-ui--settings-text');
+		if (settingsLink) {
+			settingsLink.addEventListener('click', function () {
 				if (options && typeof options.onClick === 'function') {
 					options.onClick();
 				}
@@ -524,24 +518,20 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.removeSettingsLink = function () {
-		var settingsLink = sizzle('.o-comment-ui--settings', self.widgetContainer);
-		if (settingsLink && settingsLink.length) {
-			settingsLink[0].parentNode.removeChild(settingsLink[0]);
+		var settingsLink = self.widgetContainer.querySelector('.o-comment-ui--settings');
+		if (settingsLink) {
+			settingsLink.parentNode.removeChild(settingsLink);
 		}
 	};
 
 	this.setEditorError = function (err) {
-		var editorErrorContainer = sizzle('.o-chat--editor-error', self.widgetContainer)[0];
-
-		editorErrorContainer.innerHTML = err;
-		editorErrorContainer.style.display = 'block';
+		elements.editorErrorContainer.innerHTML = err;
+		elements.editorErrorContainer.style.display = 'block';
 	};
 
 	this.clearEditorError = function () {
-		var editorErrorContainer = sizzle('.o-chat--editor-error', self.widgetContainer)[0];
-
-		editorErrorContainer.style.display = 'none';
-		editorErrorContainer.innerHTML = '';
+		elements.editorErrorContainer.style.display = 'none';
+		elements.editorErrorContainer.innerHTML = '';
 	};
 
 	this.formatTimestamp = function (timestampOrDate) {
@@ -589,6 +579,8 @@ function WidgetUi (widgetContainer, config) {
 		adaptedToHeight = null;
 		isPagination = null;
 		isOpen = null;
+
+		elements = null;
 
 		__superDestroy();
 		__superDestroy = null;

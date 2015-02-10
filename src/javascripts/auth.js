@@ -19,6 +19,8 @@ function Auth () {
 	 */
 	this.pseudonymMissing = false;
 
+	var loggedIn = false;
+
 	/**
 	 * Tries to obtain the user's login data. Calls a callback with the resulted status,
 	 * and also fires an event if the user can be logged in.
@@ -38,6 +40,7 @@ function Auth () {
 			if (authData) {
 				if (authData.token) {
 					callback(true, authData);
+					loggedIn = true;
 					globalEvents.trigger('auth.login', authData);
 				} else if (authData.pseudonym === false) {
 					// the user doesn't have pseudonym
@@ -59,6 +62,7 @@ function Auth () {
 	this.logout = function () {
 		oCommentApi.cache.clearAuth();
 		globalEvents.trigger('auth.logout');
+		loggedIn = false;
 	};
 
 	/**
@@ -165,7 +169,9 @@ function Auth () {
 					});
 				}
 			} else {
-				self.login();
+				if (!loggedIn) {
+					self.login();
+				}
 
 				callback(null, authData);
 			}
