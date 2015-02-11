@@ -189,7 +189,7 @@ Include this where you want the widget to load:
 In order to build the DOM element, follow the steps:
 
 1. Add class o-chat to the container element
-2. Add attribute `data-o-chat-autoconstruct="true"`
+2. Add attribute `data-o-chat-autoconstruct="true"` if you want the widget to be automatically instantiated on document ready, otherwise don't add it.
 3. Specify a unique ID
 4. Add configuration options that you want to pass to the widget in the following form: data-o-chat-{configName}="{configValue}". Replace `{configName}` and `{configValue}` with the name of the configuration and value you want to pass.
 
@@ -206,7 +206,11 @@ document.body.addEventListener('oChat.domConstruct', function (evt) {
 
 where evt.detail.id is the ID of the DOM element (in this example `commentWidget`).
 
-**The widgets are automatically constructed on DOM ready.**
+In order to instantiate widgets that weren't picked up on document ready (without autoconstruct attribute), call the following function:
+
+```javascript
+oChat.initDomConstruct();
+```
 
 ---
 

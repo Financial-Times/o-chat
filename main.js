@@ -112,7 +112,13 @@ module.exports = {
 };
 
 document.addEventListener('o.DOMContentLoaded', function () {
-	module.exports.initDomConstruct();
+	oCommentUtilities.initDomConstruct({
+		Widget: Widget,
+		baseClass: 'o-chat',
+		namespace: 'oChat',
+		module: self,
+		auto: true
+	});
 });
 
 module.exports.on = globalEvents.on;

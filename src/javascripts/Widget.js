@@ -52,7 +52,11 @@ var Widget = function () {
 	this.config.order = this.config.order || "normal";
 
 	// add appropriate classes to the widget container
-	this.getWidgetEl().className += ' o-chat o-chat--order-' + this.config.order;
+	if (this.getWidgetEl().className.indexOf('o-chat') === -1) {
+		this.getWidgetEl().className += ' o-chat';
+	}
+	this.getWidgetEl().className += ' o-chat--order-' + this.config.order;
+	this.getWidgetEl().setAttribute('data-o-chat-built', 'true');
 
 	/**
 	 * Collection ID.
