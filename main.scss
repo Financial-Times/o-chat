@@ -6,7 +6,12 @@ $o-assets-global-path: '//build.origami.ft.com/files/';
 $o-ft-icons-is-silent: false;
 @import "o-ft-icons/main";
 
-@import './src/stylesheets/generic';
-@import './src/stylesheets/comments';
-@import './src/stylesheets/editor';
+.o-chat {
+	font-size: 12px;
+
+	@import './src/stylesheets/generic';
+	@import './src/stylesheets/comments';
+	@import './src/stylesheets/editor';
+}
+
 @import './src/stylesheets/notification';
