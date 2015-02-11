@@ -113,14 +113,17 @@ function Auth () {
 	}
 
 
-	this.loginRequiredDefaultBehavior = function (evt) {
+	this.loginRequiredDefaultBehavior = function () {
 		window.location.href = 'https://registration.ft.com/registration/barrier/login?location='+ encodeURIComponent(document.location.href);
 	};
 
+	var loginRequiredDefaultBehaviorWrapper = function (evt) {
+		self.loginRequiredDefaultBehavior(evt.detail.callback);
+	};
 	this.setLoginRequiredDefaultBehavior = function () {
 		// add event handler as lowest priority
-		globalEvents.off('auth.loginRequired', self.loginRequiredDefaultBehavior);
-		globalEvents.on('auth.loginRequired', self.loginRequiredDefaultBehavior);
+		globalEvents.off('auth.loginRequired', loginRequiredDefaultBehaviorWrapper);
+		globalEvents.on('auth.loginRequired', loginRequiredDefaultBehaviorWrapper);
 	};
 
 	/**
