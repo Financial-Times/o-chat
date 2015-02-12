@@ -625,14 +625,14 @@ var Widget = function () {
 			force = true;
 		}
 
-		auth.loginRequired({
-			success: function () {
+		auth.loginRequired(function (err, authData) {
+			if (err) {
 				self.messageQueue.clear();
-				postComment(commentBody, secondStepOfTryingToPost);
-			},
-			failure: function () {
-				self.messageQueue.clear();
+				return;
 			}
+
+			self.messageQueue.clear();
+			postComment(commentBody, secondStepOfTryingToPost);
 		}, force);
 	}
 
