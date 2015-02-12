@@ -41,6 +41,8 @@ var globalEvents = require('./globalEvents.js');
  *      + absoluteFormat: specifies the format with which the absolute timestamp is rendered.
  *      For more information about the possible values please visit:
  *      https://github.com/Financial-Times/o-date#o-dateformatdate-tpl
+ *  - section: Override the default mapping based on URL or CAPI with an explicit mapping. Section parameter should be a valid FT metadata term (Primary section)
+ *  - tags: Tags which will be added to the collection in Livefyre
  *
  * @param {object} config Configuration object. See in the description the fields that are mandatory.
  */
@@ -175,12 +177,9 @@ var Widget = function () {
 	 * @param  {Function} callback function(err, data), where data contains collectionId and comments. See o-comment-api.api.getComments
 	 */
 	this.init = function (callback) {
-		oCommentApi.api.getComments({
-			articleId: self.config.articleId,
-			url: self.config.url,
-			title: self.config.title,
-			stream: true
-		}, function (err, data) {
+		self.config.stream = true;
+
+		oCommentApi.api.getComments(self.config, function (err, data) {
 			if (err) {
 				callback(err);
 				return;
