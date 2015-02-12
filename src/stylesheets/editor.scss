@@ -24,10 +24,10 @@
 		li {
 			border-bottom: 1px solid  oColorsGetPaletteColor(pink-tint4);
 			white-space: nowrap;
+		}
 
-			&:last-child {
-				border: 0;
-			}
+		li:last-child {
+			border: 0;
 		}
 	}
 
