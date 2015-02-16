@@ -17,6 +17,16 @@ gulp.task('build', function () {
 	});
 });
 
+gulp.task('demo', function () {
+	obt.demo(gulp);
+});
+
+gulp.task('demo-local', function () {
+	obt.demo(gulp, {
+		local: true
+	});
+});
+
 gulp.task('default', ['verify', 'build']);
 
 gulp.task('watch', function() {
