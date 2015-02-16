@@ -51,7 +51,9 @@ var Widget = function () {
 
 	var self = this;
 
-	this.config.order = this.config.order || "normal";
+	this.config.order = this.config.order || "inverted";
+	this.config.layout = this.config.layout || 'side';
+
 
 	// add appropriate classes to the widget container
 	if (this.getWidgetEl().className.indexOf('o-chat') === -1) {
@@ -77,15 +79,22 @@ var Widget = function () {
 		minutesUntilAbsoluteTime: 20160,
 		absoluteFormat: 'date'
 	};
+	this.config.datetimeFormat = defaultDatetimeFormat;
 
 	if (!this.config.datetimeFormat) {
-		if (this.config.datetimeformat) {
+		if (!this.config.datetimeformat) {
+			if (this.config.minutesuntilabsolutetime) {
+				this.config.datetimeFormat.minutesUntilAbsoluteTime = this.config.minutesuntilabsolutetime;
+			}
+
+			if (this.config.absoluteformat) {
+				this.config.datetimeFormat.absoluteFormat = this.config.absoluteformat;
+			}
+		} else {
 			this.config.datetimeFormat = this.config.datetimeformat;
 		}
-	}
-
-	// merge user date preferences with the default preferences
-	if (this.config.datetimeFormat) {
+	} else {
+		// merge user date preferences with the default preferences
 		if (typeof this.config.datetimeFormat === 'string') {
 			defaultDatetimeFormat.absoluteFormat = this.config.datetimeFormat;
 		} else if (typeof this.config.datetimeFormat === 'object') {
@@ -97,8 +106,9 @@ var Widget = function () {
 				defaultDatetimeFormat.absoluteFormat = this.config.datetimeFormat.absoluteFormat;
 			}
 		}
+
+		this.config.datetimeFormat = defaultDatetimeFormat;
 	}
-	this.config.datetimeFormat = defaultDatetimeFormat;
 
 	var nextPageNumber;
 	var isMorePageAvailable = false;
