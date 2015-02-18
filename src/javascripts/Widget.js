@@ -187,9 +187,22 @@ var Widget = function () {
 	 * @param  {Function} callback function(err, data), where data contains collectionId and comments. See o-comment-api.api.getComments
 	 */
 	this.init = function (callback) {
+		var config = {
+			title: self.config.title,
+			url: self.config.url,
+			articleId: self.config.articleId,
+			stream: true
+		};
+		if (typeof self.config.section !== 'undefined') {
+			config.section = self.config.section;
+		}
+		if (typeof self.config.tags !== 'undefined') {
+			config.tags = self.config.tags;
+		}
+
 		self.config.stream = true;
 
-		oCommentApi.api.getComments(self.config, function (err, data) {
+		oCommentApi.api.getComments(config, function (err, data) {
 			if (err) {
 				callback(err);
 				return;
@@ -503,12 +516,21 @@ var Widget = function () {
 			oCommentUtilities.logger.log('fetch next page');
 
 			nextPageFetchInProgress = true;
-			oCommentApi.api.getComments({
-				articleId: self.config.articleId,
-				url: self.config.url,
+
+			var config = {
 				title: self.config.title,
+				url: self.config.url,
+				articleId: self.config.articleId,
 				page: nextPageNumber
-			}, function (err, data) {
+			};
+			if (typeof self.config.section !== 'undefined') {
+				config.section = self.config.section;
+			}
+			if (typeof self.config.tags !== 'undefined') {
+				config.tags = self.config.tags;
+			}
+
+			oCommentApi.api.getComments(config, function (err, data) {
 				if (err) {
 					isMorePageAvailable = false;
 					self.ui.disableButtonPagination();
