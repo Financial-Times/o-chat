@@ -1,12 +1,12 @@
 {
   "name": "o-chat",
-  "version": "0.9.2",
+  "version": "0.10.0",
   "main": [
     "main.js",
     "main.scss"
   ],
   "dependencies": {
-    "o-comment-api": "^0.7.0",
+    "o-comment-api": "^0.8.0",
     "o-comment-ui": "^0.4.0",
     "o-comment-utilities": "^0.5.0",
     "o-ft-icons": "^2.3.2",
