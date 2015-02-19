@@ -248,7 +248,9 @@ function WidgetUi (widgetContainer, config) {
 
 		function notifyNewComment () {
 			setTimeout(function () {
-				newCommentNotification.newComment();
+				if (newCommentNotification) {
+					newCommentNotification.newComment();
+				}
 			}, 100);
 		}
 
