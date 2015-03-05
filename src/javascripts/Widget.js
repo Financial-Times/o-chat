@@ -76,9 +76,10 @@ var Widget = function () {
 	this.messageQueue = null;
 
 	var defaultDatetimeFormat = {
-		minutesUntilAbsoluteTime: 20160,
-		absoluteFormat: 'date'
+		minutesUntilAbsoluteTime: -1,
+		absoluteFormat: 'hh:mm a'
 	};
+
 	this.config.datetimeFormat = defaultDatetimeFormat;
 
 	if (!this.config.datetimeFormat) {
@@ -366,6 +367,10 @@ var Widget = function () {
 		}
 		aComment.timestamp = oCommentUtilities.dateHelper.toTimestamp(aComment.timestamp);
 		aComment.author.displayName = aComment.author.displayName.substring(0, 50);
+
+		if (!hasCommentId(aComment.commentId)) {
+			commentIds.push(aComment.commentId);
+		}
 
 		return aComment;
 	}
