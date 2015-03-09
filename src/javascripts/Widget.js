@@ -62,6 +62,10 @@ var Widget = function () {
 	this.getWidgetEl().className += ' o-chat--order-' + this.config.order;
 	this.getWidgetEl().setAttribute('data-o-chat-built', 'true');
 
+	if (this.config.layout) {
+		this.getWidgetEl().className += ' o-chat--comment-layout-' + this.config.layout;
+	}
+
 	/**
 	 * Collection ID.
 	 * @type {Number}
