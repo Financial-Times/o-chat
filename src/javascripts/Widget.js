@@ -407,7 +407,7 @@ var Widget = function () {
 	 * @param  {Object} commentData A comment object, in Livefyre format.
 	 */
 	function newCommentReceived (commentData) {
-		if (!hasCommentId(commentData.commentId)) {
+		if (!hasCommentId(commentData.commentId) && commentData.visibility === 1) {
 			commentIds.push(commentData.commentId);
 			self.ui.addComment({
 				id: commentData.commentId,
