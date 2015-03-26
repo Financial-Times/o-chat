@@ -80,4 +80,14 @@
 		float: right;
 		padding: 0 10px;
 	}
+
+	.o-chat--blocked {
+		background-color: oColorsGetPaletteColor(red);
+		border-radius: 15px;
+		color: white;
+		padding: 2px 7px;
+		float: left;
+		margin-right: 10px;
+		font-size: 11px;
+	}
 }

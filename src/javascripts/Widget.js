@@ -122,6 +122,9 @@ var Widget = function () {
 	var userIsAdmin = false;
 	var renderComplete = false;
 
+	var lastBannedCommentId;
+	var lastOwnCommentId;
+
 	var commentIds = [];
 
 	/**
@@ -416,6 +419,8 @@ var Widget = function () {
 				displayName: commentData.author.displayName
 			}, (commentData.author.displayName.substring(0, 50) === self.ui.getCurrentPseudonym()), userIsAdmin);
 		}
+
+		handleStreamEventForBannedComments(commentData);
 	}
 
 	function commentDeleted (commentId) {
@@ -625,6 +630,8 @@ var Widget = function () {
 									displayName: authData.displayName
 								}, true, userIsAdmin);
 							}
+
+							handleNewCommentForBannedComments(postCommentResult);
 						}
 					});
 				} else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
@@ -790,6 +797,26 @@ var Widget = function () {
 			}
 		});
 	});
+
+
+	function handleStreamEventForBannedComments (commentData) {
+		if (commentData && commentData.visibility === 2) {
+			lastBannedCommentId = commentData.commentId;
+			checkIfOwnCommentIsBanned();
+		}
+	}
+
+	function handleNewCommentForBannedComments (commentData) {
+		lastOwnCommentId = commentData.commentId;
+		checkIfOwnCommentIsBanned();
+	}
+
+	function checkIfOwnCommentIsBanned () {
+		if (lastBannedCommentId === lastOwnCommentId) {
+			self.ui.showOwnCommentBanned(lastBannedCommentId);
+		}
+	}
+
 
 	var __superDestroy = this.destroy;
 	this.destroy = function () {

@@ -511,6 +511,13 @@ function WidgetUi (widgetContainer, config) {
 		}
 	};
 
+	this.removeSettingsLink = function () {
+		var settingsLink = self.widgetContainer.querySelector('.o-comment-ui--settings');
+		if (settingsLink) {
+			settingsLink.parentNode.removeChild(settingsLink);
+		}
+	};
+
 	this.addNotAvailableMessage = function () {
 		self.widgetContainer.innerHTML = oCommentUi.templates.unavailableTemplate.render({
 			message: oCommentUi.i18n.texts.unavailable,
@@ -519,10 +526,15 @@ function WidgetUi (widgetContainer, config) {
 		});
 	};
 
-	this.removeSettingsLink = function () {
-		var settingsLink = self.widgetContainer.querySelector('.o-comment-ui--settings');
-		if (settingsLink) {
-			settingsLink.parentNode.removeChild(settingsLink);
+	this.showOwnCommentBanned = function (commentId) {
+		var commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
+
+		if (commentElement) {
+			var blockedElement = document.createElement('div');
+			blockedElement.innerHTML = "Blocked";
+			blockedElement.className = "o-chat--blocked";
+
+			commentElement.insertBefore(blockedElement, commentElement.firstChild);
 		}
 	};
 
