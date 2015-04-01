@@ -531,7 +531,7 @@ function WidgetUi (widgetContainer, config) {
 
 		if (commentElement) {
 			var blockedElement = document.createElement('div');
-			blockedElement.innerHTML = "Blocked";
+			blockedElement.innerHTML = "blocked";
 			blockedElement.className = "o-chat--blocked";
 
 			commentElement.insertBefore(blockedElement, commentElement.firstChild);
