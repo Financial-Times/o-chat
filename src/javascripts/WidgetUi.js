@@ -535,6 +535,8 @@ function WidgetUi (widgetContainer, config) {
 			blockedElement.className = "o-chat--blocked";
 
 			commentElement.insertBefore(blockedElement, commentElement.firstChild);
+
+			scrollToLastComment();
 		}
 	};
 
