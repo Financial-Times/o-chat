@@ -529,7 +529,7 @@ function WidgetUi (widgetContainer, config) {
 	this.showOwnCommentBanned = function (commentId) {
 		var commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
 
-		if (commentElement) {
+		if (commentElement && !commentElement.querySelector('.o-chat--blocked')) {
 			var blockedElement = document.createElement('div');
 			blockedElement.innerHTML = "blocked";
 			blockedElement.className = "o-chat--blocked";
