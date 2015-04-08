@@ -90,4 +90,14 @@
 		margin-right: 10px;
 		font-size: 11px;
 	}
+
+	.o-chat--pending {
+		background-color: oColorsGetPaletteColor(orange);
+		border-radius: 15px;
+		color: white;
+		padding: 2px 7px;
+		float: left;
+		margin-right: 10px;
+		font-size: 11px;
+	}
 }

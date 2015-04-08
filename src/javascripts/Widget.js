@@ -123,6 +123,7 @@ var Widget = function () {
 	var renderComplete = false;
 
 	var lastBannedCommentId;
+	var lastPendingCommentId;
 	var lastOwnCommentId;
 
 	var commentIds = [];
@@ -420,7 +421,7 @@ var Widget = function () {
 			}, (commentData.author.displayName.substring(0, 50) === self.ui.getCurrentPseudonym()), userIsAdmin);
 		}
 
-		handleStreamEventForBannedComments(commentData);
+		handleStreamEventForBadgingComments(commentData);
 	}
 
 	function commentDeleted (commentId) {
@@ -631,7 +632,7 @@ var Widget = function () {
 								}, true, userIsAdmin);
 							}
 
-							handleNewCommentForBannedComments(postCommentResult);
+							handleNewCommentForBadgingComments(postCommentResult);
 						}
 					});
 				} else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
@@ -799,21 +800,35 @@ var Widget = function () {
 	});
 
 
-	function handleStreamEventForBannedComments (commentData) {
-		if (commentData && commentData.visibility === 2) {
-			lastBannedCommentId = commentData.commentId;
-			checkIfOwnCommentIsBanned();
+	function handleStreamEventForBadgingComments (commentData) {
+		if (commentData) {
+			if (commentData.visibility === 2) {
+				lastBannedCommentId = commentData.commentId;
+				checkIfOwnCommentIsBanned();
+			}
+
+			if (commentData.visibility === 3) {
+				lastPendingCommentId = commentData.commentId;
+				checkIfOwnCommentIsPending();
+			}
 		}
 	}
 
-	function handleNewCommentForBannedComments (commentData) {
+	function handleNewCommentForBadgingComments (commentData) {
 		lastOwnCommentId = commentData.commentId;
 		checkIfOwnCommentIsBanned();
+		checkIfOwnCommentIsPending();
 	}
 
 	function checkIfOwnCommentIsBanned () {
 		if (lastBannedCommentId === lastOwnCommentId) {
-			self.ui.showOwnCommentBanned(lastBannedCommentId);
+			self.ui.showOwnCommentBadge(lastBannedCommentId, 'blocked');
+		}
+	}
+
+	function checkIfOwnCommentIsPending () {
+		if (lastPendingCommentId === lastOwnCommentId) {
+			self.ui.showOwnCommentBadge(lastPendingCommentId, 'pending');
 		}
 	}
 

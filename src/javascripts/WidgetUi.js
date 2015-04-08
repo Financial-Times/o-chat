@@ -526,7 +526,37 @@ function WidgetUi (widgetContainer, config) {
 		});
 	};
 
-	this.showOwnCommentBanned = function (commentId) {
+	this.showOwnCommentBadge = function (commentId, type) {
+		var commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
+
+		if (commentElement && !commentElement.querySelector('.o-chat--blocked')) {
+			var badgeElement = document.createElement('div');
+
+			if (type === 'blocked' || type === 'pending') {
+				var text;
+				var className;
+
+				if (type === 'pending') {
+					text = 'pending';
+					className = 'o-chat--pending';
+				}
+
+				if (type === 'blocked') {
+					text = 'blocked';
+					className = 'o-chat--blocked';
+				}
+
+
+				badgeElement.innerHTML = text;
+				badgeElement.className = className;
+
+				commentElement.insertBefore(badgeElement, commentElement.firstChild);
+				scrollToLastComment();
+			}
+		}
+	};
+
+	this.showOwnCommentPending = function (commentId) {
 		var commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
 
 		if (commentElement && !commentElement.querySelector('.o-chat--blocked')) {
