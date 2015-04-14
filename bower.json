@@ -1,6 +1,5 @@
 {
   "name": "o-chat",
-  "version": "1.0.7",
   "main": [
     "main.js",
     "main.scss"
@@ -19,6 +18,11 @@
   "ignore": [
     "node_modules",
     "tests",
-    "Gruntfile.js"
+    "Gruntfile.js",
+    "gulpfile.js",
+    "docs",
+    "package.json",
+    ".editorconfig",
+    ".jshintrc"
   ]
 }
