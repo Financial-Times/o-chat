@@ -335,7 +335,7 @@ oChat.init({
         "network": "ft-1.fyre.co"
     },
     "dependencies": {
-        "o-comment-data": {
+        "o-comment-api": {
             "suds": {
                 "baseUrl": "http://test.session-user-data.webservices.ft.com"
             },
