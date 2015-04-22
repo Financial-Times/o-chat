@@ -58,7 +58,7 @@ Use the following markup to enable chat:
 If you defer initialising oChat by  using `data-o-chat-autoconstruct="false"` then you can initialise the component by calling
 
 ```javascript
-oChat.initDomConstruct();
+oChat.init();
 ```
 
 ### <div id="imper"></div> Imperatively 
@@ -313,7 +313,7 @@ oChat.on('auth.loginRequired', function (evt) {
 
 ## <div id="api"></div> API 
 
-##### oChat.init(config)
+##### oChat.setConfig(config)
 This method is responsible for changing the default configuration used by oChat. Calling this method with an object will merge the default configuration with the object specified (deep merge, primitive type values of the same key will be overwritten).
 
 ##### Default configuration - PROD
@@ -330,7 +330,7 @@ This method is responsible for changing the default configuration used by oChat.
 In order to change to the TEST environment, use the following code:
 
 ```javascript
-oChat.init({
+oChat.setConfig({
     "livefyre": {
         "network": "ft-1.fyre.co"
     },

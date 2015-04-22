@@ -19,13 +19,13 @@ config.set(defaultConfig);
 var userSession = oCommentUtilities.ftUser.getSession();
 if (userSession) {
 	config.set('sessionId', userSession);
-	oCommentApi.init('sessionId', userSession);
+	oCommentApi.setConfig('sessionId', userSession);
 }
 
 /**
  * Enable data caching.
  */
-oCommentApi.init('cache', true);
+oCommentApi.setConfig('cache', true);
 
 module.exports = {
 	/**
@@ -44,12 +44,12 @@ module.exports = {
 	 * @param  {string|object} keyOrObject Key or actually an object with key-value pairs.
 	 * @param  {anything} value Optional. Should be specified only if keyOrObject is actually a key (string).
 	 */
-	init: function (keyOrObject, value) {
+	setConfig: function (keyOrObject, value) {
 		if (typeof keyOrObject === 'string') {
 			config.set(keyOrObject, value);
 		} else if (typeof keyOrObject === 'object') {
 			if (keyOrObject.hasOwnProperty('dependencies') && keyOrObject.dependencies.hasOwnProperty('o-comment-api')) {
-				oCommentApi.init(keyOrObject.dependencies['o-comment-api']);
+				oCommentApi.setConfig(keyOrObject.dependencies['o-comment-api']);
 
 				delete keyOrObject.dependencies;
 			}
@@ -77,7 +77,7 @@ module.exports = {
 	utilities: oCommentUtilities,
 	dataService: oCommentApi,
 
-	initDomConstruct: function () {
+	init: function () {
 		oCommentUtilities.initDomConstruct({
 			Widget: Widget,
 			baseClass: 'o-chat',
