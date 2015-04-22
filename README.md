@@ -40,22 +40,23 @@ SCSS:
 Use the following markup to enable chat:
 
 ```html
-<div class="o-chat" 
-    id="{oChatInstance}" 
-    data-o-chat-autoconstruct="true|false" 
+<div data-o-component="o-chat"
+    id="{idOfTheElement}" 
+    data-o-chat-auto-init="true|false" 
     data-o-chat-config-title="{article-title}" 
     data-o-chat-config-url="{page-url}" 
     data-o-chat-config-articleId="{article-id}">
 </div>
 ```
 
-1. `{article-title}` the title of your article/post/thing
-2. `data-o-chat-autoconstruct="true"` automatically construct the component when `o.DOMContentLoaded` fires. A `false` value (or omitting this attribute) allows you to defer component initialisation
-3. `data-o-chat-config-articleId` a unique id for your content, ideally a UUID for FT content
-4. `{page-url}` The canonical URL for your article/page/thing
-5. `id` preferable to be set, but if missing it will be generated
+1. `data-o-chat-config-title` the title of your article/post/thing
+2. `data-o-chat-config-articleId` a unique id for your content, ideally a UUID for FT content
+3. `data-o-chat-config-url` The canonical URL for your article/page/thing
+4. `data-o-chat-config-{key}` for any other configuration
+5. `data-o-chat-auto-init="false"` a module which has this attribute with a `false` value will not be initialized on the `o.DOMContentLoaded` event. This allows you to defer component initialisation.
+6. `id` preferable to be set, but if missing it will be generated
 
-If you defer initialising oChat by  using `data-o-chat-autoconstruct="false"` then you can initialise the component by calling
+If you defer initialising oChat by using `data-o-chat-auto-init="false"` then you can initialise the component by calling
 
 ```javascript
 oChat.init();
@@ -65,8 +66,7 @@ oChat.init();
 Create an instance of the component with the parameters that are available:
 
 ```javascript
-var oChatComponent = new oChat.Widget({
-    elId: 'container-id',
+var oChatComponent = new oChat.Widget(el, {
     title: document.title,
     url: document.location.href,
     articleId: 'article-id',
@@ -82,7 +82,7 @@ var oChatComponent = new oChat.Widget({
 Load the component:
 
 ```javascript
-oChat.load();
+oChatComponent.init();
 ```
 
 

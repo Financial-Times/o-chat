@@ -195,7 +195,7 @@ var Widget = function () {
 	 *
 	 * @param  {Function} callback function(err, data), where data contains collectionId and comments. See o-comment-api.api.getComments
 	 */
-	this.init = function (callback) {
+	this.loadInitData = function (callback) {
 		var config = {
 			title: self.config.title,
 			url: self.config.url,
