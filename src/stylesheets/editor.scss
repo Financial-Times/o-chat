@@ -43,8 +43,6 @@
 }
 
 .o-chat--editor-container {
-	font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
-
 	.o-chat--editor-closed {
 		display: none;
 
@@ -86,7 +84,7 @@
 		margin-top: 5px;
 		outline: 0;
 		color: oColorsGetPaletteColor(grey-tint5);
-		font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+		font-family: $o-chat-font-family;
 		font-size: 12px;
 
 		&[disabled] {
@@ -118,7 +116,7 @@
 			@include o-comment-ui--button();
 			border-radius: 0;
 			font-size: 12px;
-			font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
+			font-family: $o-chat-font-family;
 			text-shadow: none;
 			min-height: 28px;
 			line-height: 28px;

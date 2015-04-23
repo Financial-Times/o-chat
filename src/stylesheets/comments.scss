@@ -2,10 +2,6 @@
 	position: relative;
 }
 
-.o-chat--comments-area {
-	font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
-}
-
 .o-chat--show-more {
 	display: none;
 
@@ -38,7 +34,6 @@
 
 .o-chat--wrapper {
 	color: oColorsGetPaletteColor(grey-tint5);
-	font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
 	border-bottom: 1px solid oColorsGetPaletteColor(pink-tint2);
 	padding: 10px 0;
 	list-style-type: none;
