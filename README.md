@@ -79,7 +79,7 @@ var oChatComponent = new oChat.Widget(el, {
 });
 ```
 
-Load the component:
+*The widget is automatically initialized, unless you specify in the configuration `autoInit: false`. In this case you can initialize this particular object at a later time by calling the following:*
 
 ```javascript
 oChatComponent.init();
@@ -118,6 +118,7 @@ Mandatory:
  - datetimeFormat: How to format the timestamps. This is an object and has two fields:
     + minutesUntilAbsoluteTime: specifies after how many minutes to switch from relative time to absolute. If -1 is specified, the timestamps will be in the absolute format immediately. By default it is set to -1.
     + absoluteFormat: specifies the format with which the absolute timestamp is rendered. The default value `hh:mm a`. For more information about the possible values please visit: https://github.com/Financial-Times/o-date#o-dateformatdate-tpl
+ - autoInit: if this is set to false, the object will be created, but it will not be initialized automatically (the DOM will not be populated, call to backend services will not be made). In this case you should call the `init` method on the instance when you want to initialize it.
 
 
 ## <div id="login"></div> Login integration 
