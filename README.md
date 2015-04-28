@@ -5,7 +5,7 @@ A simple chat client integrated with FT's membership systems. If you simply wish
 ## Contents
 
  * <a href="#prereq">Prerequisites</a>
- * <a href="#product">Adding comments to your product</a>
+ * <a href="#product">Adding chat to your product</a>
      * <a href="#decl">Declaratively</a>
      * <a href="#imper">Imperatvely</a>
  * <a href="#login">Login integration</a>
