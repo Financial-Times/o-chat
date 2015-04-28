@@ -4,17 +4,19 @@ A simple chat client integrated with FT's membership systems. If you simply wish
 
 ## Contents
 
-* <a href="#prereq">Prerequisites</a>
-* <a href="#product">Adding comments to your product</a>
- * <a href="#decl">Declaratively</a>
- * <a href="#imper">Imperatvely</a>
-* <a href="#login">Login integration</a>
-* <a href="#events">Events</a>
-* <a href="#api">API</a>
-    * <a href="#logging">Logging</a>
-* <a href="#messages">Browser support</a>
-* <a href="#core">Core/enhanced experience</a>
-* <a href="#moderation">Moderation</a>
+ * <a href="#prereq">Prerequisites</a>
+ * <a href="#product">Adding comments to your product</a>
+     * <a href="#decl">Declaratively</a>
+     * <a href="#imper">Imperatvely</a>
+ * <a href="#login">Login integration</a>
+ * <a href="#events">Events</a>
+ * <a href="#jsapi">API</a>
+     * <a href="#logging">Logging</a>
+ * <a href="#sassapi"> Sass API
+     * <a href="#fontfamily">Font family</a>
+ * <a href="#browser">Browser support</a>
+ * <a href="#core">Core/enhanced experience</a>
+ * <a href="#moderation">Moderation</a>
 
 ## <div id="prereq"></div> Prerequisites
 * Your content must either be available in the Content API or available on a blogs URL in order for commenting to work. (See Moderation for why) 
@@ -312,50 +314,8 @@ oChat.on('auth.loginRequired', function (evt) {
 });
 ```
 
-## <div id="api"></div> API 
-
-##### oChat.setConfig(config)
-This method is responsible for changing the default configuration used by oChat. Calling this method with an object will merge the default configuration with the object specified (deep merge, primitive type values of the same key will be overwritten).
-
-##### Default configuration - PROD
-
-```javascript
-{
-    "livefyre": {
-        "network": "ft.fyre.co"
-    }
-}
-```
-
-##### Using the TEST environment
-In order to change to the TEST environment, use the following code:
-
-```javascript
-oChat.setConfig({
-    "livefyre": {
-        "network": "ft-1.fyre.co"
-    },
-    "dependencies": {
-        "o-comment-api": {
-            "suds": {
-                "baseUrl": "http://test.session-user-data.webservices.ft.com"
-            },
-            "ccs": {
-                "baseUrl": "http://test.comment-creation.webservices.ft.com"
-            },
-            "cacheConfig": {
-                "authBaseName": "comments-test-auth-",
-                "initBaseName": "comments-test-init-"
-            },
-            "livefyre": {
-                "networkName": "ft-1"
-            }
-        }
-    }
-});
-```
-
-### Logging
+## <div id="jsapi"></div> JavaScript API
+### <div id="logging"></div> Logging
 Logging can be enabled for debugging purposes. It logs using the global 'console' if available (if not, nothing happens and it degrades gracefully).
 By default logging is disabled.
 
@@ -368,6 +328,17 @@ This method disables logging of the module.
 ##### oChat.setLoggingLevel(level)
 This method sets the logging level. This could be a number from 0 to 4 (where 0 is debug, 4 is error), or a string from the available methods of 'console' (debug, log, info, warn, error).
 Default is 3 (warn).
+
+## <div id="sassapi"> Sass API
+### <div id="fontfamily"></div> Font-family
+There is a default font-family set for o-chat: `BentonSans, sans-serif`
+*Please note that the font itself is not loaded by this module, this should be done by the product.*
+
+In order to override the default font, set a value for the following variable:
+
+```scss
+$o-chat-font-family: 'Your font-family here';
+```
 
 ## <div id="browser"></div> Browser support 
 Works in accordance with our [support policy](https://docs.google.com/a/ft.com/document/d/1dX92MPm9ZNY2jqFidWf_E6V4S6pLkydjcPmk5F989YI/edit)
