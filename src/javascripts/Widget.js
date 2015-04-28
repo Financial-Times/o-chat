@@ -51,6 +51,11 @@ var Widget = function () {
 
 	var self = this;
 
+	if (!this.config) {
+		return;
+	}
+
+
 	this.config.order = this.config.order || "inverted";
 	this.config.layout = this.config.layout || 'side';
 

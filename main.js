@@ -44,18 +44,8 @@ module.exports = {
 	 * @param  {string|object} keyOrObject Key or actually an object with key-value pairs.
 	 * @param  {anything} value Optional. Should be specified only if keyOrObject is actually a key (string).
 	 */
-	setConfig: function (keyOrObject, value) {
-		if (typeof keyOrObject === 'string') {
-			config.set(keyOrObject, value);
-		} else if (typeof keyOrObject === 'object') {
-			if (keyOrObject.hasOwnProperty('dependencies') && keyOrObject.dependencies.hasOwnProperty('o-comment-api')) {
-				oCommentApi.setConfig(keyOrObject.dependencies['o-comment-api']);
-
-				delete keyOrObject.dependencies;
-			}
-
-			config.set(keyOrObject, value);
-		}
+	setConfig: function () {
+		config.set.apply(this, arguments);
 	},
 
 	/**
@@ -118,10 +108,10 @@ document.addEventListener('o.DOMContentLoaded', function () {
 		if (configInDomEl) {
 			var configInDom = JSON.parse(configInDomEl.innerHTML);
 
-			config.set(configInDom);
+			module.exports.setConfig(configInDom);
 		}
 	} catch (e) {
-		// do nothing
+		oCommentUtilities.logger.log('Invalid config in the DOM.', e);
 	}
 
 	oCommentUtilities.initDomConstruct({
