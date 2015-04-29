@@ -23,21 +23,6 @@ A simple chat client integrated with FT's membership systems. If you simply wish
 * You must be on an FT.com domain or sub-domain for authentication to work
 
 ## <div id="product"></div> Adding chat to your product 
-
-
-Javascript:
-
-```javascript
-var oChat = require('o-chat');
-```
-
-SCSS:
-
-```css
-@import 'o-chat/main';
-```
-
-
 ### <div id="decl"></div> Declaratively 
 Use the following markup to enable chat:
 
