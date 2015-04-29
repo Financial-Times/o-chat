@@ -33,6 +33,8 @@ Use the following markup to enable chat:
     data-o-chat-config-title="{article-title}" 
     data-o-chat-config-url="{page-url}" 
     data-o-chat-config-articleId="{article-id}">
+    
+        <div class="o--if-no-js">To participate in this chat, you need to upgrade to a newer web browser. <a href="http://help.ft.com/tools-services/browser-compatibility/">Learn more.</a></div>
 </div>
 ```
 
