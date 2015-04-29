@@ -33,7 +33,7 @@ Use the following markup to enable chat:
     data-o-chat-config-title="{article-title}" 
     data-o-chat-config-url="{page-url}" 
     data-o-chat-config-articleId="{article-id}">
-    
+
         <div class="o--if-no-js">To participate in this chat, you need to upgrade to a newer web browser. <a href="http://help.ft.com/tools-services/browser-compatibility/">Learn more.</a></div>
 </div>
 ```
@@ -55,7 +55,7 @@ oChat.init();
 Create an instance of the component with the parameters that are available:
 
 ```javascript
-var oChatComponent = new oChat.Widget(el, {
+var oChatComponent = new oChat(document.querySelector('.chat'), {
     title: document.title,
     url: document.location.href,
     articleId: 'article-id',
@@ -75,25 +75,17 @@ oChatComponent.init();
 ```
 
 
-#### More about the constructor of Widget
+#### More about the constructor config object
 The configuration object which is passed to the contructor can/should have the following fields:
 
 ###### Mandatory fields:
-Set one of these:
-
- - elId: ID of the HTML element in which the widget should be loaded
- - container: selector string or DOM instance. An ID will be generated on the specified element if it doesn't have one.
-
-If both are missing, comments will be loaded in document.body (which will be cleared).
-
-
-Mandatory:
 
  - articleId: ID of the article, any string
  - url: canonical URL of the page
  - title: Title of the page
     
 ###### Optional fields:
+
  - order: This specifies how the widget is built. It can have two values:
     + normal: the commenting box is placed on top of the comment stream, and the comments are ordered as newest on top.
     + inverted: the commenting box is placed at the bottom of the comment stream, and the comments are ordered newest on bottom.
@@ -113,7 +105,7 @@ Mandatory:
 ## <div id="login"></div> Login integration 
 Users need to have a valid FT session in order to post comments. The default behavior for a user without a valid session is to redirect to the FT's login page (https://registration.ft.com). However you may wish to integrate with your product's authentication process for a slicker UX in which case you can override the default behaviour.
 
-1. Override the `auth.loginRequiredDefaultBehavior` function
+ 1. Override the `auth.loginRequiredDefaultBehavior` function
 
 ```javascript
 oChat.auth.loginRequiredDefaultBehavior = function (evt) {
@@ -129,7 +121,7 @@ oChat.auth.loginRequiredDefaultBehavior = function (evt) {
 
 **Important: if the log in needs a page reload, don't call the callback at all (there's no success/failure, it's still pending)!**
 
-2. Add an event handler and stop executing other handlers
+ 2. Add an event handler and stop executing other handlers
 
 Example:
 
