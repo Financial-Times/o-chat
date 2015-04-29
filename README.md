@@ -36,12 +36,12 @@ Use the following markup to enable chat:
 </div>
 ```
 
-1. `data-o-chat-config-title` the title of your article/post/thing
-2. `data-o-chat-config-articleId` a unique id for your content, ideally a UUID for FT content
-3. `data-o-chat-config-url` The canonical URL for your article/page/thing
-4. `data-o-chat-config-{key}` for any other configuration
-5. `data-o-chat-auto-init="false"` a module which has this attribute with a `false` value will not be initialized on the `o.DOMContentLoaded` event. This allows you to defer component initialisation.
-6. `id` preferable to be set, but if missing it will be generated
+ * `data-o-chat-config-title` the title of your article/post/thing
+ * `data-o-chat-config-articleId` a unique id for your content, ideally a UUID for FT content
+ * `data-o-chat-config-url` The canonical URL for your article/page/thing
+ * `data-o-chat-config-{key}` for any other configuration
+ * `data-o-chat-auto-init="false"` a module which has this attribute with a `false` value will not be initialized on the `o.DOMContentLoaded` event. This allows you to defer component initialisation.
+ * `id` preferable to be set, but if missing it will be generated
 
 If you defer initialising oChat by using `data-o-chat-auto-init="false"` then you can initialise the component by calling
 
