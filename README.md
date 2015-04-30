@@ -317,7 +317,7 @@ There is a default font-family set for o-chat: `BentonSans, sans-serif`
 In order to override the default font, set a value for the following variable:
 
 ```scss
-$o-chat-font-family: 'Your font-family here';
+$o-chat-font-family: font1, font2;
 ```
 
 ## <div id="browser"></div> Browser support 
