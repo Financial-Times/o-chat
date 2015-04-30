@@ -147,14 +147,15 @@ oChat.on('auth.loginRequired', function (evt) {
 
 
 ## <div id="events"></div> Events 
-
-All events have a payload of data to identify the originating component and any event specific data:
+### Local events
+These events are triggered on the instance's DOM element. 
+All events have a payload of data which helps getting the ID of the instance and the instance object itself:
 
 ```javascript
 {
     detail: {
         id: "idOfTheComponent",
-        widget: componentInstance,
+        instance: componentInstance,
         data: {...} //data specific to the event
     }
 }
@@ -256,7 +257,7 @@ Event detail data: (evt.detail.data)
 ```
 
 
-#### Shared events
+### Global events
 These events are triggered on the `body` element and are relevant to all oChat components on a page. They have the same format as the component level events: `oChat.nameOfTheEvent`, where `nameOfTheEvent` is one of the following below.
 
 The payload data consists only of event specific data:
