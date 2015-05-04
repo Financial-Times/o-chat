@@ -164,10 +164,6 @@ All events have a payload of data which helps getting the ID of the instance and
 ##### oChat.widget.timeout
 Triggered when loading the widget exceeded a given time.
 
-##### oChat.error.resources
-Triggered when the necessary resource files couldn't be loaded.
-Event detail data: error object/message.
-
 ##### oChat.error.init
 Error while loading the initialization data and the comments.
 Event detail data: error object/message.

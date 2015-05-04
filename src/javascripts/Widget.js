@@ -120,6 +120,7 @@ var Widget = function () {
 		this.config.datetimeFormat = defaultDatetimeFormat;
 	}
 
+
 	var nextPageNumber;
 	var isMorePageAvailable = false;
 	var nextPageFetchInProgress = false;
@@ -132,6 +133,15 @@ var Widget = function () {
 	var lastOwnCommentId;
 
 	var commentIds = [];
+
+	var destroyed = false;
+	var executeWhenNotDestroyed = function (func) {
+		return function () {
+			if (!destroyed) {
+				func.apply(this, arguments);
+			}
+		};
+	};
 
 	/**
 	 * Comment IDs are saved to avoid duplicates. This returns if an ID already exists.
@@ -186,14 +196,6 @@ var Widget = function () {
 	});
 
 	/**
-	 * Does nothing, but it is a mandatory override of oCommentUi.Widget.
-	 * @param  {Function} callback
-	 */
-	this.loadResources = function (callback) {
-		callback();
-	};
-
-	/**
 	 * Override of oCommentUi.Widget.init function.
 	 * This is responsible to load the comments and the article related data.
 	 * This function also initiates live stream from Livefyre.
@@ -216,7 +218,7 @@ var Widget = function () {
 
 		self.config.stream = true;
 
-		oCommentApi.api.getComments(config, function (err, data) {
+		oCommentApi.api.getComments(config, executeWhenNotDestroyed(function (err, data) {
 			if (err) {
 				callback(err);
 				return;
@@ -243,7 +245,7 @@ var Widget = function () {
 					});
 				}
 			}
-		});
+		}));
 	};
 
 	/**
@@ -266,13 +268,13 @@ var Widget = function () {
 	 * @param  {Function} callback     Called when the initial rendering completed.
 	 */
 	this.render = function (commentsData, callback) {
-		if (commentsData) {
+		if (commentsData && !destroyed) {
 			if (commentsData.unclassifiedArticle !== true) {
 				self.collectionId = commentsData.collectionId;
 				self.messageQueue = new MessageQueue(self.collectionId);
 				self.trigger('widget.ready');
 
-				auth.login(function (loggedIn, authData) {
+				auth.login(executeWhenNotDestroyed(function (loggedIn, authData) {
 					if (!authData) {
 						authData = null;
 					}
@@ -333,7 +335,7 @@ var Widget = function () {
 							self.ui.repopulateCommentArea(messageInTheQueue);
 						}
 					}
-				});
+				}));
 			} else {
 				callback({
 					unclassifiedArticle: true
@@ -357,7 +359,9 @@ var Widget = function () {
 	};
 
 	if (self.config.height) {
-		this.adaptToHeight(self.config.height);
+		if (!destroyed) {
+			this.adaptToHeight(self.config.height);
+		}
 	}
 
 	/**
@@ -477,7 +481,7 @@ var Widget = function () {
 		self.ui.login(authData.token, authData.displayName, authData.admin || authData.moderator);
 		self.ui.addSettingsLink({
 			onClick: function () {
-				var showSettingsDialog = function () {
+				var showSettingsDialog = executeWhenNotDestroyed(function () {
 					oCommentApi.api.getAuth(function (authErr, currentAuthData) {
 						if (!authErr && currentAuthData) {
 							userDialogs.showChangePseudonymDialog(currentAuthData.displayName, function (err, newAuthData) {
@@ -492,7 +496,7 @@ var Widget = function () {
 							});
 						}
 					});
-				};
+				});
 
 				auth.loginRequired(function (err, authData) {
 					if (err) {
@@ -550,7 +554,7 @@ var Widget = function () {
 				config.tags = self.config.tags;
 			}
 
-			oCommentApi.api.getComments(config, function (err, data) {
+			oCommentApi.api.getComments(config, executeWhenNotDestroyed(function (err, data) {
 				if (err) {
 					isMorePageAvailable = false;
 					self.ui.disableButtonPagination();
@@ -570,7 +574,7 @@ var Widget = function () {
 				setTimeout(function () {
 					nextPageFetchInProgress = false;
 				}, 200);
-			});
+			}));
 		}
 	});
 
@@ -600,7 +604,7 @@ var Widget = function () {
 		oCommentApi.api.postComment({
 			collectionId: self.collectionId,
 			commentBody: commentBody
-		}, function (err, postCommentResult) {
+		}, executeWhenNotDestroyed(function (err, postCommentResult) {
 			self.ui.makeEditable();
 
 			if (err) {
@@ -617,7 +621,7 @@ var Widget = function () {
 				if (postCommentResult.success === true) {
 					self.ui.emptyCommentArea();
 
-					oCommentApi.api.getAuth(function (authErr, authData) {
+					oCommentApi.api.getAuth(executeWhenNotDestroyed(function (authErr, authData) {
 						if (authData) {
 							triggerCommentPostedEvent({
 								commentId: postCommentResult.commentId,
@@ -639,7 +643,7 @@ var Widget = function () {
 
 							handleNewCommentForBadgingComments(postCommentResult);
 						}
-					});
+					}));
 				} else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
 					loginRequiredToPostComment(commentBody, true);
 				} else {
@@ -666,7 +670,7 @@ var Widget = function () {
 			} else {
 				self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
 			}
-		});
+		}));
 	};
 
 
@@ -679,7 +683,7 @@ var Widget = function () {
 			force = true;
 		}
 
-		auth.loginRequired(function (err, authData) {
+		auth.loginRequired(executeWhenNotDestroyed(function (err, authData) {
 			if (err) {
 				self.messageQueue.clear();
 				return;
@@ -687,7 +691,7 @@ var Widget = function () {
 
 			self.messageQueue.clear();
 			postComment(commentBody, secondStepOfTryingToPost);
-		}, force);
+		}), force);
 	}
 
 	// the 'Submit comment' button is pressed
@@ -703,7 +707,7 @@ var Widget = function () {
 
 		self.ui.makeReadOnly();
 
-		oCommentApi.api.getAuth(function (err, authData) {
+		oCommentApi.api.getAuth(executeWhenNotDestroyed(function (err, authData) {
 			if (!authData || !authData.token) {
 				self.ui.makeEditable();
 				loginRequiredToPostComment(commentBody);
@@ -713,7 +717,7 @@ var Widget = function () {
 				}
 				postComment(commentBody);
 			}
-		});
+		}));
 	});
 
 
@@ -724,7 +728,7 @@ var Widget = function () {
 		oCommentApi.api.deleteComment({
 			collectionId: self.collectionId,
 			commentId: commentId
-		}, function (err, deleteCommentResult) {
+		}, executeWhenNotDestroyed(function (err, deleteCommentResult) {
 			if (err) {
 				userDialogs.showMessage("Delete comment", oCommentUi.i18n.texts.genericError);
 				oCommentUtilities.logger.log("delete comment call error: ", err);
@@ -770,7 +774,7 @@ var Widget = function () {
 
 				userDialogs.showMessage("Delete comment", oCommentUi.i18n.texts.genericError);
 			}
-		});
+		}));
 	}
 
 	function loginRequiredToDeleteComment (commentId, secondStepOfTryingToDelete) {
@@ -780,19 +784,19 @@ var Widget = function () {
 		}
 
 		auth.loginRequired({
-			success: function () {
+			success: executeWhenNotDestroyed(function () {
 				deleteComment(commentId, secondStepOfTryingToDelete);
-			},
-			failure: function () {
+			}),
+			failure: executeWhenNotDestroyed(function () {
 				self.ui.markCommentAsDeleteInProgressEnded(commentId);
-			}
+			})
 		}, force);
 	}
 
 	self.ui.on('deleteComment', function (commentId) {
 		self.ui.markCommentAsDeleteInProgress(commentId);
 
-		oCommentApi.api.getAuth(function (err, authData) {
+		oCommentApi.api.getAuth(executeWhenNotDestroyed(function (err, authData) {
 			if (!authData || !authData.token) {
 				loginRequiredToDeleteComment(commentId);
 			} else {
@@ -801,7 +805,7 @@ var Widget = function () {
 				}
 				deleteComment(commentId);
 			}
-		});
+		}));
 	});
 
 
@@ -842,6 +846,8 @@ var Widget = function () {
 	this.destroy = function () {
 		self.ui.off();
 
+		destroyed = true;
+
 		nextPageNumber = null;
 		isMorePageAvailable = null;
 		nextPageFetchInProgress = null;
@@ -852,7 +858,9 @@ var Widget = function () {
 
 		self.collectionId = null;
 
-		self.messageQueue.destroy();
+		if (self.messageQueue) {
+			self.messageQueue.destroy();
+		}
 		self.messageQueue = null;
 
 		globalEvents.off('auth.login', login);

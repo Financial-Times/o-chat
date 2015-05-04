@@ -24,6 +24,15 @@ function WidgetUi (widgetContainer, config) {
 	var isOpen = true;
 	var scrollMonitor;
 
+	var destroyed = false;
+	var executeWhenNotDestroyed = function (func) {
+		return function () {
+			if (!destroyed) {
+				func.apply(this, arguments);
+			}
+		};
+	};
+
 	this.on = events.on;
 	this.off = events.off;
 
@@ -166,7 +175,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.adaptToHeight = function (height) {
-		var adapt = function () {
+		var adapt = executeWhenNotDestroyed(function () {
 			if (!adaptedToHeight) {
 				if (isPagination) {
 					self.disableButtonPagination();
@@ -205,10 +214,15 @@ function WidgetUi (widgetContainer, config) {
 
 				initNotification();
 			}
-		};
+		});
 
 		// poll for the existence of container
 		var pollForContainer = setInterval(function () {
+			if (destroyed) {
+				clearInterval(pollForContainer);
+				return;
+			}
+
 			if (self.widgetContainer.querySelector('.o-chat--editor-container')) {
 				clearInterval(pollForContainer);
 				adapt();
@@ -220,7 +234,7 @@ function WidgetUi (widgetContainer, config) {
 	// Specific functions for the widget that was shrinked to a fixed height
 
 		function initScrollPagination () {
-			scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(elements.commentArea, function (scrollPos) {
+			scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(elements.commentArea, executeWhenNotDestroyed(function (scrollPos) {
 				if (config.orderType === 'inverted') {
 					if (scrollPos < 0.2 * elements.commentArea.scrollHeight) {
 						events.trigger('nextPage');
@@ -230,7 +244,7 @@ function WidgetUi (widgetContainer, config) {
 						events.trigger('nextPage');
 					}
 				}
-			});
+			}));
 		}
 
 		function initNotification () {
@@ -247,11 +261,11 @@ function WidgetUi (widgetContainer, config) {
 		}
 
 		function notifyNewComment () {
-			setTimeout(function () {
+			setTimeout(executeWhenNotDestroyed(function () {
 				if (newCommentNotification) {
 					newCommentNotification.newComment();
 				}
-			}, 100);
+			}), 100);
 		}
 
 	this.disableButtonPagination = function () {
@@ -613,13 +627,19 @@ function WidgetUi (widgetContainer, config) {
 	this.destroy = function () {
 		self.off();
 
+		destroyed = true;
+
 		events.destroy();
 		events = null;
 
-		scrollMonitor.destroy();
+		if (scrollMonitor) {
+			scrollMonitor.destroy();
+		}
 		scrollMonitor = null;
 
-		newCommentNotification.destroy();
+		if (newCommentNotification) {
+			newCommentNotification.destroy();
+		}
 		newCommentNotification = null;
 
 		adaptedToHeight = null;
