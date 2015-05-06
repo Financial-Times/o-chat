@@ -20,7 +20,6 @@ var globalEvents = require('./globalEvents.js');
  *
  * #### Configuration:
  * ##### Mandatory fields:
- *  - elId: ID of the HTML element in which the widget should be loaded
  *  - articleId: ID of the article, any string
  *  - url: canonical URL of the page
  *  - title: Title of the page
@@ -44,7 +43,8 @@ var globalEvents = require('./globalEvents.js');
  *  - section: Override the default mapping based on URL or CAPI with an explicit mapping. Section parameter should be a valid FT metadata term (Primary section)
  *  - tags: Tags which will be added to the collection in Livefyre
  *
- * @param {object} config Configuration object. See in the description the fields that are mandatory.
+ * @param {object|string} rootEl Root element in which the widget should be loaded.
+ * @param {object}        config Configuration object. See in the description the fields that are mandatory.
  */
 var Widget = function () {
 	oCommentUi.Widget.apply(this, arguments);
@@ -878,9 +878,9 @@ var Widget = function () {
 		this.init.call(this);
 	}
 };
-oCommentUi.Widget.__extend(Widget, 'oChat');
+oCommentUi.Widget.__extend(Widget, 'oChat', 'o-chat');
 
-Widget.__extend = function(child, eventNamespace) {
+Widget.__extend = function(child, eventNamespace, classNamespace) {
 	if (typeof Object.create === 'function') {
 		child.prototype = Object.create(Widget.prototype);
 	} else {
@@ -892,6 +892,7 @@ Widget.__extend = function(child, eventNamespace) {
 
 	if (eventNamespace) {
 		child.prototype.eventNamespace = eventNamespace;
+		child.prototype.classNamespace = classNamespace;
 	}
 };
 
