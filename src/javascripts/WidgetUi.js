@@ -64,6 +64,11 @@ function WidgetUi (widgetContainer, config) {
 		isPagination = paginationEnabled;
 		self.widgetContainer.innerHTML = "";
 
+		var commentsRendered = [];
+		for (var i = 0; i < commentsData.length; i++) {
+			commentsRendered.push(templates.comment.render(commentsData[i]));
+		}
+
 		var addEditor = function () {
 			self.widgetContainer.appendChild(
 				oCommentUi.utils.toDOM(
@@ -80,7 +85,7 @@ function WidgetUi (widgetContainer, config) {
 			self.widgetContainer.appendChild(
 				oCommentUi.utils.toDOM(
 					templates.comments.render({
-						comments: commentsData,
+						comments: commentsRendered,
 						orderType: config.orderType,
 						adminMode: adminMode
 					})
@@ -89,6 +94,7 @@ function WidgetUi (widgetContainer, config) {
 		};
 
 		if (config.orderType === 'inverted') {
+			commentsRendered.reverse();
 			commentsData.reverse();
 			addComments();
 			addEditor();
