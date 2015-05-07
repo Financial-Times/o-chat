@@ -892,6 +892,9 @@ Widget.__extend = function(child, eventNamespace, classNamespace) {
 
 	if (eventNamespace) {
 		child.prototype.eventNamespace = eventNamespace;
+	}
+
+	if (classNamespace) {
 		child.prototype.classNamespace = classNamespace;
 	}
 };
