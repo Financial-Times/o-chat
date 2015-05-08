@@ -10,8 +10,8 @@
 
 	.o-chat--notification-button {
 		display: inline-block;
-		background-color: oColorsGetPaletteColor(blue);
-		color: oColorsGetPaletteColor(white);
+		background-color: oColorsGetPaletteColor("blue");
+		color: oColorsGetPaletteColor("white");
 		cursor: pointer;
 		padding: 3px 8px;
 		border-radius: 5px;

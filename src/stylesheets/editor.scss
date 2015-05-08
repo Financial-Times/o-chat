@@ -19,10 +19,10 @@
 		top: 100%;
 		left: 0;
 		z-index: 1000;
-		border: 1px solid oColorsGetPaletteColor(pink-tint4);
+		border: 1px solid oColorsGetPaletteColor("pink-tint4");
 
 		li {
-			border-bottom: 1px solid  oColorsGetPaletteColor(pink-tint4);
+			border-bottom: 1px solid  oColorsGetPaletteColor("pink-tint4");
 			white-space: nowrap;
 		}
 
@@ -46,9 +46,9 @@
 	.o-chat--editor-closed {
 		display: none;
 
-		background: oColorsGetPaletteColor(white);
+		background: oColorsGetPaletteColor("white");
 		border: 1px solid #b2b2b2;
-		color: oColorsGetPaletteColor(grey-tint4);
+		color: oColorsGetPaletteColor("grey-tint4");
 		margin-top: 41px;
 		margin-bottom: 42px;
 		padding: 5px 10px;
@@ -64,14 +64,14 @@
 	}
 
 	.o-chat--editor-input {
-		border: 1px solid oColorsGetPaletteColor(pink-tint2);
+		border: 1px solid oColorsGetPaletteColor("pink-tint2");
 		padding: 5px 10px;
-		background: oColorsGetPaletteColor(white);
+		background: oColorsGetPaletteColor("white");
 		cursor: text;
 		position: relative;
 
 		&.disabled {
-			background: oColorsGetPaletteColor(pink-tint2);
+			background: oColorsGetPaletteColor("pink-tint2");
 		}
 	}
 
@@ -83,12 +83,12 @@
 		height: 60px;
 		margin-top: 5px;
 		outline: 0;
-		color: oColorsGetPaletteColor(grey-tint5);
+		color: oColorsGetPaletteColor("grey-tint5");
 		font-family: $o-chat-font-family;
 		font-size: 12px;
 
 		&[disabled] {
-			background: oColorsGetPaletteColor(pink-tint2);
+			background: oColorsGetPaletteColor("pink-tint2");
 		}
 	}
 
@@ -98,14 +98,14 @@
 		right: 0;
 		max-width: 50%;
 		padding: 5px 10px;
-		background: oColorsGetPaletteColor(red);
-		color: oColorsGetPaletteColor(white);
+		background: oColorsGetPaletteColor("red");
+		color: oColorsGetPaletteColor("white");
 		line-height: 15px;
 		display: none;
 	}
 
 	.o-chat--editor-footer {
-		border: 1px solid oColorsGetPaletteColor(pink-tint2);
+		border: 1px solid oColorsGetPaletteColor("pink-tint2");
 		border-top: 0;
 	}
 

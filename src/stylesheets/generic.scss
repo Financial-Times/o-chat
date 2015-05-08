@@ -1,9 +1,9 @@
 a {
-	color: oColorsGetPaletteColor(blue);
+	color: oColorsGetPaletteColor("blue");
 	text-decoration: none;
 
 	&:hover {
-		color: oColorsGetPaletteColor(black);
+		color: oColorsGetPaletteColor("black");
 	}
 }
 
