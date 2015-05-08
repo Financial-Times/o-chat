@@ -61,13 +61,15 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.render = function (commentsData, adminMode, paginationEnabled) {
+		var i;
+
 		isPagination = paginationEnabled;
 		oCommentUtilities.logger.debug('isPagination', isPagination);
 
 		self.widgetContainer.innerHTML = "";
 
 		var commentsRendered = [];
-		for (var i = 0; i < commentsData.length; i++) {
+		for (i = 0; i < commentsData.length; i++) {
 			commentsRendered.push(templates.comment.render(commentsData[i]));
 		}
 
@@ -120,7 +122,7 @@ function WidgetUi (widgetContainer, config) {
 		elements.showMore = {
 			before: self.widgetContainer.querySelector('.o-chat--show-more-before'),
 			after: self.widgetContainer.querySelector('.o-chat--show-more-after'),
-			label: self.widgetContainer.querySelector('.o-chat--show-more .o-chat--show-more-label')
+			labels: self.widgetContainer.querySelectorAll('.o-chat--show-more .o-chat--show-more-label')
 		};
 
 
@@ -158,9 +160,13 @@ function WidgetUi (widgetContainer, config) {
 				elements.showMore.after.style.display = 'block';
 			}
 
-			elements.showMore.label.addEventListener('click', function () {
+			var triggereNextPage = function () {
 				events.trigger('nextPage');
-			});
+			};
+
+			for (i = 0; i < elements.showMore.labels.length; i++) {
+				elements.showMore.labels[i].addEventListener('click', triggereNextPage);
+			}
 		}
 
 		if (adminMode) {
