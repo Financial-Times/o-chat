@@ -62,6 +62,8 @@ function WidgetUi (widgetContainer, config) {
 
 	this.render = function (commentsData, adminMode, paginationEnabled) {
 		isPagination = paginationEnabled;
+		oCommentUtilities.logger.debug('isPagination', isPagination);
+
 		self.widgetContainer.innerHTML = "";
 
 		var commentsRendered = [];
@@ -240,17 +242,19 @@ function WidgetUi (widgetContainer, config) {
 	// Specific functions for the widget that was shrinked to a fixed height
 
 		function initScrollPagination () {
-			scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(elements.commentArea, executeWhenNotDestroyed(function (scrollPos) {
+			scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(elements.commentArea, function (scrollPos) {
 				if (config.orderType === 'inverted') {
 					if (scrollPos < 0.2 * elements.commentArea.scrollHeight) {
 						events.trigger('nextPage');
+						oCommentUtilities.logger.debug('nextPage');
 					}
 				} else {
 					if (scrollPos + elements.commentArea.clientHeight > 0.8 * elements.commentArea.scrollHeight) {
 						events.trigger('nextPage');
+						oCommentUtilities.logger.debug('nextPage');
 					}
 				}
-			}));
+			});
 		}
 
 		function initNotification () {
