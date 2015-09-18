@@ -4,7 +4,7 @@ var oCommentUtilities = require('o-comment-utilities');
 var userDialogs = require('./userDialogs');
 var oCommentApi = require('o-comment-api');
 var globalEvents = require('./globalEvents.js');
-
+var envConfig = require('./config.js');
 
 
 /**
@@ -114,7 +114,7 @@ function Auth () {
 
 
 	this.loginRequiredDefaultBehavior = function () {
-		window.location.href = 'https://registration.ft.com/registration/barrier/login?location='+ encodeURIComponent(document.location.href);
+		window.location.href = envConfig.get('loginUrl') + '?location=' + encodeURIComponent(document.location.href);
 	};
 
 	var loginRequiredDefaultBehaviorWrapper = function (evt) {
@@ -164,7 +164,7 @@ function Auth () {
 
 					userDialogs.showInactivityMessage({
 						submit: function () {
-							window.location.href = 'https://registration.ft.com/registration/barrier/login?location='+ encodeURIComponent(document.location.href);
+							window.location.href = envConfig.get('loginUrl') + '?location=' + encodeURIComponent(document.location.href);
 						},
 						close: function () {
 							callback(new Error("Login failed."));

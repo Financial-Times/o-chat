@@ -10,6 +10,9 @@ A simple chat client integrated with FT's membership systems. If you simply wish
      * <a href="#imper">Imperatvely</a>
  * <a href="#login">Login integration</a>
  * <a href="#events">Events</a>
+ * <a href="#configuration">Global configuration</a>
+     * <a href="#confdecl">Declaratively</a>
+     * <a href="#confimper">Imperatively</a>
  * <a href="#jsapi">API</a>
      * <a href="#logging">Logging</a>
  * <a href="#sassapi">Sass API</a>
@@ -289,6 +292,78 @@ oChat.on('auth.loginRequired', function (evt) {
     }
 });
 ```
+
+
+## <div id="configuration"></div> Global configuration
+This module uses global configuration. These are related configurations for Livefyre and authentication.
+
+The default configuration is the production one:
+
+```json
+{
+    "loginUrl": "https://accounts.ft.com/login",
+    "livefyre": {
+        "network": "ft.fyre.co"
+    }
+}
+```
+
+In order to change to the settings of the TEST environment, then this configuration should be used:
+
+```json
+{
+    "loginUrl": "https://accounts-test.ft.com/login",
+    "livefyre": {
+        "network": "ft-1.fyre.co"
+    }
+}
+
+```
+
+
+There are two ways for changing the environment:
+
+### <div id="confdecl"></div> Declaratively
+In order to change the configuration, you can add a script tag in your page source with the format in the example below:
+
+```javascript
+<script data-o-chat-config type="application/json">
+    {
+        "loginUrl": "https://accounts-test.ft.com/login",
+        "livefyre": {
+            "network": "ft-1.fyre.co"
+        }
+    }
+</script>
+```
+
+This configuration will be loaded on the `o.DOMContentLoaded` event.
+
+**Also, don't forget to also add the configuration for `o-comment-api` (http://registry.origami.ft.com/components/o-comment-api#configuration).**
+
+
+
+### <div id="confimper"></div> Imperatively
+##### oChat.setConfig(config)
+The configuration can be changed be using the `setConfig` static method. Calling this method with an object will merge the current configuration with the object specified (deep merge, primitive type values of the same key will be overwritten).
+
+Example:
+
+```javascript
+oChat.setConfig({
+    "loginUrl": "https://accounts-test.ft.com/login",
+    "livefyre": {
+        "network": "ft-1.fyre.co"
+    }
+});
+```
+
+*As on the event `o.DOMContentLoaded` the widgets declared in the DOM are automatically initialized, it is preferred to call this function **before** the `o.DOMContentLoaded` event is triggered.*
+
+
+**Also, don't forget to also add the configuration for `o-comment-api` (http://registry.origami.ft.com/components/o-comment-api#configuration).**
+The API of o-comment-api is available by using `oChat.dataService`.
+
 
 ## <div id="jsapi"></div> JavaScript API
 ### <div id="logging"></div> Logging
