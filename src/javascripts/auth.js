@@ -1,16 +1,17 @@
-const oCommentUtilities = require('o-comment-utilities');
-const userDialogs = require('./userDialogs');
-const oCommentApi = require('o-comment-api');
-const globalEvents = require('./globalEvents.js');
+"use strict";
+
+var oCommentUtilities = require('o-comment-utilities');
+var userDialogs = require('./userDialogs');
+var oCommentApi = require('o-comment-api');
+var globalEvents = require('./globalEvents.js');
 
 
 
 /**
  * Auth is responsible to handle login and logout requests and broadcast these requests.
- * @returns {undefined}
  */
 function Auth () {
-	const self = this;
+	var self = this;
 
 	/**
 	 * Pseudonym is still missing.
@@ -18,13 +19,12 @@ function Auth () {
 	 */
 	this.pseudonymMissing = false;
 
-	let loggedIn = false;
+	var loggedIn = false;
 
 	/**
 	 * Tries to obtain the user's login data. Calls a callback with the resulted status,
 	 * and also fires an event if the user can be logged in.
 	 * @param  {Function} callback Called with two parameters: loginStatus, authData.
-	 * @returns {undefined}
 	 */
 	this.login = function (callback) {
 		if (typeof callback !== 'function') {
@@ -58,7 +58,6 @@ function Auth () {
 
 	/**
 	 * Broadcasts a logout event.
-	 * @returns {undefined}
 	 */
 	this.logout = function () {
 		oCommentApi.cache.clearAuth();
@@ -69,7 +68,6 @@ function Auth () {
 	/**
 	 * Login required and pseudonym is missing
 	 * @param  {Function} callback function (err, authData)
-	 * @returns {undefined}
 	 */
 	function loginRequiredPseudonymMissing (callback) {
 		if (typeof callback !== 'function') {
@@ -97,7 +95,6 @@ function Auth () {
 	 * If the user is still not logged in, then fail.
 	 * If the user has no pseudonym, ask for a pseudonym.
 	 * @param  {Function} callback function (err, authData)
-	 * @returns {undefined}
 	 */
 	function loginRequiredAfterASuccess (callback) {
 		if (typeof callback !== 'function') {
@@ -120,7 +117,7 @@ function Auth () {
 		window.location.href = 'https://registration.ft.com/registration/barrier/login?location='+ encodeURIComponent(document.location.href);
 	};
 
-	const loginRequiredDefaultBehaviorWrapper = function (evt) {
+	var loginRequiredDefaultBehaviorWrapper = function (evt) {
 		self.loginRequiredDefaultBehavior(evt.detail.callback);
 	};
 	this.setLoginRequiredDefaultBehavior = function () {
@@ -134,9 +131,7 @@ function Auth () {
 	 * If pseudonym is missing, ask for a pseudonym.
 	 * If there is no known method to login the user, generate a `loginRequired.authAction` event that can be handled at the integration level.
 	 * If successful, check if the user is logged in.
-	 * @param {Function} callback function (err, authData)
-	 * @param {Boolean} force Forces checking the login status of the user by a call to SUDS
-	 * @returns {undefined}
+	 * @param  {Function} callback function (err, authData)
 	 */
 	this.loginRequired = function (callback, force) {
 		if (typeof callback !== 'function') {

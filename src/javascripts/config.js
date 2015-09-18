@@ -1,4 +1,6 @@
-const EnvConfig = require('o-comment-utilities').EnvConfig;
+"use strict";
+
+var EnvConfig = require('o-comment-utilities').EnvConfig;
 
 /**
  * Export a single instance of the config container.

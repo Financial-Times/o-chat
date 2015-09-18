@@ -1,4 +1,6 @@
-const hogan = require('hogan');
+"use strict";
+
+var hogan = require('hogan');
 
 /**
  * List of the templates available.

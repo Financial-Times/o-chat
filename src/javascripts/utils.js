@@ -1,4 +1,6 @@
-const strings = {
+"use strict";
+
+var strings = {
 	/**
 	 * Shim of String.trim for older browsers. Trims a string.
 	 * @param  {String} string String to be trimmed.

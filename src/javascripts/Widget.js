@@ -1,12 +1,14 @@
-const auth = require('./auth.js');
-const MessageQueue = require('./MessageQueue.js');
-const WidgetUi = require('./WidgetUi.js');
-const oCommentUi = require('o-comment-ui');
-const oCommentApi = require('o-comment-api');
-const oCommentUtilities = require('o-comment-utilities');
-const userDialogs = require('./userDialogs.js');
-const i18n = require('./i18n.js');
-const globalEvents = require('./globalEvents.js');
+"use strict";
+
+var auth = require('./auth.js');
+var MessageQueue = require('./MessageQueue.js');
+var WidgetUi = require('./WidgetUi.js');
+var oCommentUi = require('o-comment-ui');
+var oCommentApi = require('o-comment-api');
+var oCommentUtilities = require('o-comment-utilities');
+var userDialogs = require('./userDialogs.js');
+var i18n = require('./i18n.js');
+var globalEvents = require('./globalEvents.js');
 
 /**
  * Incorporates the communication with the content creation service,
@@ -43,12 +45,11 @@ const globalEvents = require('./globalEvents.js');
  *
  * @param {object|string} rootEl Root element in which the widget should be loaded.
  * @param {object}        config Configuration object. See in the description the fields that are mandatory.
- * @returns {undefined}
  */
-const Widget = function () {
+var Widget = function () {
 	oCommentUi.Widget.apply(this, arguments);
 
-	let self = this;
+	var self = this;
 
 	if (!this.config) {
 		return;
@@ -83,7 +84,7 @@ const Widget = function () {
 	 */
 	this.messageQueue = null;
 
-	const defaultDatetimeFormat = {
+	var defaultDatetimeFormat = {
 		minutesUntilAbsoluteTime: -1,
 		absoluteFormat: 'hh:mm a'
 	};
@@ -120,21 +121,21 @@ const Widget = function () {
 	}
 
 
-	let nextPageNumber;
-	let isMorePageAvailable = false;
-	let nextPageFetchInProgress = false;
-	let loginStatus = false;
-	let userIsAdmin = false;
-	let renderComplete = false;
+	var nextPageNumber;
+	var isMorePageAvailable = false;
+	var nextPageFetchInProgress = false;
+	var loginStatus = false;
+	var userIsAdmin = false;
+	var renderComplete = false;
 
-	let lastBannedCommentId;
-	let lastPendingCommentId;
-	let lastOwnCommentId;
+	var lastBannedCommentId;
+	var lastPendingCommentId;
+	var lastOwnCommentId;
 
-	let commentIds = [];
+	var commentIds = [];
 
-	let destroyed = false;
-	const executeWhenNotDestroyed = function (func) {
+	var destroyed = false;
+	var executeWhenNotDestroyed = function (func) {
 		return function () {
 			if (!destroyed) {
 				func.apply(this, arguments);
@@ -145,13 +146,13 @@ const Widget = function () {
 	/**
 	 * Comment IDs are saved to avoid duplicates. This returns if an ID already exists.
 	 * @param  {Number}  id ID of a comment.
-	 * @return {Boolean} If the comment ID was already processed or not.
+	 * @return {Boolean}
 	 */
-	const hasCommentId = function (id) {
+	var hasCommentId = function (id) {
 		if (Array.prototype.indexOf) {
 			return commentIds.indexOf(id) !== -1 ? true : false;
 		} else {
-			for (let i = 0; i < commentIds.length; i++) {
+			for (var i = 0; i < commentIds.length; i++) {
 				if (commentIds[i] === id) {
 					return true;
 				}
@@ -163,10 +164,10 @@ const Widget = function () {
 	/**
 	 * Removes a comment ID from the list of existing comments IDs.
 	 * @param  {Number} id ID of a comment.
-	 * @return {Boolean} If the ID was already saved or not.
+	 * @return {Boolean}
 	 */
-	const removeCommentId = function (id) {
-		let index;
+	var removeCommentId = function (id) {
+		var index;
 		if (Array.prototype.indexOf) {
 			index = commentIds.indexOf(id);
 			if (index !== -1) {
@@ -200,10 +201,9 @@ const Widget = function () {
 	 * This function also initiates live stream from Livefyre.
 	 *
 	 * @param  {Function} callback function(err, data), where data contains collectionId and comments. See o-comment-api.api.getComments
-	 * @returns {undefined}
 	 */
 	this.loadInitData = function (callback) {
-		const config = {
+		var config = {
 			title: self.config.title,
 			url: self.config.url,
 			articleId: self.config.articleId,
@@ -253,7 +253,6 @@ const Widget = function () {
 	 * If the article is flagged as unclassified, no message appears.
 	 * If any other error occurs, show a generic not available message.
 	 * @param  {Object|String} err Error object or string.
-	 * @returns {undefined}
 	 */
 	this.onError = function (err) {
 		self.ui.clearContainer();
@@ -267,7 +266,6 @@ const Widget = function () {
 	 * Handle the comments, render them, and initiate the login process as well.
 	 * @param  {Object}   commentsData Object with collectionId and comments.
 	 * @param  {Function} callback     Called when the initial rendering completed.
-	 * @returns {undefined}
 	 */
 	this.render = function (commentsData, callback) {
 		if (commentsData && !destroyed) {
@@ -316,12 +314,12 @@ const Widget = function () {
 								// the user is forced to finish the login process
 								// ask to set a pseudonym instantly
 								if (self.forceMode === true) {
-									auth.loginRequiredPseudonymMissing(function (err) {
+									auth.loginRequiredPseudonymMissing(function (err, newAuthData) {
 										if (err) {
 											return;
 										}
 
-										const messageInTheQueue = self.messageQueue.getComment();
+										var messageInTheQueue = self.messageQueue.getComment();
 										self.ui.repopulateCommentArea(messageInTheQueue);
 										self.messageQueue.clear();
 									});
@@ -333,7 +331,7 @@ const Widget = function () {
 								self.ui.hideSignInLink();
 							}
 						} else if (self.forceMode === true) {
-							const messageInTheQueue = self.messageQueue.getComment();
+							var messageInTheQueue = self.messageQueue.getComment();
 							self.ui.repopulateCommentArea(messageInTheQueue);
 						}
 					}
@@ -353,7 +351,6 @@ const Widget = function () {
 	 * will appear on the comments.
 	 *
 	 * @param  {Number} height Desired height in pixels.
-	 * @returns {undefined}
 	 */
 	this.adaptToHeight = function (height) {
 		if (height) {
@@ -377,7 +374,7 @@ const Widget = function () {
 	 *  - author.displayName truncated to 50 characters
 	 *
 	 * @param  {Object} aComment A comment object, which respects the format the oCommentApi.api.getComments returns.
-	 * @return {Object} Processed comment
+	 * @return {Object}
 	 */
 	function processOneComment (aComment) {
 		aComment.dateToShow = self.ui.formatTimestamp(aComment.timestamp);
@@ -400,12 +397,12 @@ const Widget = function () {
 	 * processOneComment function.
 	 *
 	 * @param  {Array} comments Array with comments objects, which respects the format the oCommentApi.api.getComments returns.
-	 * @return {Array} Processed comment array
+	 * @return {Array}
 	 */
 	function preprocessCommentData (comments) {
 		if (comments) {
 			if (typeof comments.length === 'number') {
-				for (let index = 0; index < comments.length; index++) {
+				for (var index = 0; index < comments.length; index++) {
 					comments[index] = processOneComment(comments[index]);
 				}
 
@@ -421,7 +418,6 @@ const Widget = function () {
 	/**
 	 * New comment received over the stream, this function handles it.
 	 * @param  {Object} commentData A comment object, in Livefyre format.
-	 * @returns {undefined}
 	 */
 	function newCommentReceived (commentData) {
 		if (!hasCommentId(commentData.commentId) && commentData.visibility === 1) {
@@ -480,12 +476,12 @@ const Widget = function () {
 
 	function login (evt) {
 		loginStatus = true;
-		const authData = evt.detail;
+		var authData = evt.detail;
 
 		self.ui.login(authData.token, authData.displayName, authData.admin || authData.moderator);
 		self.ui.addSettingsLink({
 			onClick: function () {
-				const showSettingsDialog = executeWhenNotDestroyed(function () {
+				var showSettingsDialog = executeWhenNotDestroyed(function () {
 					oCommentApi.api.getAuth(function (authErr, currentAuthData) {
 						if (!authErr && currentAuthData) {
 							userDialogs.showChangePseudonymDialog(currentAuthData.displayName, function (err, newAuthData) {
@@ -502,7 +498,7 @@ const Widget = function () {
 					});
 				});
 
-				auth.loginRequired(function (err) {
+				auth.loginRequired(function (err, authData) {
 					if (err) {
 						return;
 					}
@@ -515,7 +511,7 @@ const Widget = function () {
 
 		// after login, post the comments from the message queue
 		if (self.forceMode && self.messageQueue.hasComment()) {
-			const messageInTheQueue = self.messageQueue.getComment();
+			var messageInTheQueue = self.messageQueue.getComment();
 			self.messageQueue.clear();
 
 			self.ui.repopulateCommentArea(messageInTheQueue);
@@ -545,7 +541,7 @@ const Widget = function () {
 
 			nextPageFetchInProgress = true;
 
-			const config = {
+			var config = {
 				title: self.config.title,
 				url: self.config.url,
 				articleId: self.config.articleId,
@@ -602,12 +598,9 @@ const Widget = function () {
 	 * Insert the comment in the DOM instantly, and try to post the comment with the API.
 	 * If successful, leave the comment in the DOM and change the ID with the real comment ID.
 	 * If unsuccessful, remove the comment from the DOM, repopulate the comment area with the comment and show the error message.
-	 *
-	 * @param {String} commentBody Text of the comment
-	 * @param {Boolean} secondStepOfTryingToPost Is this the second attempt to post the comment or not
-	 * @returns {undefined}
+	 * @return {[type]} [description]
 	 */
-	const postComment = function (commentBody, secondStepOfTryingToPost) {
+	var postComment = function (commentBody, secondStepOfTryingToPost) {
 		oCommentApi.api.postComment({
 			collectionId: self.collectionId,
 			commentBody: commentBody
@@ -655,11 +648,10 @@ const Widget = function () {
 					loginRequiredToPostComment(commentBody, true);
 				} else {
 					if (postCommentResult.errorMessage) {
-						let match;
-						let errMsg = postCommentResult.errorMessage;
-						let msgToOverride;
+						var match;
+						var errMsg = postCommentResult.errorMessage;
 
-						for (msgToOverride in oCommentUi.i18n.serviceMessageOverrides) {
+						for (var msgToOverride in oCommentUi.i18n.serviceMessageOverrides) {
 							if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(msgToOverride)) {
 								match = postCommentResult.errorMessage.match(new RegExp(msgToOverride));
 								if (match && match.length) {
@@ -686,12 +678,12 @@ const Widget = function () {
 		self.messageQueue.save(commentBody);
 		oCommentUtilities.logger.log('user not actively logged in, save comment to the storage');
 
-		let force = false;
+		var force = false;
 		if (secondStepOfTryingToPost) {
 			force = true;
 		}
 
-		auth.loginRequired(executeWhenNotDestroyed(function (err) {
+		auth.loginRequired(executeWhenNotDestroyed(function (err, authData) {
 			if (err) {
 				self.messageQueue.clear();
 				return;
@@ -704,7 +696,7 @@ const Widget = function () {
 
 	// the 'Submit comment' button is pressed
 	self.ui.on('postComment', function () {
-		const commentBody = self.ui.getCurrentComment();
+		var commentBody = self.ui.getCurrentComment();
 
 		oCommentUtilities.logger.debug('postComment', 'comment: "'+ commentBody +'"');
 
@@ -758,11 +750,10 @@ const Widget = function () {
 					self.ui.markCommentAsDeleteInProgressEnded(commentId);
 
 					if (deleteCommentResult.errorMessage) {
-						let match;
-						let errMsg = deleteCommentResult.errorMessage;
-						let msgToOverride;
+						var match;
+						var errMsg = deleteCommentResult.errorMessage;
 
-						for (msgToOverride in oCommentUi.i18n.serviceMessageOverrides) {
+						for (var msgToOverride in oCommentUi.i18n.serviceMessageOverrides) {
 							if (oCommentUi.i18n.serviceMessageOverrides.hasOwnProperty(msgToOverride)) {
 								match = deleteCommentResult.errorMessage.match(new RegExp(msgToOverride));
 								if (match && match.length) {
@@ -787,7 +778,7 @@ const Widget = function () {
 	}
 
 	function loginRequiredToDeleteComment (commentId, secondStepOfTryingToDelete) {
-		let force = false;
+		var force = false;
 		if (secondStepOfTryingToDelete) {
 			force = true;
 		}
@@ -851,7 +842,7 @@ const Widget = function () {
 	}
 
 
-	let __superDestroy = this.destroy;
+	var __superDestroy = this.destroy;
 	this.destroy = function () {
 		self.ui.off();
 
@@ -893,7 +884,7 @@ Widget.__extend = function(child, eventNamespace, classNamespace) {
 	if (typeof Object.create === 'function') {
 		child.prototype = Object.create(Widget.prototype);
 	} else {
-		const Tmp = function () {};
+		var Tmp = function () {};
 		Tmp.prototype = Widget.prototype;
 		child.prototype = new Tmp();
 		child.prototype.constructor = child;
