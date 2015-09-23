@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Error message override.
  * @type {Object}

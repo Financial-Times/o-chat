@@ -1,11 +1,9 @@
-"use strict";
-
-var globalEvents = require('./src/javascripts/globalEvents');
-var config = require('./src/javascripts/config.js'),
-	oCommentApi = require('o-comment-api'),
-	defaultConfig = require('./config.json'),
-	oCommentUtilities = require('o-comment-utilities');
-var Widget = require('./src/javascripts/Widget.js');
+const globalEvents = require('./src/javascripts/globalEvents');
+const config = require('./src/javascripts/config.js');
+const oCommentApi = require('o-comment-api');
+const defaultConfig = require('./config.json');
+const oCommentUtilities = require('o-comment-utilities');
+const Widget = require('./src/javascripts/Widget.js');
 
 /**
  * Default config (prod) is set.
@@ -15,7 +13,7 @@ config.set(defaultConfig);
 /**
  * Set user's session data if it's available.
  */
-var userSession = oCommentUtilities.ftUser.getSession();
+const userSession = oCommentUtilities.ftUser.getSession();
 if (userSession) {
 	config.set('sessionId', userSession);
 	oCommentApi.setConfig('sessionId', userSession);
@@ -39,6 +37,7 @@ module.exports = Widget;
  *
  * @param  {string|object} keyOrObject Key or actually an object with key-value pairs.
  * @param  {anything} value Optional. Should be specified only if keyOrObject is actually a key (string).
+ * @return {undefined}
  */
 module.exports.setConfig = function () {
 	config.set.apply(this, arguments);
@@ -58,7 +57,7 @@ module.exports.dataService = oCommentApi;
 
 /**
  * Enables logging.
- * @type {function}
+ * @return {undefined}
  */
 module.exports.enableLogging = function () {
 	oCommentUtilities.logger.enable.apply(this, arguments);
@@ -66,7 +65,7 @@ module.exports.enableLogging = function () {
 
 /**
  * Disables logging.
- * @type {function}
+ * @return {undefined}
  */
 module.exports.disableLogging = function () {
 	oCommentUtilities.logger.disable.apply(this, arguments);
@@ -74,7 +73,7 @@ module.exports.disableLogging = function () {
 
 /**
  * Sets logging level.
- * @type {number|string}
+ * @return {undefined}
  */
 module.exports.setLoggingLevel = function () {
 	oCommentUtilities.logger.setLevel.apply(this, arguments);
@@ -82,9 +81,9 @@ module.exports.setLoggingLevel = function () {
 
 document.addEventListener('o.DOMContentLoaded', function () {
 	try {
-		var configInDomEl = document.querySelector('script[type="application/json"][data-o-chat-config]');
+		const configInDomEl = document.querySelector('script[type="application/json"][data-o-chat-config]');
 		if (configInDomEl) {
-			var configInDom = JSON.parse(configInDomEl.innerHTML);
+			const configInDom = JSON.parse(configInDomEl.innerHTML);
 
 			module.exports.setConfig(configInDom);
 		}

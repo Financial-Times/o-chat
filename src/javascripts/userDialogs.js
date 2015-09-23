@@ -1,12 +1,11 @@
-"use strict";
-
-var oCommentUi = require('o-comment-ui');
-var oCommentApi = require('o-comment-api');
-var oOverlay = require('o-overlay');
+const oCommentUi = require('o-comment-ui');
+const oCommentApi = require('o-comment-api');
+const Overlay = require('o-overlay');
 
 /**
  * Shows a dialog for setting the initial pseudonym (shown when the user doesn't have a pseudonym set).
  * @param  {Function} callback Optional. function (err, authData)
+ * @returns {undefined}
  */
 exports.showSetPseudonymDialog = function (callback) {
 	callback = callback || function () {};
@@ -59,6 +58,7 @@ exports.showSetPseudonymDialog = function (callback) {
  * Settings dialog where the user can change its pseudonym or email preferences.
  * @param  {Object} currentPseudonym Required. Current pseudonym of the user.
  * @param  {Function} callback Optional. function (err, authData)
+ * @returns {undefined}
  */
 exports.showChangePseudonymDialog = function (currentPseudonym, callback) {
 	callback = callback || function () {};
@@ -117,10 +117,11 @@ exports.showInactivityMessage = oCommentUi.userDialogs.showInactivityMessage;
  * Shows a message to the user in a dialog (not modal).
  * @param  {String} title   Title of the dialog
  * @param  {String} message The content of the dialog (the message).
+ * @returns {undefined}
  */
 exports.showMessage = function (title, message) {
-	var idOfTheOverlay = "oChat_showMessage";
-	var overlay = new oOverlay(idOfTheOverlay, {
+	const idOfTheOverlay = "oChat_showMessage";
+	const overlay = new Overlay(idOfTheOverlay, {
 		html: message,
 		heading: {
 			title: title

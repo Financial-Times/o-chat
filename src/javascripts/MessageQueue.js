@@ -1,18 +1,17 @@
-"use strict";
-
-var oCommentUtilities = require('o-comment-utilities');
+const oCommentUtilities = require('o-comment-utilities');
 
 
 /**
  * Base name for the message queue session storage container, which is completed with the collectionId.
  * @type {String}
  */
-var storageBaseName = "o-chat-comment-queue-";
+const storageBaseName = "o-chat-comment-queue-";
 
 /**
  * MessageQueue saves a message to the session storage to preserve it
  * after a page reload.
  * @param {Number|String} collectionId Collection ID.
+ * @returns {undefined}
  */
 function MessageQueue (collectionId) {
 	if (typeof collectionId === "undefined") {
@@ -22,6 +21,7 @@ function MessageQueue (collectionId) {
 	/**
 	 * Saves a comment to the session storage.
 	 * @param  {String} commentBody  Body of the comment
+	 * @returns {undefined}
 	 */
 	this.save = function (commentBody) {
 		oCommentUtilities.storageWrapper.sessionStorage.setItem(storageBaseName + collectionId, commentBody);
@@ -29,7 +29,7 @@ function MessageQueue (collectionId) {
 
 	/**
 	 * Verifies if there are comments for the provided collection id.
-	 * @return {Boolean}
+	 * @return {Boolean} If there are comments saved
 	 */
 	this.hasComment = function () {
 		if (oCommentUtilities.storageWrapper.sessionStorage.hasItem(storageBaseName + collectionId)) {

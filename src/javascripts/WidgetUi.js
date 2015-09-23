@@ -1,31 +1,29 @@
-"use strict";
+const oCommentUtilities = require('o-comment-utilities');
+const oCommentUi = require('o-comment-ui');
+const oDate = require('o-date');
 
-var oCommentUtilities = require('o-comment-utilities');
-var oCommentUi = require('o-comment-ui');
-var oDate = require('o-date');
-
-var NewCommentNotification = require('./NewCommentNotification.js');
-var templates = require('./templates.js');
-var utils = require('./utils.js');
-var envConfig = require('./config.js');
+const NewCommentNotification = require('./NewCommentNotification.js');
+const templates = require('./templates.js');
+const utils = require('./utils.js');
+const envConfig = require('./config.js');
 
 function WidgetUi (widgetContainer, config) {
 	oCommentUi.WidgetUi.apply(this, arguments);
 
 	config.orderType = config.orderType || "normal";
 
-	var self = this;
+	let self = this;
 
-	var events = new oCommentUtilities.Events();
-	var newCommentNotification;
+	let events = new oCommentUtilities.Events();
+	let newCommentNotification;
 
-	var adaptedToHeight = false;
-	var isPagination = false;
-	var isOpen = true;
-	var scrollMonitor;
+	let adaptedToHeight = false;
+	let isPagination = false;
+	let isOpen = true;
+	let scrollMonitor;
 
-	var destroyed = false;
-	var executeWhenNotDestroyed = function (func) {
+	let destroyed = false;
+	const executeWhenNotDestroyed = function (func) {
 		return function () {
 			if (!destroyed) {
 				func.apply(this, arguments);
@@ -37,7 +35,7 @@ function WidgetUi (widgetContainer, config) {
 	this.off = events.off;
 
 
-	var elements = {};
+	let elements = {};
 
 
 	this.open = function () {
@@ -61,19 +59,19 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.render = function (commentsData, adminMode, paginationEnabled) {
-		var i;
+		let i;
 
 		isPagination = paginationEnabled;
 		oCommentUtilities.logger.debug('isPagination', isPagination);
 
 		self.widgetContainer.innerHTML = "";
 
-		var commentsRendered = [];
+		const commentsRendered = [];
 		for (i = 0; i < commentsData.length; i++) {
 			commentsRendered.push(templates.comment.render(commentsData[i]));
 		}
 
-		var addEditor = function () {
+		const addEditor = function () {
 			self.widgetContainer.appendChild(
 				oCommentUi.utils.toDOM(
 					templates.editor.render({
@@ -85,7 +83,7 @@ function WidgetUi (widgetContainer, config) {
 			);
 		};
 
-		var addComments = function () {
+		const addComments = function () {
 			self.widgetContainer.appendChild(
 				oCommentUi.utils.toDOM(
 					templates.comments.render({
@@ -160,7 +158,7 @@ function WidgetUi (widgetContainer, config) {
 				elements.showMore.after.style.display = 'block';
 			}
 
-			var triggereNextPage = function () {
+			const triggereNextPage = function () {
 				events.trigger('nextPage');
 			};
 
@@ -173,7 +171,7 @@ function WidgetUi (widgetContainer, config) {
 			elements.commentContainer.addEventListener('click', function (event) {
 				if (event.target.className === 'o-chat--delete') {
 					try {
-						var commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
+						const commentId = event.target.parentNode.id.match(/commentid-([0-9]+)/)[1];
 
 						events.trigger('deleteComment', commentId);
 					} catch (e) {}
@@ -189,7 +187,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.adaptToHeight = function (height) {
-		var adapt = executeWhenNotDestroyed(function () {
+		const adapt = executeWhenNotDestroyed(function () {
 			if (!adaptedToHeight) {
 				if (isPagination) {
 					self.disableButtonPagination();
@@ -198,25 +196,25 @@ function WidgetUi (widgetContainer, config) {
 				}
 			}
 
-			var editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorContainer);
+			const editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorContainer);
 
-			var editorContainerMarginTopValue;
-			var editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
+			let editorContainerMarginTopValue;
+			const editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
 			if (editorContainerMarginTop.indexOf('px') !== -1) {
 				editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
 			} else {
 				editorContainerMarginTopValue = 0;
 			}
 
-			var editorContainerMarginBottomValue;
-			var editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
+			let editorContainerMarginBottomValue;
+			const editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
 			if (editorContainerMarginBottom.indexOf('px') !== -1) {
 				editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
 			} else {
 				editorContainerMarginBottomValue = 0;
 			}
 
-			var editorHeight = elements.editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
+			const editorHeight = elements.editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
 			elements.commentArea.style.overflow = "auto";
 			elements.commentArea.style.height = (height - editorHeight) + "px";
 
@@ -231,7 +229,7 @@ function WidgetUi (widgetContainer, config) {
 		});
 
 		// poll for the existence of container
-		var pollForContainer = setInterval(function () {
+		const pollForContainer = setInterval(function () {
 			if (destroyed) {
 				clearInterval(pollForContainer);
 				return;
@@ -290,7 +288,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.login = function (token, pseudonym, isAdmin) {
-		var authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
+		const authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
 
 		if (authEl) {
 			authEl.innerHTML = templates.loggedIn.render({
@@ -303,7 +301,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.logout = function () {
-		var authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
+		const authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
 
 		if (authEl) {
 			authEl.innerHTML = templates.signIn.render();
@@ -311,7 +309,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.getCurrentPseudonym = function () {
-		var pseudonymArea = self.widgetContainer.querySelector('.o-chat--editor-auth .o-chat--pseudonym');
+		const pseudonymArea = self.widgetContainer.querySelector('.o-chat--editor-auth .o-chat--pseudonym');
 
 		if (pseudonymArea) {
 			return pseudonymArea.innerHTML;
@@ -321,7 +319,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.hideSignInLink = function () {
-		var authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
+		const authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
 
 		if (authEl) {
 			authEl.innerHTML = "";
@@ -349,11 +347,11 @@ function WidgetUi (widgetContainer, config) {
 		ownComment = typeof ownComment === 'boolean' ? ownComment : false;
 
 		// normalize timestamp if one provided or use current time
-		var timestamp = commentData.timestamp ? oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
+		const timestamp = commentData.timestamp ? oCommentUtilities.dateHelper.toTimestamp(commentData.timestamp) : new Date();
 
-		var scrolledToLast;
+		let scrolledToLast;
 
-		var commentDom = oCommentUi.utils.toDOM(
+		let commentDom = oCommentUi.utils.toDOM(
 			templates.comment.render({
 				commentId: commentData.id,
 				content: commentData.content,
@@ -369,9 +367,9 @@ function WidgetUi (widgetContainer, config) {
 		);
 
 
-		var comments = elements.commentContainer.querySelectorAll('.o-chat--wrapper');
-		var i;
-		var inserted = false;
+		const comments = elements.commentContainer.querySelectorAll('.o-chat--wrapper');
+		let i;
+		let inserted = false;
 
 		if (config.orderType === "inverted") {
 			oCommentUtilities.logger.debug("new comment");
@@ -421,7 +419,7 @@ function WidgetUi (widgetContainer, config) {
 		if (this.isRelativeTime(timestamp)) {
 			commentDom = self.widgetContainer.querySelector('#commentid-' + commentData.id);
 
-			var timeoutToStart = 10000;
+			let timeoutToStart = 10000;
 			if (new Date().getTime() - timestamp < 0) {
 				timeoutToStart += Math.abs(new Date().getTime() - timestamp);
 			}
@@ -435,10 +433,10 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.addNextPageComments = function (comments, adminMode) {
-		var commentData;
-		var commentDom;
+		let commentData;
+		let commentDom;
 
-		for (var index = 0; index < comments.length; index++) {
+		for (let index = 0; index < comments.length; index++) {
 			commentData = comments[index];
 
 			commentDom = oCommentUi.utils.toDOM(
@@ -456,7 +454,7 @@ function WidgetUi (widgetContainer, config) {
 				})
 			);
 
-			var previousScrollHeight = elements.commentArea.scrollHeight;
+			const previousScrollHeight = elements.commentArea.scrollHeight;
 			if (config.orderType === "inverted") {
 				elements.commentContainer.insertBefore(commentDom, elements.commentContainer.firstChild);
 
@@ -468,28 +466,28 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.removeComment = function (id) {
-		var comment = self.widgetContainer.querySelector('#commentid-'+id);
+		const comment = self.widgetContainer.querySelector('#commentid-'+id);
 		if (comment) {
 			comment.parentNode.removeChild(comment);
 		}
 	};
 
 	this.updateComment = function (id, newContent) {
-		var commentContentEl = self.widgetContainer.querySelector('#commentid-' + id + ' .o-chat--content');
+		const commentContentEl = self.widgetContainer.querySelector('#commentid-' + id + ' .o-chat--content');
 		if (commentContentEl) {
 			commentContentEl.innerHTML = newContent;
 		}
 	};
 
 	this.markCommentAsDeleteInProgress = function (id) {
-		var comment = self.widgetContainer.querySelector('#commentid-'+id);
+		const comment = self.widgetContainer.querySelector('#commentid-'+id);
 		if (comment) {
 			comment.className += " o-chat--delete-progress";
 		}
 	};
 
 	this.markCommentAsDeleteInProgressEnded = function (id) {
-		var comment = self.widgetContainer.querySelector('#commentid-'+id);
+		const comment = self.widgetContainer.querySelector('#commentid-'+id);
 		if (comment) {
 			comment.className = comment.className.replace("o-chat--delete-progress", "");
 		}
@@ -516,7 +514,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.addSettingsLink = function (options) {
-		var loginBarContainer = self.widgetContainer.querySelector('.o-chat--editor-auth');
+		const loginBarContainer = self.widgetContainer.querySelector('.o-chat--editor-auth');
 
 		if (loginBarContainer) {
 			loginBarContainer.appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.commentingSettingsLink.render({
@@ -527,7 +525,7 @@ function WidgetUi (widgetContainer, config) {
 			return;
 		}
 
-		var settingsLink = loginBarContainer.querySelector('.o-comment-ui--settings-text');
+		const settingsLink = loginBarContainer.querySelector('.o-comment-ui--settings-text');
 		if (settingsLink) {
 			settingsLink.addEventListener('click', function () {
 				if (options && typeof options.onClick === 'function') {
@@ -542,7 +540,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.removeSettingsLink = function () {
-		var settingsLink = self.widgetContainer.querySelector('.o-comment-ui--settings');
+		const settingsLink = self.widgetContainer.querySelector('.o-comment-ui--settings');
 		if (settingsLink) {
 			settingsLink.parentNode.removeChild(settingsLink);
 		}
@@ -557,14 +555,14 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.showOwnCommentBadge = function (commentId, type) {
-		var commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
+		const commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
 
 		if (commentElement && !commentElement.querySelector('.o-chat--blocked')) {
-			var badgeElement = document.createElement('div');
+			const badgeElement = document.createElement('div');
 
 			if (type === 'blocked' || type === 'pending') {
-				var text;
-				var className;
+				let text;
+				let className;
 
 				if (type === 'pending') {
 					text = 'pending';
@@ -587,10 +585,10 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.showOwnCommentPending = function (commentId) {
-		var commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
+		const commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
 
 		if (commentElement && !commentElement.querySelector('.o-chat--blocked')) {
-			var blockedElement = document.createElement('div');
+			const blockedElement = document.createElement('div');
 			blockedElement.innerHTML = "blocked";
 			blockedElement.className = "o-chat--blocked";
 
@@ -611,8 +609,8 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.formatTimestamp = function (timestampOrDate) {
-		var timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
-		var isRelative = this.isRelativeTime(timestampOrDate);
+		const timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
+		const isRelative = this.isRelativeTime(timestampOrDate);
 
 		if (isRelative) {
 			// relative time
@@ -628,7 +626,7 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.isRelativeTime = function (timestampOrDate) {
-		var timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
+		const timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
 
 		if (config.datetimeFormat.minutesUntilAbsoluteTime === -1 ||
 			new Date().getTime() - timestamp > config.datetimeFormat.minutesUntilAbsoluteTime * 60 * 1000) {
@@ -639,7 +637,7 @@ function WidgetUi (widgetContainer, config) {
 		}
 	};
 
-	var __superDestroy = this.destroy;
+	let __superDestroy = this.destroy;
 	this.destroy = function () {
 		self.off();
 
@@ -675,7 +673,7 @@ WidgetUi.__extend = function(child) {
 	if (typeof Object.create === 'function') {
 		child.prototype = Object.create(WidgetUi.prototype);
 	} else {
-		var Tmp = function () {};
+		const Tmp = function () {};
 		Tmp.prototype = WidgetUi.prototype;
 		child.prototype = new Tmp();
 		child.prototype.constructor = child;
