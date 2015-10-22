@@ -258,7 +258,7 @@ const Widget = function () {
 	this.onError = function (err) {
 		self.ui.clearContainer();
 
-		if (typeof err !== 'object' || !err || err.unclassifiedArticle !== true) {
+		if (typeof err === 'object'&& err.unclassifiedArticle !== true && err.notAllowedToCreateCollection !== true) {
 			self.ui.addNotAvailableMessage();
 		}
 	};
@@ -271,7 +271,7 @@ const Widget = function () {
 	 */
 	this.render = function (commentsData, callback) {
 		if (commentsData && !destroyed) {
-			if (commentsData.unclassifiedArticle !== true) {
+			if (commentsData.unclassifiedArticle !== true && commentsData.notAllowedToCreateCollection !== true) {
 				self.collectionId = commentsData.collectionId;
 				self.messageQueue = new MessageQueue(self.collectionId);
 				self.trigger('widget.ready');
@@ -339,9 +339,15 @@ const Widget = function () {
 					}
 				}));
 			} else {
-				callback({
-					unclassifiedArticle: true
-				});
+				if (commentsData.unclassifiedArticle === true) {
+					callback({
+						unclassifiedArticle: true
+					});
+				} else if (commentsData.notAllowedToCreateCollection === true) {
+					callback({
+						notAllowedToCreateCollection: true
+					});
+				}
 			}
 		}
 	};
