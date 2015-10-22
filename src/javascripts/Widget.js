@@ -7,6 +7,7 @@ const oCommentUtilities = require('o-comment-utilities');
 const userDialogs = require('./userDialogs.js');
 const i18n = require('./i18n.js');
 const globalEvents = require('./globalEvents.js');
+const envConfig = require('./config.js');
 
 /**
  * Incorporates the communication with the content creation service,
@@ -296,6 +297,10 @@ const Widget = function () {
 					self.ui.clearContainer();
 					// render the widget in the DOM
 					self.ui.render(commentsData.comments, userIsAdmin, isMorePageAvailable);
+
+					if (envConfig.get().showEnvironment === true) {
+						self.ui.showEnvironment(envConfig.get().livefyre.network);
+					}
 
 					// all fine, no errors with the rendering
 					callback();
