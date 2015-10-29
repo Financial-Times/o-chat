@@ -5,8 +5,6 @@ const globalEvents = require('./globalEvents.js');
 const envConfig = require('./config.js');
 
 
-const sessionStorageKey = 'o-comments-auth-last-token';
-
 let loggedIn = false;
 
 /**
