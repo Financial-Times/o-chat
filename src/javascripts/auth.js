@@ -38,7 +38,7 @@ exports.login = function (callback) {
 			} else if (authData.pseudonym === false) {
 				// the user doesn't have pseudonym
 
-				self.pseudonymMissing = true;
+				exports.pseudonymMissing = true;
 				callback(false, authData);
 			} else {
 				callback(false, authData);
@@ -114,7 +114,7 @@ exports.loginRequiredDefaultBehavior = function () {
 };
 
 const loginRequiredDefaultBehaviorWrapper = function (evt) {
-	self.loginRequiredDefaultBehavior(evt.detail.callback);
+	exports.loginRequiredDefaultBehavior(evt.detail.callback);
 };
 exports.setLoginRequiredDefaultBehavior = function () {
 	// add event handler as lowest priority
