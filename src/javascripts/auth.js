@@ -116,7 +116,7 @@ exports.loginRequiredDefaultBehavior = function () {
 const loginRequiredDefaultBehaviorWrapper = function (evt) {
 	self.loginRequiredDefaultBehavior(evt.detail.callback);
 };
-this.setLoginRequiredDefaultBehavior = function () {
+exports.setLoginRequiredDefaultBehavior = function () {
 	// add event handler as lowest priority
 	globalEvents.off('auth.loginRequired', loginRequiredDefaultBehaviorWrapper);
 	globalEvents.on('auth.loginRequired', loginRequiredDefaultBehaviorWrapper);
