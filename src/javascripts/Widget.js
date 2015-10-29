@@ -670,6 +670,7 @@ const Widget = function () {
 					} else {
 						userDialogs.showInactivityMessage({
 							submit: function () {
+								self.messageQueue.save(commentBody);
 								window.location.href = envConfig.get('loginUrl') + '?location=' + encodeURIComponent(document.location.href);
 							},
 							close: function () {
