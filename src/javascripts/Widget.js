@@ -661,8 +661,12 @@ const Widget = function () {
 							handleNewCommentForBadgingComments(postCommentResult);
 						}
 					}));
-				} else if (postCommentResult.invalidSession === true && secondStepOfTryingToPost !== true) {
-					loginRequiredToPostComment(commentBody, true);
+				} else if (postCommentResult.invalidSession === true) {
+					if (secondStepOfTryingToPost !== true) {
+						loginRequiredToPostComment(commentBody, true);
+					} else {
+						userDialogs.showInactivityMessage();
+					}
 				} else {
 					if (postCommentResult.errorMessage) {
 						let match;
