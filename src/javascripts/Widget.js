@@ -505,8 +505,7 @@ const Widget = function () {
 								}
 
 								if (newAuthData && newAuthData.token) {
-									auth.logout();
-									auth.login();
+									self.login(newAuthData.token, newAuthData.displayName, newAuthData.admin || newAuthData.moderator);
 								}
 							});
 						}
