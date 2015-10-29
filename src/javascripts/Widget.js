@@ -665,7 +665,14 @@ const Widget = function () {
 					if (secondStepOfTryingToPost !== true) {
 						loginRequiredToPostComment(commentBody, true);
 					} else {
-						userDialogs.showInactivityMessage();
+						userDialogs.showInactivityMessage({
+							submit: function () {
+								window.location.href = envConfig.get('loginUrl') + '?location=' + encodeURIComponent(document.location.href);
+							},
+							close: function () {
+								self.messageQueue.clear();
+							}
+						});
 					}
 				} else {
 					if (postCommentResult.errorMessage) {
