@@ -620,7 +620,7 @@ const Widget = function () {
 	 * @param {Boolean} secondStepOfTryingToPost Is this the second attempt to post the comment or not
 	 * @returns {undefined}
 	 */
-	const postComment = function (commentBody, secondStepOfTryingToPost) {
+	const postComment = function (commentBody, nrOfTrial) {
 		oCommentApi.api.postComment({
 			collectionId: self.collectionId,
 			commentBody: commentBody
@@ -665,19 +665,7 @@ const Widget = function () {
 						}
 					}));
 				} else if (postCommentResult.invalidSession === true) {
-					if (secondStepOfTryingToPost !== true) {
-						loginRequiredToPostComment(commentBody, true);
-					} else {
-						userDialogs.showInactivityMessage({
-							submit: function () {
-								self.messageQueue.save(commentBody);
-								window.location.href = envConfig.get('loginUrl') + '?location=' + encodeURIComponent(document.location.href);
-							},
-							close: function () {
-								self.messageQueue.clear();
-							}
-						});
-					}
+					loginRequiredToPostComment(commentBody, nrOfTrial);
 				} else {
 					if (postCommentResult.errorMessage) {
 						let match;
@@ -707,23 +695,22 @@ const Widget = function () {
 	};
 
 
-	function loginRequiredToPostComment (commentBody, secondStepOfTryingToPost) {
+	function loginRequiredToPostComment (commentBody, nrOfTrial) {
 		self.messageQueue.save(commentBody);
 		oCommentUtilities.logger.log('user not actively logged in, save comment to the storage');
 
-		let force = false;
-		if (secondStepOfTryingToPost) {
-			force = true;
-		}
+		const force = true;
 
 		auth.loginRequired(executeWhenNotDestroyed(function (err) {
-			if (err) {
+			if (err || nrOfTrial > 2) {
+				self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
 				self.messageQueue.clear();
 				return;
 			}
 
 			self.messageQueue.clear();
-			postComment(commentBody, secondStepOfTryingToPost);
+
+			postComment(commentBody, nrOfTrial + 1);
 		}), force);
 	}
 
@@ -740,17 +727,7 @@ const Widget = function () {
 
 		self.ui.makeReadOnly();
 
-		oCommentApi.api.getAuth(executeWhenNotDestroyed(function (err, authData) {
-			if (!authData || !authData.token) {
-				self.ui.makeEditable();
-				loginRequiredToPostComment(commentBody);
-			} else {
-				if (!loginStatus) {
-					auth.login();
-				}
-				postComment(commentBody);
-			}
-		}));
+		postComment(commentBody, 1);
 	});
 
 
