@@ -68,7 +68,7 @@ function WidgetUi (widgetContainer, config) {
 
 		const commentsRendered = [];
 		for (i = 0; i < commentsData.length; i++) {
-			commentsRendered.push(templates.comment.render(commentsData[i]));
+			commentsRendered.push(templates.comment.render(oCommentUtilities.merge({}, commentsData[i], {isAdmin: adminMode})));
 		}
 
 		const addEditor = function () {
@@ -88,8 +88,7 @@ function WidgetUi (widgetContainer, config) {
 				oCommentUi.utils.toDOM(
 					templates.comments.render({
 						comments: commentsRendered,
-						orderType: config.orderType,
-						adminMode: adminMode
+						orderType: config.orderType
 					})
 				)
 			);
