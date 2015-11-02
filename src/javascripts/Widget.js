@@ -617,10 +617,10 @@ const Widget = function () {
 	 * If unsuccessful, remove the comment from the DOM, repopulate the comment area with the comment and show the error message.
 	 *
 	 * @param {String} commentBody Text of the comment
-	 * @param {Boolean} secondStepOfTryingToPost Is this the second attempt to post the comment or not
+	 * @param {Boolean} retryingToPostAfterReLogin Second trial
 	 * @returns {undefined}
 	 */
-	const postComment = function (commentBody, nrOfTrial) {
+	const postComment = function (commentBody, retryingToPostAfterReLogin) {
 		oCommentApi.api.postComment({
 			collectionId: self.collectionId,
 			commentBody: commentBody
@@ -665,7 +665,11 @@ const Widget = function () {
 						}
 					}));
 				} else if (postCommentResult.invalidSession === true) {
-					loginRequiredToPostComment(commentBody, nrOfTrial);
+					if (!retryingToPostAfterReLogin) {
+						loginRequiredToPostComment(commentBody);
+					} else {
+						postCommentSessionExpired(commentBody);
+					}
 				} else {
 					if (postCommentResult.errorMessage) {
 						let match;
@@ -694,15 +698,28 @@ const Widget = function () {
 		}));
 	};
 
+	function postCommentSessionExpired (commentBody) {
+		self.messageQueue.save(commentBody);
+		oCommentUtilities.logger.log('user session expired, save comment to the storage');
 
-	function loginRequiredToPostComment (commentBody, nrOfTrial) {
+		userDialogs.showInactivityMessage({
+			submit: function () {
+				window.location.href = envConfig.get('loginUrl') + '?location=' + encodeURIComponent(document.location.href);
+			},
+			close: function () {
+				self.messageQueue.clear();
+			}
+		});
+	};
+
+	function loginRequiredToPostComment (commentBody) {
 		self.messageQueue.save(commentBody);
 		oCommentUtilities.logger.log('user not actively logged in, save comment to the storage');
 
 		const force = true;
 
 		auth.loginRequired(executeWhenNotDestroyed(function (err) {
-			if (err || nrOfTrial > 2) {
+			if (err) {
 				self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
 				self.messageQueue.clear();
 				return;
@@ -710,7 +727,7 @@ const Widget = function () {
 
 			self.messageQueue.clear();
 
-			postComment(commentBody, nrOfTrial + 1);
+			postComment(commentBody, true);
 		}), force);
 	}
 
