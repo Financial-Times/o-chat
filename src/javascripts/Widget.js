@@ -130,9 +130,9 @@ const Widget = function () {
 
 	let lastBannedCommentId;
 	let lastPendingCommentId;
-	let lastOwnCommentId;
 
 	let commentIds = [];
+	let ownCommentIds = [];
 
 	let destroyed = false;
 	const executeWhenNotDestroyed = function (func) {
@@ -453,8 +453,18 @@ const Widget = function () {
 		self.ui.removeComment(commentId);
 	}
 
-	function commentUpdated (comment) {
-		self.ui.updateComment(comment.commentId, comment.content);
+	function commentUpdated (commentData) {
+		if (commentData.content) {
+			self.ui.updateComment(commentData.commentId, commentData.content);
+		}
+
+		if (commentData.visibility !== commentData.lastVisibility) {
+			handleStreamEventForBadgingComments(commentData);
+		}
+
+		if (commentData.visibility !== commentData.lastVisibility && commentData.visibility === 2 && ownCommentIds.indexOf(commentData.commentId) === -1) {
+			self.ui.removeComment(commentData.commentId);
+		}
 	}
 
 
@@ -465,10 +475,7 @@ const Widget = function () {
 				// comment deleted
 				commentDeleted(streamData.comment.commentId);
 			} else if (streamData.comment.updated === true) {
-				commentUpdated({
-					commentId: streamData.comment.commentId,
-					content: streamData.comment.content
-				});
+				commentUpdated(streamData.comment);
 			} else if (streamData.comment.commentId) {
 				// new comment
 				newCommentReceived(streamData.comment);
@@ -650,6 +657,8 @@ const Widget = function () {
 									displayName: authData.displayName
 								}
 							});
+
+							ownCommentIds.push(postCommentResult.commentId);
 
 							if (!hasCommentId(postCommentResult.commentId)) {
 								commentIds.push(postCommentResult.commentId);
@@ -851,20 +860,19 @@ const Widget = function () {
 		}
 	}
 
-	function handleNewCommentForBadgingComments (commentData) {
-		lastOwnCommentId = commentData.commentId;
+	function handleNewCommentForBadgingComments () {
 		checkIfOwnCommentIsBanned();
 		checkIfOwnCommentIsPending();
 	}
 
 	function checkIfOwnCommentIsBanned () {
-		if (lastBannedCommentId === lastOwnCommentId) {
+		if (ownCommentIds.indexOf(lastBannedCommentId) !== -1) {
 			self.ui.showOwnCommentBadge(lastBannedCommentId, 'blocked');
 		}
 	}
 
 	function checkIfOwnCommentIsPending () {
-		if (lastPendingCommentId === lastOwnCommentId) {
+		if (ownCommentIds.indexOf(lastPendingCommentId) !== -1) {
 			self.ui.showOwnCommentBadge(lastPendingCommentId, 'pending');
 		}
 	}
@@ -883,6 +891,7 @@ const Widget = function () {
 		userIsAdmin = null;
 		renderComplete = null;
 		commentIds = null;
+		ownCommentIds = null;
 
 		self.collectionId = null;
 
