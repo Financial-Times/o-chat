@@ -68,7 +68,7 @@ function WidgetUi (widgetContainer, config) {
 
 		const commentsRendered = [];
 		for (i = 0; i < commentsData.length; i++) {
-			commentsRendered.push(templates.comment.render(oCommentUtilities.merge({}, commentsData[i], {isAdmin: adminMode})));
+			commentsRendered.push(templates.comment.render(oCommentUtilities.merge({}, commentsData[i], {adminMode: adminMode})));
 		}
 
 		const addEditor = function () {
