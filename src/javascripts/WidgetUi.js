@@ -556,44 +556,16 @@ function WidgetUi (widgetContainer, config) {
 	this.showOwnCommentBadge = function (commentId, type) {
 		const commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
 
-		if (commentElement && !commentElement.querySelector('.o-chat--blocked')) {
-			const badgeElement = document.createElement('div');
+		if (type === 'blocked' || type === 'pending') {
+			if (commentElement && !commentElement.querySelector('.o-chat--' + type)) {
+				const badgeElement = document.createElement('div');
 
-			if (type === 'blocked' || type === 'pending') {
-				let text;
-				let className;
-
-				if (type === 'pending') {
-					text = 'pending';
-					className = 'o-chat--pending';
-				}
-
-				if (type === 'blocked') {
-					text = 'blocked';
-					className = 'o-chat--blocked';
-				}
-
-
-				badgeElement.innerHTML = text;
-				badgeElement.className = className;
+				badgeElement.innerHTML = type;
+				badgeElement.className = 'o-chat--' + type;
 
 				commentElement.insertBefore(badgeElement, commentElement.firstChild);
 				scrollToLastComment();
 			}
-		}
-	};
-
-	this.showOwnCommentPending = function (commentId) {
-		const commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
-
-		if (commentElement && !commentElement.querySelector('.o-chat--blocked')) {
-			const blockedElement = document.createElement('div');
-			blockedElement.innerHTML = "blocked";
-			blockedElement.className = "o-chat--blocked";
-
-			commentElement.insertBefore(blockedElement, commentElement.firstChild);
-
-			scrollToLastComment();
 		}
 	};
 

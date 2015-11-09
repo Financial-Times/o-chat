@@ -462,7 +462,7 @@ const Widget = function () {
 			handleStreamEventForBadgingComments(commentData);
 		}
 
-		if (commentData.visibility !== commentData.lastVisibility && commentData.visibility === 2 && ownCommentIds.indexOf(commentData.commentId) === -1) {
+		if (commentData.visibility !== commentData.lastVisibility && commentData.visibility > 1 && ownCommentIds.indexOf(commentData.commentId) === -1) {
 			self.ui.removeComment(commentData.commentId);
 		}
 	}
