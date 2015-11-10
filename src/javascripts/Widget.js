@@ -448,22 +448,28 @@ const Widget = function () {
 		handleStreamEventForBadgingComments(commentData);
 	}
 
-	function commentDeleted (commentId) {
+	function removeComment (commentId) {
 		removeCommentId(commentId);
 		self.ui.removeComment(commentId);
 	}
 
 	function commentUpdated (commentData) {
 		if (commentData.content) {
-			self.ui.updateComment(commentData.commentId, commentData.content);
+			if (hasCommentId(commentData.commentId)) {
+				self.ui.updateComment(commentData.commentId, commentData.content);
+			} else {
+				commentIds.push(commentData.commentId);
+				self.ui.addComment({
+					id: commentData.commentId,
+					content: commentData.content,
+					timestamp: commentData.timestamp,
+					displayName: commentData.author.displayName
+				}, (commentData.author.displayName.substring(0, 50) === self.ui.getCurrentPseudonym()), userIsAdmin);
+			}
 		}
 
 		if (commentData.visibility !== commentData.lastVisibility) {
 			handleStreamEventForBadgingComments(commentData);
-		}
-
-		if (commentData.visibility !== commentData.lastVisibility && commentData.visibility > 1 && ownCommentIds.indexOf(commentData.commentId) === -1) {
-			self.ui.removeComment(commentData.commentId);
 		}
 	}
 
@@ -473,7 +479,7 @@ const Widget = function () {
 			// comment related
 			if (streamData.comment.deleted === true) {
 				// comment deleted
-				commentDeleted(streamData.comment.commentId);
+				removeComment(streamData.comment.commentId);
 			} else if (streamData.comment.updated === true) {
 				commentUpdated(streamData.comment);
 			} else if (streamData.comment.commentId) {
@@ -753,7 +759,7 @@ const Widget = function () {
 
 		self.ui.makeReadOnly();
 
-		postComment(commentBody, 1);
+		postComment(commentBody);
 	});
 
 
@@ -773,7 +779,8 @@ const Widget = function () {
 
 			if (deleteCommentResult) {
 				if (deleteCommentResult.success === true) {
-					self.ui.removeComment(commentId);
+					removeComment(commentId);
+
 					self.trigger('tracking.deleteComment', {
 						collectionId: self.collectionId,
 						comment: {
@@ -848,15 +855,36 @@ const Widget = function () {
 
 	function handleStreamEventForBadgingComments (commentData) {
 		if (commentData) {
+			if (commentData.visibility !== commentData.lastVisibility) {
+				if (commentData.visibility > 1 && ownCommentIds.indexOf(commentData.commentId) === -1 && !userIsAdmin) {
+					removeComment(commentData.commentId);
+				}
+
+				if (commentData.visibility === 1 && (ownCommentIds.indexOf(commentData.commentId) !== -1 || userIsAdmin)) {
+					if (commentData.lastVisibility === 2) {
+						self.ui.renewmoveOwnCommentBadge(commentData.commentId, 'blocked');
+					}
+
+					if (commentData.lastVisibility === 3) {
+						self.ui.removeOwnCommentBadge(commentData.commentId, 'pending');
+					}
+				}
+			}
+
+
 			if (commentData.visibility === 2) {
 				lastBannedCommentId = commentData.commentId;
-				checkIfOwnCommentIsBanned();
+				checkIfOwnCommentIsBanned(commentData.commentId);
 			}
 
 			if (commentData.visibility === 3) {
 				lastPendingCommentId = commentData.commentId;
-				checkIfOwnCommentIsPending();
+				checkIfOwnCommentIsPending(commentData.commentId);
 			}
+		}
+
+		if (commentData) {
+
 		}
 	}
 
@@ -865,15 +893,17 @@ const Widget = function () {
 		checkIfOwnCommentIsPending();
 	}
 
-	function checkIfOwnCommentIsBanned () {
-		if (ownCommentIds.indexOf(lastBannedCommentId) !== -1) {
-			self.ui.showOwnCommentBadge(lastBannedCommentId, 'blocked');
+	function checkIfOwnCommentIsBanned (commentId) {
+		commentId = commentId || lastBannedCommentId;
+		if (ownCommentIds.indexOf(commentId) !== -1) {
+			self.ui.showOwnCommentBadge(commentId, 'blocked');
 		}
 	}
 
-	function checkIfOwnCommentIsPending () {
-		if (ownCommentIds.indexOf(lastPendingCommentId) !== -1) {
-			self.ui.showOwnCommentBadge(lastPendingCommentId, 'pending');
+	function checkIfOwnCommentIsPending (commentId) {
+		commentId = commentId || lastPendingCommentId;
+		if (ownCommentIds.indexOf(commentId) !== -1) {
+			self.ui.showOwnCommentBadge(commentId, 'pending');
 		}
 	}
 

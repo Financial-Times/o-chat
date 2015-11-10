@@ -569,6 +569,20 @@ function WidgetUi (widgetContainer, config) {
 		}
 	};
 
+	this.removeOwnCommentBadge = function (commentId, type) {
+		const commentElement = self.widgetContainer.querySelector('#commentid-'+ commentId);
+
+		if (type === 'blocked' || type === 'pending') {
+			if (commentElement) {
+				const badge = commentElement.querySelector('.o-chat--' + type);
+
+				if (badge) {
+					badge.parentNode.removeChild(badge);
+				}
+			}
+		}
+	};
+
 	this.setEditorError = function (err) {
 		elements.editorErrorContainer.innerHTML = err;
 		elements.editorErrorContainer.style.display = 'block';
