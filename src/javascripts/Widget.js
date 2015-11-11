@@ -860,7 +860,7 @@ const Widget = function () {
 					removeComment(commentData.commentId);
 				}
 
-				if (commentData.visibility === 1 && (ownCommentIds.indexOf(commentData.commentId) !== -1 || userIsAdmin)) {
+				if (ownCommentIds.indexOf(commentData.commentId) !== -1 || userIsAdmin) {
 					if (commentData.lastVisibility === 2) {
 						self.ui.removeOwnCommentBadge(commentData.commentId, 'blocked');
 					}
