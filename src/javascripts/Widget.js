@@ -862,7 +862,7 @@ const Widget = function () {
 
 				if (commentData.visibility === 1 && (ownCommentIds.indexOf(commentData.commentId) !== -1 || userIsAdmin)) {
 					if (commentData.lastVisibility === 2) {
-						self.ui.renewmoveOwnCommentBadge(commentData.commentId, 'blocked');
+						self.ui.removeOwnCommentBadge(commentData.commentId, 'blocked');
 					}
 
 					if (commentData.lastVisibility === 3) {
@@ -895,14 +895,14 @@ const Widget = function () {
 
 	function checkIfOwnCommentIsBanned (commentId) {
 		commentId = commentId || lastBannedCommentId;
-		if (ownCommentIds.indexOf(commentId) !== -1) {
+		if (ownCommentIds.indexOf(commentId) !== -1 || userIsAdmin) {
 			self.ui.showOwnCommentBadge(commentId, 'blocked');
 		}
 	}
 
 	function checkIfOwnCommentIsPending (commentId) {
 		commentId = commentId || lastPendingCommentId;
-		if (ownCommentIds.indexOf(commentId) !== -1) {
+		if (ownCommentIds.indexOf(commentId) !== -1 || userIsAdmin) {
 			self.ui.showOwnCommentBadge(commentId, 'pending');
 		}
 	}
