@@ -558,6 +558,20 @@ const Widget = function () {
 	globalEvents.on('auth.logout', logout);
 
 
+	function sessionExpired (onCancel) {
+		userDialogs.showInactivityMessage({
+			submit: function () {
+				window.location.href = envConfig.get('loginUrl') + '?location=' + encodeURIComponent(document.location.href);
+			},
+			close: function () {
+				if (typeof onCancel === 'function') {
+					onCancel();
+				}
+			}
+		});
+	};
+
+
 
 	// sign in button pressed
 	self.ui.on('signIn', function () {
@@ -683,7 +697,10 @@ const Widget = function () {
 					if (!retryingToPostAfterReLogin) {
 						loginRequiredToPostComment(commentBody);
 					} else {
-						postCommentSessionExpired(commentBody);
+						self.messageQueue.save(commentBody);
+						sessionExpired(function () {
+							self.messageQueue.clear();
+						});
 					}
 				} else {
 					if (postCommentResult.errorMessage) {
@@ -702,7 +719,13 @@ const Widget = function () {
 
 						self.ui.setEditorError(errMsg);
 					} else {
-						self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
+						let errMsg = oCommentUi.i18n.texts.genericError;
+
+						if (postCommentResult.code && oCommentUi.i18n.serviceCodeMessages[postCommentResult.code]) {
+							errMsg = oCommentUi.i18n.serviceCodeMessages[postCommentResult.code]
+						}
+
+						self.ui.setEditorError(errMsg);
 					}
 
 					return;
@@ -711,20 +734,6 @@ const Widget = function () {
 				self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
 			}
 		}));
-	};
-
-	function postCommentSessionExpired (commentBody) {
-		self.messageQueue.save(commentBody);
-		oCommentUtilities.logger.log('user session expired, save comment to the storage');
-
-		userDialogs.showInactivityMessage({
-			submit: function () {
-				window.location.href = envConfig.get('loginUrl') + '?location=' + encodeURIComponent(document.location.href);
-			},
-			close: function () {
-				self.messageQueue.clear();
-			}
-		});
 	};
 
 	function loginRequiredToPostComment (commentBody) {
@@ -766,7 +775,7 @@ const Widget = function () {
 
 
 
-	function deleteComment (commentId, secondStepOfTryingToDelete) {
+	function deleteComment (commentId, retryingToPostAfterReLogin) {
 		oCommentApi.api.deleteComment({
 			collectionId: self.collectionId,
 			commentId: commentId
@@ -787,8 +796,14 @@ const Widget = function () {
 							id: commentId
 						}
 					});
-				} else if (deleteCommentResult.invalidSession === true && secondStepOfTryingToDelete !== true) {
-					loginRequiredToDeleteComment(commentId, true);
+				} else if (deleteCommentResult.invalidSession === true) {
+					if (!retryingToPostAfterReLogin) {
+						loginRequiredToDeleteComment(commentId);
+					} else {
+						sessionExpired(function () {
+							self.ui.markCommentAsDeleteInProgressEnded(commentId);
+						});
+					}
 				} else {
 					self.ui.markCommentAsDeleteInProgressEnded(commentId);
 
@@ -808,7 +823,13 @@ const Widget = function () {
 
 						userDialogs.showMessage("Delete comment", errMsg);
 					} else {
-						userDialogs.showMessage("Delete comment", oCommentUi.i18n.texts.genericError);
+						let errMsg = oCommentUi.i18n.texts.genericError;
+
+						if (deleteCommentResult.code && oCommentUi.i18n.serviceCodeMessages[deleteCommentResult.code]) {
+							errMsg = oCommentUi.i18n.serviceCodeMessages[deleteCommentResult.code]
+						}
+
+						userDialogs.showMessage("Delete comment", errMsg);
 					}
 
 					return;
@@ -821,20 +842,19 @@ const Widget = function () {
 		}));
 	}
 
-	function loginRequiredToDeleteComment (commentId, secondStepOfTryingToDelete) {
-		let force = false;
-		if (secondStepOfTryingToDelete) {
-			force = true;
-		}
+	function loginRequiredToDeleteComment (commentId) {
+		const force = true;
 
-		auth.loginRequired({
-			success: executeWhenNotDestroyed(function () {
-				deleteComment(commentId, secondStepOfTryingToDelete);
-			}),
-			failure: executeWhenNotDestroyed(function () {
+		auth.loginRequired(executeWhenNotDestroyed(function (err) {
+			if (err) {
 				self.ui.markCommentAsDeleteInProgressEnded(commentId);
-			})
-		}, force);
+				userDialogs.showMessage("Delete comment", oCommentUi.i18n.texts.genericError);
+
+				return;
+			}
+
+			deleteComment(commentId, true);
+		}), force);
 	}
 
 	self.ui.on('deleteComment', function (commentId) {
