@@ -336,6 +336,8 @@ const Widget = function () {
 							} else if (authData.serviceUp === false) {
 								self.ui.makeReadOnly();
 								self.ui.hideSignInLink();
+								self.ui.addAuthNotAvailableMessage();
+								self.ui.hideEditor();
 							}
 						} else if (self.forceMode === true) {
 							const messageInTheQueue = self.messageQueue.getComment();

@@ -42,37 +42,35 @@
 	cursor: default;
 }
 
-.o-chat--editor-container {
-	.o-chat--editor-closed {
-		display: none;
+.o-chat--editor-closed {
+	display: none;
 
-		background: oColorsGetPaletteColor("white");
-		border: 1px solid #b2b2b2;
-		color: oColorsGetPaletteColor("grey-tint4");
-		margin-top: 41px;
-		margin-bottom: 42px;
-		padding: 5px 10px;
-		font-weight: bold;
-	}
+	background: oColorsGetPaletteColor("white");
+	border: 1px solid #b2b2b2;
+	color: oColorsGetPaletteColor("grey-tint4");
+	margin-top: 41px;
+	margin-bottom: 42px;
+	padding: 5px 10px;
+	font-weight: bold;
+}
 
-	.o-chat--editor-header {
-		margin-bottom: 4px;
-	}
+.o-chat--editor-auth-container {
+	margin-bottom: 4px;
+}
 
-	.o-comment-ui--settings {
-		float: right;
-	}
+.o-comment-ui--settings {
+	float: right;
+}
 
-	.o-chat--editor-input {
-		border: 1px solid oColorsGetPaletteColor("pink-tint2");
-		padding: 5px 10px;
-		background: oColorsGetPaletteColor("white");
-		cursor: text;
-		position: relative;
+.o-chat--editor-input {
+	border: 1px solid oColorsGetPaletteColor("pink-tint2");
+	padding: 5px 10px;
+	background: oColorsGetPaletteColor("white");
+	cursor: text;
+	position: relative;
 
-		&.disabled {
-			background: oColorsGetPaletteColor("pink-tint2");
-		}
+	&.disabled {
+		background: oColorsGetPaletteColor("pink-tint2");
 	}
 
 	textarea {
@@ -91,39 +89,39 @@
 			background: oColorsGetPaletteColor("pink-tint2");
 		}
 	}
+}
 
-	.o-chat--editor-error {
-		position: absolute;
-		bottom: 0;
-		right: 0;
-		max-width: 50%;
-		padding: 5px 10px;
-		background: oColorsGetPaletteColor("red");
-		color: oColorsGetPaletteColor("white");
-		line-height: 15px;
-		display: none;
-	}
+.o-chat--editor-error {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	max-width: 50%;
+	padding: 5px 10px;
+	background: oColorsGetPaletteColor("red");
+	color: oColorsGetPaletteColor("white");
+	line-height: 15px;
+	display: none;
+}
 
-	.o-chat--editor-footer {
-		border: 1px solid oColorsGetPaletteColor("pink-tint2");
-		border-top: 0;
-	}
+.o-chat--editor-footer {
+	border: 1px solid oColorsGetPaletteColor("pink-tint2");
+	border-top: 0;
+}
 
-	.o-chat--editor-submit {
-		float: right;
+.o-chat--editor-submit {
+	float: right;
 
-		button {
-			@include o-comment-ui--button();
-			border-radius: 0;
-			font-size: 12px;
-			font-family: $o-chat-font-family;
-			text-shadow: none;
-			min-height: 28px;
-			line-height: 28px;
-		}
+	button {
+		@include o-comment-ui--button();
+		border-radius: 0;
+		font-size: 12px;
+		font-family: $o-chat-font-family;
+		text-shadow: none;
+		min-height: 28px;
+		line-height: 28px;
 	}
 }
 
-.o-chat--editor-terms {
+.o-chat--editor-container {
 	padding-bottom: 16px;
 }

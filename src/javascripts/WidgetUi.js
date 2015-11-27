@@ -111,6 +111,9 @@ function WidgetUi (widgetContainer, config) {
 		elements.commentContainer = self.widgetContainer.querySelector('.o-chat--comments-container');
 		elements.commentArea = self.widgetContainer.querySelector('.o-chat--comments-area');
 		elements.editorContainer = self.widgetContainer.querySelector('.o-chat--editor-container');
+		elements.editorArea = self.widgetContainer.querySelector('.o-chat--editor-area');
+		elements.editorAuthContainer = self.widgetContainer.querySelector('.o-chat--editor-auth-container');
+		elements.editorAuth = self.widgetContainer.querySelector('.o-chat--editor-auth');
 		elements.signIn = self.widgetContainer.querySelector('.o-chat--signIn');
 		elements.postCommentButton = self.widgetContainer.querySelector('.o-chat--editor-submit > button');
 		elements.editorInput = self.widgetContainer.querySelector('.o-chat--editor-input');
@@ -195,25 +198,25 @@ function WidgetUi (widgetContainer, config) {
 				}
 			}
 
-			const editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorContainer);
+			const editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorArea);
 
-			let editorContainerMarginTopValue;
-			const editorContainerMarginTop = editorComputedStyle.getPropertyValue('margin-top');
-			if (editorContainerMarginTop.indexOf('px') !== -1) {
-				editorContainerMarginTopValue = parseInt(editorContainerMarginTop.replace('px', ''), 10);
+			let editorAreaMarginTopValue;
+			const editorAreaMarginTop = editorComputedStyle.getPropertyValue('margin-top');
+			if (editorAreaMarginTop.indexOf('px') !== -1) {
+				editorAreaMarginTopValue = parseInt(editorAreaMarginTop.replace('px', ''), 10);
 			} else {
-				editorContainerMarginTopValue = 0;
+				editorAreaMarginTopValue = 0;
 			}
 
-			let editorContainerMarginBottomValue;
-			const editorContainerMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
-			if (editorContainerMarginBottom.indexOf('px') !== -1) {
-				editorContainerMarginBottomValue = parseInt(editorContainerMarginBottom.replace('px', ''), 10);
+			let editorAreaMarginBottomValue;
+			const editorAreaMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
+			if (editorAreaMarginBottom.indexOf('px') !== -1) {
+				editorAreaMarginBottomValue = parseInt(editorAreaMarginBottom.replace('px', ''), 10);
 			} else {
-				editorContainerMarginBottomValue = 0;
+				editorAreaMarginBottomValue = 0;
 			}
 
-			const editorHeight = elements.editorContainer.clientHeight + editorContainerMarginTopValue + editorContainerMarginBottomValue;
+			const editorHeight = elements.editorArea.clientHeight + editorAreaMarginTopValue + editorAreaMarginBottomValue;
 			elements.commentArea.style.overflow = "auto";
 			elements.commentArea.style.height = (height - editorHeight) + "px";
 
@@ -287,10 +290,8 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.login = function (token, pseudonym, isAdmin) {
-		const authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
-
-		if (authEl) {
-			authEl.innerHTML = templates.loggedIn.render({
+		if (elements.editorAuth) {
+			elements.editorAuth.innerHTML = templates.loggedIn.render({
 				token: token,
 				pseudonym: pseudonym.substring(0, 50),
 				livefyreNetwork: envConfig.get().livefyre.network,
@@ -300,15 +301,13 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.logout = function () {
-		const authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
-
-		if (authEl) {
-			authEl.innerHTML = templates.signIn.render();
+		if (elements.editorAuth) {
+			elements.editorAuth.innerHTML = templates.signIn.render();
 		}
 	};
 
 	this.getCurrentPseudonym = function () {
-		const pseudonymArea = self.widgetContainer.querySelector('.o-chat--editor-auth .o-chat--pseudonym');
+		const pseudonymArea = elements.editorAuth.querySelector('.o-chat--pseudonym');
 
 		if (pseudonymArea) {
 			return pseudonymArea.innerHTML;
@@ -318,11 +317,25 @@ function WidgetUi (widgetContainer, config) {
 	};
 
 	this.hideSignInLink = function () {
-		const authEl = self.widgetContainer.querySelector('.o-chat--editor-auth');
-
-		if (authEl) {
-			authEl.innerHTML = "";
+		if (elements.editorAuth) {
+			elements.editorAuth.innerHTML = "";
 		}
+	};
+
+	/**
+	 * Inserts message when SUDS reports as authentication is not available.
+	 * @return {undefined}
+	 */
+	this.addAuthNotAvailableMessage = function () {
+		elements.editorAuthContainer.appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.authUnavailableTemplate.render()));
+	};
+
+	this.hideEditor = function () {
+		elements.editorContainer.style.display = 'none';
+	};
+
+	this.showEditor = function () {
+		elements.editorContainer.style.display = 'block';
 	};
 
 	this.makeReadOnly = function () {
