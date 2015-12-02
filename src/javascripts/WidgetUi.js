@@ -327,7 +327,9 @@ function WidgetUi (widgetContainer, config) {
 	 * @return {undefined}
 	 */
 	this.addAuthNotAvailableMessage = function () {
-		elements.editorAuthContainer.appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.authUnavailableTemplate.render()));
+		elements.editorAuthContainer.appendChild(oCommentUi.utils.toDOM(oCommentUi.templates.authUnavailableTemplate.render({
+			fontSize: '13px'
+		})));
 	};
 
 	this.hideEditor = function () {
@@ -605,6 +607,15 @@ function WidgetUi (widgetContainer, config) {
 		elements.editorErrorContainer.style.display = 'none';
 		elements.editorErrorContainer.innerHTML = '';
 	};
+
+
+	this.showEnvironment = function (envName) {
+		elements.editorArea.insertBefore(oCommentUi.utils.toDOM(oCommentUi.templates.environmentDisplay.render({
+			envName: envName
+		})), elements.editorArea.firstChild);
+	};
+
+
 
 	this.formatTimestamp = function (timestampOrDate) {
 		const timestamp = oCommentUtilities.dateHelper.toTimestamp(timestampOrDate);
