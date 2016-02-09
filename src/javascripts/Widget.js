@@ -8,6 +8,7 @@ const userDialogs = require('./userDialogs.js');
 const i18n = require('./i18n.js');
 const globalEvents = require('./globalEvents.js');
 const envConfig = require('./config.js');
+const oTrackingIntegration = require('./oTrackingIntegration');
 
 /**
  * Incorporates the communication with the content creation service,
@@ -275,7 +276,10 @@ const Widget = function () {
 			if (commentsData.unclassifiedArticle !== true && commentsData.notAllowedToCreateCollection !== true) {
 				self.collectionId = commentsData.collectionId;
 				self.messageQueue = new MessageQueue(self.collectionId);
+
 				self.trigger('widget.ready');
+				self.trigger('widget.load');
+				oTrackingIntegration.trackSuccessLoad();
 
 				auth.login(executeWhenNotDestroyed(function (loggedIn, authData) {
 					if (!authData) {
@@ -635,7 +639,17 @@ const Widget = function () {
 				}
 			}
 		});
+		oTrackingIntegration.trackPost(self.colleciontId);
 	}
+
+
+	let errorTrackSent = false;
+	this.on('error.init', function () {
+		if (!errorTrackSent) {
+			errorTrackSent = true;
+			oTrackingIntegration.trackCcsDown();
+		}
+	});
 
 	/**
 	 * Post a comment.
