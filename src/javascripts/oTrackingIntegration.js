@@ -1,8 +1,6 @@
 const oCommentUtilities = require('o-comment-utilities');
 const globalEvents = require('./globalEvents');
 
-/* global Track */
-
 /**
  * Tracks a comment post.
  * @param  {number} collectionId Livefyre collection ID.
