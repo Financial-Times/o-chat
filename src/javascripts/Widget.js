@@ -129,9 +129,6 @@ const Widget = function () {
 	let userIsAdmin = false;
 	let renderComplete = false;
 
-	let lastBannedCommentId;
-	let lastPendingCommentId;
-
 	let commentIds = [];
 	let ownCommentIds = [];
 
@@ -705,8 +702,6 @@ const Widget = function () {
 									displayName: authData.displayName
 								}, true, userIsAdmin);
 							}
-
-							handleNewCommentForBadgingComments(postCommentResult);
 						}
 					}));
 				} else if (postCommentResult.invalidSession === true) {
@@ -892,7 +887,7 @@ const Widget = function () {
 	function handleStreamEventForBadgingComments (commentData) {
 		if (commentData) {
 			if (commentData.visibility !== commentData.lastVisibility) {
-				if (commentData.visibility > 1 && ownCommentIds.indexOf(commentData.commentId) === -1 && !userIsAdmin) {
+				if (commentData.visibility !== 1 && ownCommentIds.indexOf(commentData.commentId) === -1 && !userIsAdmin) {
 					removeComment(commentData.commentId);
 				}
 
@@ -909,35 +904,22 @@ const Widget = function () {
 
 
 			if (commentData.visibility === 2) {
-				lastBannedCommentId = commentData.commentId;
 				checkIfOwnCommentIsBanned(commentData.commentId);
 			}
 
 			if (commentData.visibility === 3) {
-				lastPendingCommentId = commentData.commentId;
 				checkIfOwnCommentIsPending(commentData.commentId);
 			}
 		}
-
-		if (commentData) {
-
-		}
-	}
-
-	function handleNewCommentForBadgingComments () {
-		checkIfOwnCommentIsBanned();
-		checkIfOwnCommentIsPending();
 	}
 
 	function checkIfOwnCommentIsBanned (commentId) {
-		commentId = commentId || lastBannedCommentId;
 		if (ownCommentIds.indexOf(commentId) !== -1 || userIsAdmin) {
 			self.ui.showOwnCommentBadge(commentId, 'blocked');
 		}
 	}
 
 	function checkIfOwnCommentIsPending (commentId) {
-		commentId = commentId || lastPendingCommentId;
 		if (ownCommentIds.indexOf(commentId) !== -1 || userIsAdmin) {
 			self.ui.showOwnCommentBadge(commentId, 'pending');
 		}
