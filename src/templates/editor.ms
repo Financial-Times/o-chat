@@ -7,7 +7,7 @@
 	</div>
 	<div class="o-chat--editor-container">
 		<div class="o-chat--editor-closed">
-			<span class="o-comment-ui--icon-lock"></span> This conversation is closed to new comments.
+			<span class="o-comment-ui--icon-lock o-chat--lock-icon"></span> This conversation is closed to new comments.
 		</div>
 
 		<div class="o-chat--editor-input">
