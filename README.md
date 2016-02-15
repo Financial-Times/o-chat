@@ -19,10 +19,9 @@ A simple chat client integrated with FT's membership systems. If you simply wish
      * <a href="#fontfamily">Font family</a>
  * <a href="#browser">Browser support</a>
  * <a href="#core">Core/enhanced experience</a>
- * <a href="#moderation">Moderation</a>
 
 ## <div id="prereq"></div> Prerequisites
-* Your content must either be available in the Content API or available on a blogs URL in order for commenting to work. (See Moderation for why) 
+
 * You must be on an FT.com domain or sub-domain for authentication to work
 
 ## <div id="product"></div> Adding chat to your product 
@@ -35,14 +34,14 @@ Use the following markup to enable chat:
     data-o-chat-auto-init="true|false" 
     data-o-chat-config-title="{article-title}" 
     data-o-chat-config-url="{page-url}" 
-    data-o-chat-config-articleId="{article-id}">
+    data-o-chat-config-article-id="{article-id}">
 
         <div class="o--if-no-js">To participate in this chat, you need to upgrade to a newer web browser. <a href="http://help.ft.com/tools-services/browser-compatibility/">Learn more.</a></div>
 </div>
 ```
 
  * `data-o-chat-config-title` the title of your article/post/thing
- * `data-o-chat-config-articleId` a unique id for your content, ideally a UUID for FT content
+ * `data-o-chat-config-article-id` a unique id for your content, ideally a UUID for FT content
  * `data-o-chat-config-url` The canonical URL for your article/page/thing
  * `data-o-chat-config-{key}` for any other configuration
  * `data-o-chat-auto-init="false"` a module which has this attribute with a `false` value will not be initialized on the `o.DOMContentLoaded` event. This allows you to defer component initialisation.
@@ -396,10 +395,3 @@ Works in accordance with our [support policy](https://docs.google.com/a/ft.com/d
 
 ## <div id="core"></div> Core/Enhanced Experience
 Only the enhanced experience offers any kind of commenting functionality. Core functionality will be added in due course.
-
-## <div id="moderation"></div> Moderation
-Moderators review certain comments posted by users on FT platforms. Moderation is important but expensive: so various comments are categorised so that different moderation teams can effectively manage the comments they have responsibility for.
-
-This does add some complexity though, and it places some constraints on where comments can be used. There are 2 ways in which the categorisation happens: Using the URL of the page where the comments appear (used for blogs) or by looking up the Content API using the passed in UUID and using the returned metatdata. 
-
-If you cannot meet either of these criteria commenting will simply not work. This is going to change though and in the future you will be able to explicitly define which team should moderate the comments generated on your page/article/story/thing.
