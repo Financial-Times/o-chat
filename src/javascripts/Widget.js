@@ -131,6 +131,7 @@ const Widget = function () {
 
 	let commentIds = [];
 	let ownCommentIds = [];
+	const commentVisibilities = {};
 
 	let destroyed = false;
 	const executeWhenNotDestroyed = function (func) {
@@ -438,7 +439,9 @@ const Widget = function () {
 	 * @returns {undefined}
 	 */
 	function newCommentReceived (commentData) {
-		if (!hasCommentId(commentData.commentId) && commentData.visibility === 1) {
+		commentVisibilities[commentData.commentId] = commentData.visibility;
+
+		if (!hasCommentId(commentData.commentId) && (commentData.visibility === 1 || userIsAdmin) && commentData.content) {
 			commentIds.push(commentData.commentId);
 			self.ui.addComment({
 				id: commentData.commentId,
@@ -454,9 +457,13 @@ const Widget = function () {
 	function removeComment (commentId) {
 		removeCommentId(commentId);
 		self.ui.removeComment(commentId);
+
+		commentVisibilities[commentId] = 0;
 	}
 
 	function commentUpdated (commentData) {
+		commentVisibilities[commentData.commentId] = commentData.visibility;
+
 		if (commentData.content) {
 			if (hasCommentId(commentData.commentId)) {
 				self.ui.updateComment(commentData.commentId, commentData.content);
@@ -471,9 +478,7 @@ const Widget = function () {
 			}
 		}
 
-		if (commentData.visibility !== commentData.lastVisibility) {
-			handleStreamEventForBadgingComments(commentData);
-		}
+		handleStreamEventForBadgingComments(commentData);
 	}
 
 
@@ -702,6 +707,13 @@ const Widget = function () {
 									displayName: authData.displayName
 								}, true, userIsAdmin);
 							}
+
+							if (commentVisibilities.hasOwnProperty(postCommentResult.commentId)) {
+								handleStreamEventForBadgingComments({
+									commentId: postCommentResult.commentId,
+									visibility: commentVisibilities[postCommentResult.commentId]
+								});
+							}
 						}
 					}));
 				} else if (postCommentResult.invalidSession === true) {
@@ -886,19 +898,17 @@ const Widget = function () {
 
 	function handleStreamEventForBadgingComments (commentData) {
 		if (commentData) {
-			if (commentData.visibility !== commentData.lastVisibility) {
-				if (commentData.visibility !== 1 && ownCommentIds.indexOf(commentData.commentId) === -1 && !userIsAdmin) {
-					removeComment(commentData.commentId);
+			if (commentData.visibility !== 1 && ownCommentIds.indexOf(commentData.commentId) === -1 && !userIsAdmin) {
+				removeComment(commentData.commentId);
+			}
+
+			if (ownCommentIds.indexOf(commentData.commentId) !== -1 || userIsAdmin) {
+				if (commentData.lastVisibility === 2) {
+					self.ui.removeOwnCommentBadge(commentData.commentId, 'blocked');
 				}
 
-				if (ownCommentIds.indexOf(commentData.commentId) !== -1 || userIsAdmin) {
-					if (commentData.lastVisibility === 2) {
-						self.ui.removeOwnCommentBadge(commentData.commentId, 'blocked');
-					}
-
-					if (commentData.lastVisibility === 3) {
-						self.ui.removeOwnCommentBadge(commentData.commentId, 'pending');
-					}
+				if (commentData.lastVisibility === 3) {
+					self.ui.removeOwnCommentBadge(commentData.commentId, 'pending');
 				}
 			}
 
