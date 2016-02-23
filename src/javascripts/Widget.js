@@ -439,9 +439,6 @@ const Widget = function () {
 	 * @returns {undefined}
 	 */
 	function newCommentReceived (commentData) {
-		oCommentUtilities.logger.log('new comment received', commentData.commentId, commentData.visibility);
-		commentVisibilities[commentData.commentId] = commentData.visibility;
-
 		if (!hasCommentId(commentData.commentId) && (commentData.visibility === 1 || userIsAdmin) && commentData.content) {
 			commentIds.push(commentData.commentId);
 			self.ui.addComment({
@@ -460,14 +457,9 @@ const Widget = function () {
 		oCommentUtilities.logger.log('comment removed', commentId);
 		removeCommentId(commentId);
 		self.ui.removeComment(commentId);
-
-		commentVisibilities[commentId] = 0;
 	}
 
 	function commentUpdated (commentData) {
-		oCommentUtilities.logger.log('comment updated', commentData.commentId, commentData.visibility);
-		commentVisibilities[commentData.commentId] = commentData.visibility;
-
 		if (commentData.content) {
 			if (hasCommentId(commentData.commentId)) {
 				self.ui.updateComment(commentData.commentId, commentData.content);
@@ -488,8 +480,11 @@ const Widget = function () {
 
 	function handleStream (streamData) {
 		if (streamData.comment) {
+			commentVisibilities[streamData.comment.commentId] = streamData.comment.visibility;
+
 			// comment related
 			if (streamData.comment.deleted === true) {
+				commentVisibilities[streamData.comment.commentId] = 0;
 				// comment deleted
 				removeComment(streamData.comment.commentId);
 			} else if (streamData.comment.updated === true) {
@@ -907,11 +902,11 @@ const Widget = function () {
 
 	function handleStreamEventForBadgingComments (commentData) {
 		if (commentData) {
-			if (commentData.visibility !== 1 && ownCommentIds.indexOf(commentData.commentId) === -1 && !userIsAdmin) {
-				removeComment(commentData.commentId);
-			}
-
-			if (ownCommentIds.indexOf(commentData.commentId) !== -1 || userIsAdmin) {
+			if (ownCommentIds.indexOf(commentData.commentId) === -1 && !userIsAdmin) {
+				if (commentData.visibility !== 1) {
+					removeComment(commentData.commentId);
+				}
+			} else {
 				if (commentData.lastVisibility === 2) {
 					self.ui.removeOwnCommentBadge(commentData.commentId, 'blocked');
 				}
@@ -919,34 +914,17 @@ const Widget = function () {
 				if (commentData.lastVisibility === 3) {
 					self.ui.removeOwnCommentBadge(commentData.commentId, 'pending');
 				}
+
+				if (commentData.visibility === 2) {
+					oCommentUtilities.logger.log('comment marked blocked');
+					self.ui.showOwnCommentBadge(commentData.commentId, 'blocked');
+				}
+
+				if (commentData.visibility === 3) {
+					oCommentUtilities.logger.log('comment marked pending');
+					self.ui.showOwnCommentBadge(commentData.commentId, 'pending');
+				}
 			}
-
-
-			if (commentData.visibility === 2) {
-				checkIfOwnCommentIsBanned(commentData.commentId);
-			}
-
-			if (commentData.visibility === 3) {
-				checkIfOwnCommentIsPending(commentData.commentId);
-			}
-		}
-	}
-
-	function checkIfOwnCommentIsBanned (commentId) {
-		if (ownCommentIds.indexOf(commentId) !== -1 || userIsAdmin) {
-			oCommentUtilities.logger.log('comment marked blocked');
-			self.ui.showOwnCommentBadge(commentId, 'blocked');
-		} else {
-			oCommentUtilities.logger.log('comment blocked, but not own comment');
-		}
-	}
-
-	function checkIfOwnCommentIsPending (commentId) {
-		if (ownCommentIds.indexOf(commentId) !== -1 || userIsAdmin) {
-			oCommentUtilities.logger.log('comment marked pending');
-			self.ui.showOwnCommentBadge(commentId, 'pending');
-		} else {
-			oCommentUtilities.logger.log('comment pending, but not own comment');
 		}
 	}
 
