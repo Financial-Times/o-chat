@@ -439,6 +439,7 @@ const Widget = function () {
 	 * @returns {undefined}
 	 */
 	function newCommentReceived (commentData) {
+		oCommentUtilities.logger.log('new comment received', commentData.commentId, commentData.visibility);
 		commentVisibilities[commentData.commentId] = commentData.visibility;
 
 		if (!hasCommentId(commentData.commentId) && (commentData.visibility === 1 || userIsAdmin) && commentData.content) {
@@ -451,10 +452,12 @@ const Widget = function () {
 			}, (commentData.author.displayName.substring(0, 50) === self.ui.getCurrentPseudonym()), userIsAdmin);
 		}
 
+		oCommentUtilities.logger.log('new comment, handling visibility');
 		handleStreamEventForBadgingComments(commentData);
 	}
 
 	function removeComment (commentId) {
+		oCommentUtilities.logger.log('comment removed', commentId);
 		removeCommentId(commentId);
 		self.ui.removeComment(commentId);
 
@@ -462,6 +465,7 @@ const Widget = function () {
 	}
 
 	function commentUpdated (commentData) {
+		oCommentUtilities.logger.log('comment updated', commentData.commentId, commentData.visibility);
 		commentVisibilities[commentData.commentId] = commentData.visibility;
 
 		if (commentData.content) {
@@ -696,6 +700,8 @@ const Widget = function () {
 								}
 							});
 
+							oCommentUtilities.logger.log('own comment', postCommentResult.commentId);
+
 							ownCommentIds.push(postCommentResult.commentId);
 
 							if (!hasCommentId(postCommentResult.commentId)) {
@@ -709,10 +715,13 @@ const Widget = function () {
 							}
 
 							if (commentVisibilities.hasOwnProperty(postCommentResult.commentId)) {
+								oCommentUtilities.logger.log('own comment, handling visibility');
 								handleStreamEventForBadgingComments({
 									commentId: postCommentResult.commentId,
 									visibility: commentVisibilities[postCommentResult.commentId]
 								});
+							} else {
+								oCommentUtilities.logger.log('own comment, no comment visibility known yet', postCommentResult.commentId);
 							}
 						}
 					}));
@@ -925,13 +934,19 @@ const Widget = function () {
 
 	function checkIfOwnCommentIsBanned (commentId) {
 		if (ownCommentIds.indexOf(commentId) !== -1 || userIsAdmin) {
+			oCommentUtilities.logger.log('comment marked blocked');
 			self.ui.showOwnCommentBadge(commentId, 'blocked');
+		} else {
+			oCommentUtilities.logger.log('comment blocked, but not own comment');
 		}
 	}
 
 	function checkIfOwnCommentIsPending (commentId) {
 		if (ownCommentIds.indexOf(commentId) !== -1 || userIsAdmin) {
+			oCommentUtilities.logger.log('comment marked pending');
 			self.ui.showOwnCommentBadge(commentId, 'pending');
+		} else {
+			oCommentUtilities.logger.log('comment pending, but not own comment');
 		}
 	}
 
