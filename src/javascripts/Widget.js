@@ -129,11 +129,9 @@ const Widget = function () {
 	let userIsAdmin = false;
 	let renderComplete = false;
 
-	let lastBannedCommentId;
-	let lastPendingCommentId;
-
 	let commentIds = [];
 	let ownCommentIds = [];
+	const commentVisibilities = {};
 
 	let destroyed = false;
 	const executeWhenNotDestroyed = function (func) {
@@ -441,7 +439,7 @@ const Widget = function () {
 	 * @returns {undefined}
 	 */
 	function newCommentReceived (commentData) {
-		if (!hasCommentId(commentData.commentId) && commentData.visibility === 1) {
+		if (!hasCommentId(commentData.commentId) && (commentData.visibility === 1 || userIsAdmin) && commentData.content) {
 			commentIds.push(commentData.commentId);
 			self.ui.addComment({
 				id: commentData.commentId,
@@ -451,10 +449,12 @@ const Widget = function () {
 			}, (commentData.author.displayName.substring(0, 50) === self.ui.getCurrentPseudonym()), userIsAdmin);
 		}
 
+		oCommentUtilities.logger.log('new comment, handling visibility');
 		handleStreamEventForBadgingComments(commentData);
 	}
 
 	function removeComment (commentId) {
+		oCommentUtilities.logger.log('comment removed', commentId);
 		removeCommentId(commentId);
 		self.ui.removeComment(commentId);
 	}
@@ -474,16 +474,17 @@ const Widget = function () {
 			}
 		}
 
-		if (commentData.visibility !== commentData.lastVisibility) {
-			handleStreamEventForBadgingComments(commentData);
-		}
+		handleStreamEventForBadgingComments(commentData);
 	}
 
 
 	function handleStream (streamData) {
 		if (streamData.comment) {
+			commentVisibilities[streamData.comment.commentId] = streamData.comment.visibility;
+
 			// comment related
 			if (streamData.comment.deleted === true) {
+				commentVisibilities[streamData.comment.commentId] = 0;
 				// comment deleted
 				removeComment(streamData.comment.commentId);
 			} else if (streamData.comment.updated === true) {
@@ -694,6 +695,8 @@ const Widget = function () {
 								}
 							});
 
+							oCommentUtilities.logger.log('own comment', postCommentResult.commentId);
+
 							ownCommentIds.push(postCommentResult.commentId);
 
 							if (!hasCommentId(postCommentResult.commentId)) {
@@ -706,7 +709,15 @@ const Widget = function () {
 								}, true, userIsAdmin);
 							}
 
-							handleNewCommentForBadgingComments(postCommentResult);
+							if (commentVisibilities.hasOwnProperty(postCommentResult.commentId)) {
+								oCommentUtilities.logger.log('own comment, handling visibility');
+								handleStreamEventForBadgingComments({
+									commentId: postCommentResult.commentId,
+									visibility: commentVisibilities[postCommentResult.commentId]
+								});
+							} else {
+								oCommentUtilities.logger.log('own comment, no comment visibility known yet', postCommentResult.commentId);
+							}
 						}
 					}));
 				} else if (postCommentResult.invalidSession === true) {
@@ -891,55 +902,29 @@ const Widget = function () {
 
 	function handleStreamEventForBadgingComments (commentData) {
 		if (commentData) {
-			if (commentData.visibility !== commentData.lastVisibility) {
-				if (commentData.visibility > 1 && ownCommentIds.indexOf(commentData.commentId) === -1 && !userIsAdmin) {
+			if (ownCommentIds.indexOf(commentData.commentId) === -1 && !userIsAdmin) {
+				if (commentData.visibility !== 1) {
 					removeComment(commentData.commentId);
 				}
+			} else {
+				if (commentData.lastVisibility === 2) {
+					self.ui.removeOwnCommentBadge(commentData.commentId, 'blocked');
+				}
 
-				if (ownCommentIds.indexOf(commentData.commentId) !== -1 || userIsAdmin) {
-					if (commentData.lastVisibility === 2) {
-						self.ui.removeOwnCommentBadge(commentData.commentId, 'blocked');
-					}
+				if (commentData.lastVisibility === 3) {
+					self.ui.removeOwnCommentBadge(commentData.commentId, 'pending');
+				}
 
-					if (commentData.lastVisibility === 3) {
-						self.ui.removeOwnCommentBadge(commentData.commentId, 'pending');
-					}
+				if (commentData.visibility === 2) {
+					oCommentUtilities.logger.log('comment marked blocked');
+					self.ui.showOwnCommentBadge(commentData.commentId, 'blocked');
+				}
+
+				if (commentData.visibility === 3) {
+					oCommentUtilities.logger.log('comment marked pending');
+					self.ui.showOwnCommentBadge(commentData.commentId, 'pending');
 				}
 			}
-
-
-			if (commentData.visibility === 2) {
-				lastBannedCommentId = commentData.commentId;
-				checkIfOwnCommentIsBanned(commentData.commentId);
-			}
-
-			if (commentData.visibility === 3) {
-				lastPendingCommentId = commentData.commentId;
-				checkIfOwnCommentIsPending(commentData.commentId);
-			}
-		}
-
-		if (commentData) {
-
-		}
-	}
-
-	function handleNewCommentForBadgingComments () {
-		checkIfOwnCommentIsBanned();
-		checkIfOwnCommentIsPending();
-	}
-
-	function checkIfOwnCommentIsBanned (commentId) {
-		commentId = commentId || lastBannedCommentId;
-		if (ownCommentIds.indexOf(commentId) !== -1 || userIsAdmin) {
-			self.ui.showOwnCommentBadge(commentId, 'blocked');
-		}
-	}
-
-	function checkIfOwnCommentIsPending (commentId) {
-		commentId = commentId || lastPendingCommentId;
-		if (ownCommentIds.indexOf(commentId) !== -1 || userIsAdmin) {
-			self.ui.showOwnCommentBadge(commentId, 'pending');
 		}
 	}
 

@@ -52,6 +52,13 @@
 	margin-bottom: 42px;
 	padding: 5px 10px;
 	font-weight: bold;
+	font-size: 13px;
+
+	.o-chat--lock-icon {
+		margin-right: 5px;
+		position: relative;
+		top: 1px;
+	}
 }
 
 .o-chat--editor-auth-container {
