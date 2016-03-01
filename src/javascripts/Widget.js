@@ -9,6 +9,7 @@ const i18n = require('./i18n.js');
 const globalEvents = require('./globalEvents.js');
 const envConfig = require('./config.js');
 const oTrackingIntegration = require('./oTrackingIntegration');
+const oErrorsIntegration = require('./oErrorsIntegration');
 
 /**
  * Incorporates the communication with the content creation service,
@@ -260,6 +261,8 @@ const Widget = function () {
 
 		if (typeof err === 'object'&& err.unclassifiedArticle !== true && err.notAllowedToCreateCollection !== true) {
 			self.ui.addNotAvailableMessage();
+
+			oErrorsIntegration.trigger(self.getWidgetEl(), err);
 		}
 	};
 
@@ -521,6 +524,7 @@ const Widget = function () {
 						if (!authErr && currentAuthData) {
 							userDialogs.showChangePseudonymDialog(currentAuthData.displayName, function (err, newAuthData) {
 								if (err) {
+									oErrorsIntegration.trigger(self.getWidgetEl(), err);
 									return;
 								}
 
@@ -672,6 +676,7 @@ const Widget = function () {
 			self.ui.makeEditable();
 
 			if (err) {
+				oErrorsIntegration.trigger(self.getWidgetEl(), err);
 				oCommentUtilities.logger.debug('postComment error:', err);
 
 				self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
@@ -808,6 +813,7 @@ const Widget = function () {
 			commentId: commentId
 		}, executeWhenNotDestroyed(function (err, deleteCommentResult) {
 			if (err) {
+				oErrorsIntegration.trigger(self.getWidgetEl(), err);
 				userDialogs.showMessage("Delete comment", oCommentUi.i18n.texts.genericError);
 				oCommentUtilities.logger.log("delete comment call error: ", err);
 				return;
