@@ -8,7 +8,7 @@
     "o-comment-api": "^2.3.0",
     "o-comment-ui": "^2.3.0",
     "o-comment-utilities": "^2.2.1",
-    "o-ft-icons": "^2.3.6",
+    "o-ft-icons": ">=2.0.0 <4",
     "o-date": "^1.1.1",
     "o-overlay": "^1.4.5",
 
