@@ -5,10 +5,10 @@ const hogan = require('hogan');
  * @type {Object}
  */
 module.exports = {
-	editor: hogan.compile(requireText('../templates/editor.ms')),
-	comments: hogan.compile(requireText('../templates/comments.ms')),
-	comment: hogan.compile(requireText('../templates/comment.ms')),
-	signIn: hogan.compile(requireText('../templates/signIn.ms')),
-	loggedIn: hogan.compile(requireText('../templates/loggedIn.ms')),
-	notification: hogan.compile(requireText('../templates/notification.ms'))
+	editor: hogan.compile(require('../templates/editor.html')),
+	comments: hogan.compile(require('../templates/comments.html')),
+	comment: hogan.compile(require('../templates/comment.html')),
+	signIn: hogan.compile(require('../templates/signIn.html')),
+	loggedIn: hogan.compile(require('../templates/loggedIn.html')),
+	notification: hogan.compile(require('../templates/notification.html'))
 };
