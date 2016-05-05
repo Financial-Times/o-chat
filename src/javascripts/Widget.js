@@ -754,7 +754,7 @@ const Widget = function () {
 						let errMsg = oCommentUi.i18n.texts.genericError;
 
 						if (postCommentResult.code && oCommentUi.i18n.serviceCodeMessages[postCommentResult.code]) {
-							errMsg = oCommentUi.i18n.serviceCodeMessages[postCommentResult.code]
+							errMsg = oCommentUi.i18n.serviceCodeMessages[postCommentResult.code];
 						}
 
 						self.ui.setEditorError(errMsg);
@@ -859,7 +859,7 @@ const Widget = function () {
 						let errMsg = oCommentUi.i18n.texts.genericError;
 
 						if (deleteCommentResult.code && oCommentUi.i18n.serviceCodeMessages[deleteCommentResult.code]) {
-							errMsg = oCommentUi.i18n.serviceCodeMessages[deleteCommentResult.code]
+							errMsg = oCommentUi.i18n.serviceCodeMessages[deleteCommentResult.code];
 						}
 
 						userDialogs.showMessage("Delete comment", errMsg);
