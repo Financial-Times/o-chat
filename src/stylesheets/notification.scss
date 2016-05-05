@@ -17,6 +17,14 @@
 		border-radius: 5px;
 		font-size: 13px;
 	}
+
+	.o-chat--notification-icon-downwards {
+		@include oIconsGetIcon('downwards', oColorsGetPaletteColor('blue'), 32);
+	}
+
+	.o-chat--notification-icon-upwards {
+		@include oIconsGetIcon('upwards', oColorsGetPaletteColor('blue'), 32);
+	}
 }
 
 .o-chat--notification-fade-top {

@@ -6,13 +6,11 @@
   ],
   "dependencies": {
     "o-comment-api": "^2.3.0",
-    "o-comment-ui": "^2.3.0",
+    "o-comment-ui": "^3.0.0-beta.1",
     "o-comment-utilities": "^2.2.1",
-    "o-ft-icons": ">=2.0.0 <4",
-    "o-date": "^1.1.1",
-    "o-overlay": "^1.4.5",
-
-    "hogan": "git+https://github.com/twitter/hogan.js.git#3.0.0"
+    "o-icons": "^4.0.0",
+    "o-date": "^2.3.0",
+    "o-overlay": "^1.4.5"
   },
   "ignore": [
     "node_modules",

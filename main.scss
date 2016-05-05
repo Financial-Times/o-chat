@@ -6,8 +6,7 @@ $o-comment-ui-font-family: $o-chat-font-family !default;
 $o-overlay-is-silent: false;
 @import "o-overlay/main";
 
-$o-ft-icons-is-silent: false;
-@import "o-ft-icons/main";
+@import "o-icons/main";
 
 .o-chat {
 	font-family: $o-chat-font-family;
