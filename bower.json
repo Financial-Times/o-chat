@@ -6,7 +6,7 @@
   ],
   "dependencies": {
     "o-comment-api": "^2.3.0",
-    "o-comment-ui": "^3.0.0-beta.3",
+    "o-comment-ui": "^3.0.0",
     "o-comment-utilities": "^2.2.1",
     "o-icons": "^4.0.0",
     "o-date": "^2.3.0",
