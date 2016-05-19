@@ -19,11 +19,11 @@
 	}
 
 	.o-chat--notification-icon-downwards {
-		@include oIconsGetIcon('downwards', oColorsGetPaletteColor('blue'), 32);
+		@include oIconsGetIcon('arrow-downwards', oColorsGetPaletteColor('white'), 12);
 	}
 
 	.o-chat--notification-icon-upwards {
-		@include oIconsGetIcon('upwards', oColorsGetPaletteColor('blue'), 32);
+		@include oIconsGetIcon('arrow-upwards', oColorsGetPaletteColor('white'), 12);
 	}
 }
 
