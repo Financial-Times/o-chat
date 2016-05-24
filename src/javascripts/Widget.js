@@ -375,7 +375,6 @@ const Widget = function () {
 	 */
 	this.adaptToHeight = function (height) {
 		if (height) {
-			self.ui.clearStretch();
 			self.ui.adaptToHeight(height);
 		}
 	};
@@ -385,7 +384,6 @@ const Widget = function () {
 	};
 
 	this.stretchVertical = function () {
-		self.ui.clearHeight();
 		self.ui.stretchVertical();
 	};
 
@@ -395,13 +393,13 @@ const Widget = function () {
 
 	if (self.config.height) {
 		if (!destroyed) {
-			this.adaptToHeight(self.config.height);
+			self.adaptToHeight(self.config.height);
 		}
 	}
 
-	if (self.config.strechVertical) {
+	if (self.config.stretchVertical) {
 		if (!destroyed) {
-			this.strechVertical();
+			self.stretchVertical();
 		}
 	}
 
@@ -632,7 +630,7 @@ const Widget = function () {
 			oCommentApi.api.getComments(config, executeWhenNotDestroyed(function (err, data) {
 				if (err) {
 					isMorePageAvailable = false;
-					self.ui.disableButtonPagination();
+					self.ui.disablePagination();
 					return;
 				}
 
@@ -640,7 +638,7 @@ const Widget = function () {
 					nextPageNumber = data.collection.nextPage;
 				} else {
 					isMorePageAvailable = false;
-					self.ui.disableButtonPagination();
+					self.ui.disablePagination();
 				}
 
 				self.ui.addNextPageComments(preprocessCommentData(data.collection.comments), userIsAdmin);

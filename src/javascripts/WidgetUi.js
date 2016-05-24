@@ -155,18 +155,14 @@ function WidgetUi (widgetContainer, config) {
 		});
 
 		if (isPagination) {
-			if (config.orderType === 'inverted') {
-				elements.showMore.before.style.display = 'block';
-			} else {
-				elements.showMore.after.style.display = 'block';
-			}
+			self.enablePagination();
 
-			const triggereNextPage = function () {
+			const triggerNextPage = function () {
 				events.trigger('nextPage');
 			};
 
 			for (i = 0; i < elements.showMore.labels.length; i++) {
-				elements.showMore.labels[i].addEventListener('click', triggereNextPage);
+				elements.showMore.labels[i].addEventListener('click', triggerNextPage);
 			}
 		}
 
@@ -189,12 +185,35 @@ function WidgetUi (widgetContainer, config) {
 		}
 	};
 
+	this.enablePagination = function () {
+		widgetContainer.classList.add('o-chat--pagination');
+	};
+
+	this.disablePagination = function () {
+		widgetContainer.classList.remove('o-chat--pagination');
+	};
+
+	// poll for the existence of container
+	function pollForContainer (callback) {
+		const pollForContainerInterv = setInterval(function () {
+			if (destroyed) {
+				clearInterval(pollForContainerInterv);
+				return;
+			}
+
+			if (self.widgetContainer.querySelector('.o-chat--editor-container')) {
+				clearInterval(pollForContainerInterv);
+				callback();
+			}
+		}, 200);
+	}
+
 	this.adaptToHeight = function (height) {
+		widgetContainer.classList.add('o-chat--fixed-height');
+
 		const adapt = executeWhenNotDestroyed(function () {
 			if (!adaptedToHeight) {
 				if (isPagination) {
-					self.disableButtonPagination();
-
 					initScrollPagination();
 				}
 			}
@@ -221,67 +240,83 @@ function WidgetUi (widgetContainer, config) {
 			elements.commentArea.style.overflow = "auto";
 			elements.commentArea.style.height = (height - editorHeight) + "px";
 
+			scrollToLastComment();
+
 			if (!adaptedToHeight) {
 				adaptedToHeight = true;
 
 				oCommentUtilities.logger.debug("adapt to height, scroll to last");
-				scrollToLastComment();
-
 				initNotification();
 			}
 		});
 
-		// poll for the existence of container
-		const pollForContainer = setInterval(function () {
-			if (destroyed) {
-				clearInterval(pollForContainer);
-				return;
-			}
-
-			if (self.widgetContainer.querySelector('.o-chat--editor-container')) {
-				clearInterval(pollForContainer);
-				adapt();
-			}
-		}, 200);
+		pollForContainer(adapt);
 	};
 
 	this.clearHeight = function () {
-		elements.commentArea.style.height = 'auto';
+		const clear = function () {
+			adaptedToHeight = false;
+			elements.commentArea.style.height = 'auto';
+			widgetContainer.classList.remove('o-chat--fixed-height');
+		};
+
+		pollForContainer(clear);
 	};
 
 	function adjustStretchVertical () {
-		this.getWidgetEl().classList.add('o-chat--stretch-vertical', 'true');
+		const stretch = function () {
+			if (!adaptedToHeight) {
+				if (isPagination) {
+					initScrollPagination();
+				}
+			}
 
-		const bodyHeight = document.body.scrollHeight;
-		const viewportHeight = oCommentUtilities.dom.windowSize().height;
-		const chatHeight = widgetContainer.scrollHeight;
-		const nonChatHeight = bodyHeight - chatHeight;
+			let bodyHeight = document.body.clientHeight;
 
-		const editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorArea);
+			elements.commentArea.style.height = (bodyHeight) + "px";
 
-		let editorAreaMarginTopValue;
-		const editorAreaMarginTop = editorComputedStyle.getPropertyValue('margin-top');
-		if (editorAreaMarginTop.indexOf('px') !== -1) {
-			editorAreaMarginTopValue = parseInt(editorAreaMarginTop.replace('px', ''), 10);
-		} else {
-			editorAreaMarginTopValue = 0;
-		}
+			bodyHeight = document.body.clientHeight;
 
-		let editorAreaMarginBottomValue;
-		const editorAreaMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
-		if (editorAreaMarginBottom.indexOf('px') !== -1) {
-			editorAreaMarginBottomValue = parseInt(editorAreaMarginBottom.replace('px', ''), 10);
-		} else {
-			editorAreaMarginBottomValue = 0;
-		}
+			const viewportHeight = oCommentUtilities.dom.windowSize().height;
+			const chatHeight = widgetContainer.scrollHeight;
+			const nonChatHeight = bodyHeight - chatHeight;
 
-		const editorHeight = elements.editorArea.clientHeight + editorAreaMarginTopValue + editorAreaMarginBottomValue;
+			const editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorArea);
 
-		elements.commentArea.style.overflow = "auto";
-		elements.commentArea.style.height = (viewportHeight - nonChatHeight - editorHeight) + "px";
+			let editorAreaMarginTopValue;
+			const editorAreaMarginTop = editorComputedStyle.getPropertyValue('margin-top');
+			if (editorAreaMarginTop.indexOf('px') !== -1) {
+				editorAreaMarginTopValue = parseInt(editorAreaMarginTop.replace('px', ''), 10);
+			} else {
+				editorAreaMarginTopValue = 0;
+			}
+
+			let editorAreaMarginBottomValue;
+			const editorAreaMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
+			if (editorAreaMarginBottom.indexOf('px') !== -1) {
+				editorAreaMarginBottomValue = parseInt(editorAreaMarginBottom.replace('px', ''), 10);
+			} else {
+				editorAreaMarginBottomValue = 0;
+			}
+
+			const editorHeight = elements.editorArea.clientHeight + editorAreaMarginTopValue + editorAreaMarginBottomValue;
+
+			elements.commentArea.style.overflow = "auto";
+			elements.commentArea.style.height = (viewportHeight - nonChatHeight - editorHeight) + "px";
+
+			scrollToLastComment();
+
+			if (!adaptedToHeight) {
+				adaptedToHeight = true;
+
+				initNotification();
+			}
+		};
+
+		pollForContainer(stretch);
 	}
 	function suspendVerticalStretch () {
-		this.getWidgetEl().classList.remove('o-chat--stretch-vertical');
+		self.clearHeight();
 	}
 
 	const onResizeFetch = function () {
@@ -295,12 +330,13 @@ function WidgetUi (widgetContainer, config) {
 	this.clearStretch = function () {
 		window.removeEventListener('resize', onResizeFetch);
 		suspendVerticalStretch();
-		self.clearHeight();
+		widgetContainer.classList.remove('o-chat--stretch-vertical');
 	};
 
 	this.stretchVertical = function () {
 		window.addEventListener('resize', onResizeFetch);
 		onResizeFetch();
+		widgetContainer.classList.add('o-chat--stretch-vertical');
 	};
 
 
@@ -308,15 +344,17 @@ function WidgetUi (widgetContainer, config) {
 
 		function initScrollPagination () {
 			scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(elements.commentArea, function (scrollPos) {
-				if (config.orderType === 'inverted') {
-					if (scrollPos < 0.2 * elements.commentArea.scrollHeight) {
-						events.trigger('nextPage');
-						oCommentUtilities.logger.debug('nextPage');
-					}
-				} else {
-					if (scrollPos + elements.commentArea.clientHeight > 0.8 * elements.commentArea.scrollHeight) {
-						events.trigger('nextPage');
-						oCommentUtilities.logger.debug('nextPage');
+				if (!widgetContainer.classList.contains('o-chat--stretch-vertical') || ['default', 'S'].indexOf(oGrid.getCurrentLayout()) === -1) {
+					if (config.orderType === 'inverted') {
+						if (scrollPos < 0.2 * elements.commentArea.scrollHeight) {
+							events.trigger('nextPage');
+							oCommentUtilities.logger.debug('nextPage');
+						}
+					} else {
+						if (scrollPos + elements.commentArea.clientHeight > 0.8 * elements.commentArea.scrollHeight) {
+							events.trigger('nextPage');
+							oCommentUtilities.logger.debug('nextPage');
+						}
 					}
 				}
 			});
@@ -342,11 +380,6 @@ function WidgetUi (widgetContainer, config) {
 				}
 			}), 100);
 		}
-
-	this.disableButtonPagination = function () {
-		elements.showMore.before.style.display = 'none';
-		elements.showMore.after.style.display = 'none';
-	};
 
 	this.login = function (token, pseudonym, isAdmin) {
 		if (elements.editorAuth) {

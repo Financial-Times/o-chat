@@ -27,5 +27,10 @@ ul {
 		.o-chat--editor-area {
 			order: 1;
 		}
+
+		.o-chat--comments-container {
+			display: flex;
+			flex-direction: column-reverse;
+		}
 	}
 }
