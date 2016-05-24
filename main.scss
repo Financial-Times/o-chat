@@ -8,6 +8,8 @@ $o-overlay-is-silent: false;
 
 @import "o-icons/main";
 
+@import "o-grid/main";
+
 .o-chat {
 	font-family: $o-chat-font-family;
 	font-size: 12px;

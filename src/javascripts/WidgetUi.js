@@ -6,6 +6,7 @@ const NewCommentNotification = require('./NewCommentNotification.js');
 const templates = require('./templates.js');
 const utils = require('./utils.js');
 const envConfig = require('./config.js');
+const oGrid = require('o-grid');
 
 function WidgetUi (widgetContainer, config) {
 	oCommentUi.WidgetUi.apply(this, arguments);
@@ -242,6 +243,64 @@ function WidgetUi (widgetContainer, config) {
 				adapt();
 			}
 		}, 200);
+	};
+
+	this.clearHeight = function () {
+		elements.commentArea.style.height = 'auto';
+	};
+
+	function adjustStretchVertical () {
+		this.getWidgetEl().classList.add('o-chat--stretch-vertical', 'true');
+
+		const bodyHeight = document.body.scrollHeight;
+		const viewportHeight = oCommentUtilities.dom.windowSize().height;
+		const chatHeight = widgetContainer.scrollHeight;
+		const nonChatHeight = bodyHeight - chatHeight;
+
+		const editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorArea);
+
+		let editorAreaMarginTopValue;
+		const editorAreaMarginTop = editorComputedStyle.getPropertyValue('margin-top');
+		if (editorAreaMarginTop.indexOf('px') !== -1) {
+			editorAreaMarginTopValue = parseInt(editorAreaMarginTop.replace('px', ''), 10);
+		} else {
+			editorAreaMarginTopValue = 0;
+		}
+
+		let editorAreaMarginBottomValue;
+		const editorAreaMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
+		if (editorAreaMarginBottom.indexOf('px') !== -1) {
+			editorAreaMarginBottomValue = parseInt(editorAreaMarginBottom.replace('px', ''), 10);
+		} else {
+			editorAreaMarginBottomValue = 0;
+		}
+
+		const editorHeight = elements.editorArea.clientHeight + editorAreaMarginTopValue + editorAreaMarginBottomValue;
+
+		elements.commentArea.style.overflow = "auto";
+		elements.commentArea.style.height = (viewportHeight - nonChatHeight - editorHeight) + "px";
+	}
+	function suspendVerticalStretch () {
+		this.getWidgetEl().classList.remove('o-chat--stretch-vertical');
+	}
+
+	const onResizeFetch = function () {
+		if (['default', 'S'].indexOf(oGrid.getCurrentLayout()) !== -1) {
+			suspendVerticalStretch();
+		} else {
+			adjustStretchVertical();
+		}
+	};
+
+	this.clearStretch = function () {
+		window.removeEventListener('resize', onResizeFetch);
+		suspendVerticalStretch();
+		self.clearHeight();
+	};
+
+	this.stretchVertical = function () {
+		window.addEventListener('resize', onResizeFetch);
+		onResizeFetch();
 	};
 
 

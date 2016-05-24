@@ -13,3 +13,19 @@ ul {
 	list-style-type: none;
 	list-style-position: outside;
 }
+
+
+&.o-chat--order-inverted.o-chat--stretch-vertical {
+	@include oGridRespondTo($until: M) {
+		display: flex;
+		flex-direction: column;
+
+		.o-chat--comments-wrapper {
+			order: 2;
+		}
+
+		.o-chat--editor-area {
+			order: 1;
+		}
+	}
+}

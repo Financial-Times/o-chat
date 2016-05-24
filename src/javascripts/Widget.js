@@ -375,13 +375,33 @@ const Widget = function () {
 	 */
 	this.adaptToHeight = function (height) {
 		if (height) {
+			self.ui.clearStretch();
 			self.ui.adaptToHeight(height);
 		}
+	};
+
+	this.clearHeight = function () {
+		self.ui.clearHeight();
+	};
+
+	this.stretchVertical = function () {
+		self.ui.clearHeight();
+		self.ui.stretchVertical();
+	};
+
+	this.clearStretch = function () {
+		self.ui.clearStretch();
 	};
 
 	if (self.config.height) {
 		if (!destroyed) {
 			this.adaptToHeight(self.config.height);
+		}
+	}
+
+	if (self.config.strechVertical) {
+		if (!destroyed) {
+			this.strechVertical();
 		}
 	}
 
