@@ -272,14 +272,25 @@ function WidgetUi (widgetContainer, config) {
 			}
 
 			let bodyHeight = document.body.clientHeight;
+			console.log('o-chat', 'bodyHeight before expand', bodyHeight);
 
 			elements.commentArea.style.height = (bodyHeight) + "px";
 
 			bodyHeight = document.body.clientHeight;
+			console.log('o-chat', 'bodyHeight after expand', bodyHeight);
 
 			const viewportHeight = oCommentUtilities.dom.windowSize().height;
+			console.log('o-chat', 'viewportHeight', viewportHeight);
+			console.log('o-chat', 'window.innerHeight', window.innerHeight);
+			console.log('o-chat', 'window.outerHeight', window.outerHeight);
+			console.log('o-chat', 'window.clientHeight', window.clientHeight);
+			console.log('o-chat', 'window.scrollHeight', window.scrollHeight);
+
 			const chatHeight = widgetContainer.scrollHeight;
+			console.log('o-chat', 'chatHeight', chatHeight);
+
 			const nonChatHeight = bodyHeight - chatHeight;
+			console.log('o-chat', 'nonChatHeight', nonChatHeight);
 
 			const editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorArea);
 
@@ -300,9 +311,12 @@ function WidgetUi (widgetContainer, config) {
 			}
 
 			const editorHeight = elements.editorArea.clientHeight + editorAreaMarginTopValue + editorAreaMarginBottomValue;
+			console.log('o-chat', 'editorHeight', editorHeight);
 
 			elements.commentArea.style.overflow = "auto";
 			elements.commentArea.style.height = (viewportHeight - nonChatHeight - editorHeight) + "px";
+
+			console.log('o-chat', 'computed height', viewportHeight - nonChatHeight - editorHeight);
 
 			scrollToLastComment();
 
