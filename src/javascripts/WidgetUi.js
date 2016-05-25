@@ -208,6 +208,9 @@ function WidgetUi (widgetContainer, config) {
 		}, 200);
 	}
 
+
+	const minimumHeight = 250;
+
 	this.adaptToHeight = function (height) {
 		widgetContainer.classList.add('o-chat--fixed-height');
 
@@ -237,8 +240,12 @@ function WidgetUi (widgetContainer, config) {
 			}
 
 			const editorHeight = elements.editorArea.clientHeight + editorAreaMarginTopValue + editorAreaMarginBottomValue;
+
+			let targetHeight = height - editorHeight;
+			targetHeight = Math.max(targetHeight, minimumHeight);
+
 			elements.commentArea.style.overflow = "auto";
-			elements.commentArea.style.height = (height - editorHeight) + "px";
+			elements.commentArea.style.height = targetHeight + "px";
 
 			scrollToLastComment();
 
@@ -272,25 +279,13 @@ function WidgetUi (widgetContainer, config) {
 			}
 
 			let bodyHeight = document.body.clientHeight;
-			console.log('o-chat', 'bodyHeight before expand', bodyHeight);
 
 			elements.commentArea.style.height = (bodyHeight) + "px";
-
 			bodyHeight = document.body.clientHeight;
-			console.log('o-chat', 'bodyHeight after expand', bodyHeight);
 
 			const viewportHeight = oCommentUtilities.dom.windowSize().height;
-			console.log('o-chat', 'viewportHeight', viewportHeight);
-			console.log('o-chat', 'window.innerHeight', window.innerHeight);
-			console.log('o-chat', 'window.outerHeight', window.outerHeight);
-			console.log('o-chat', 'window.clientHeight', window.clientHeight);
-			console.log('o-chat', 'window.scrollHeight', window.scrollHeight);
-
 			const chatHeight = widgetContainer.scrollHeight;
-			console.log('o-chat', 'chatHeight', chatHeight);
-
 			const nonChatHeight = bodyHeight - chatHeight;
-			console.log('o-chat', 'nonChatHeight', nonChatHeight);
 
 			const editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorArea);
 
@@ -311,12 +306,13 @@ function WidgetUi (widgetContainer, config) {
 			}
 
 			const editorHeight = elements.editorArea.clientHeight + editorAreaMarginTopValue + editorAreaMarginBottomValue;
-			console.log('o-chat', 'editorHeight', editorHeight);
+
+			let targetHeight = viewportHeight - nonChatHeight - editorHeight;
+			targetHeight = Math.max(targetHeight, minimumHeight);
 
 			elements.commentArea.style.overflow = "auto";
-			elements.commentArea.style.height = (viewportHeight - nonChatHeight - editorHeight) + "px";
+			elements.commentArea.style.height = targetHeight + "px";
 
-			console.log('o-chat', 'computed height', viewportHeight - nonChatHeight - editorHeight);
 
 			scrollToLastComment();
 
