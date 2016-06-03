@@ -208,9 +208,6 @@ function WidgetUi (widgetContainer, config) {
 		}, 200);
 	}
 
-
-	const minimumHeight = 250;
-
 	this.adaptToHeight = function (height) {
 		widgetContainer.classList.add('o-chat--fixed-height');
 
@@ -241,8 +238,7 @@ function WidgetUi (widgetContainer, config) {
 
 			const editorHeight = elements.editorArea.clientHeight + editorAreaMarginTopValue + editorAreaMarginBottomValue;
 
-			let targetHeight = height - editorHeight;
-			targetHeight = Math.max(targetHeight, minimumHeight);
+			const targetHeight = height - editorHeight;
 
 			elements.commentArea.style.overflow = "auto";
 			elements.commentArea.style.height = targetHeight + "px";
@@ -278,37 +274,31 @@ function WidgetUi (widgetContainer, config) {
 				}
 			}
 
-			let bodyHeight = document.body.clientHeight;
-
-			elements.commentArea.style.height = (bodyHeight) + "px";
-			bodyHeight = document.body.clientHeight;
-
 			const viewportHeight = oCommentUtilities.dom.windowSize().height;
+			console.log('o-chat viewportHeight', viewportHeight);
+
+			const bodyHeightBefore = document.body.clientHeight;
+			console.log('o-chat bodyHeightBefore', bodyHeightBefore);
+
+			const temporaryContentHeight = Math.max(viewportHeight, bodyHeightBefore);
+			console.log('o-chat temporaryContentHeight', temporaryContentHeight);
+
+			elements.commentArea.style.height = (temporaryContentHeight) + "px";
+
+			const bodyHeightAfter = document.body.clientHeight;
+			console.log('o-chat bodyHeightAfter', bodyHeightAfter);
+
 			const chatHeight = widgetContainer.scrollHeight;
-			const nonChatHeight = bodyHeight - chatHeight;
+			console.log('o-chat chatHeight', chatHeight);
 
-			const editorComputedStyle = oCommentUi.utils.getComputedStyle(elements.editorArea);
+			const nonChatHeight = bodyHeightAfter - chatHeight;
+			console.log('o-chat nonChatHeight', nonChatHeight);
 
-			let editorAreaMarginTopValue;
-			const editorAreaMarginTop = editorComputedStyle.getPropertyValue('margin-top');
-			if (editorAreaMarginTop.indexOf('px') !== -1) {
-				editorAreaMarginTopValue = parseInt(editorAreaMarginTop.replace('px', ''), 10);
-			} else {
-				editorAreaMarginTopValue = 0;
-			}
+			const nonContentHeight = chatHeight - temporaryContentHeight;
+			console.log('o-chat nonContentHeight', nonContentHeight);
 
-			let editorAreaMarginBottomValue;
-			const editorAreaMarginBottom = editorComputedStyle.getPropertyValue('margin-bottom');
-			if (editorAreaMarginBottom.indexOf('px') !== -1) {
-				editorAreaMarginBottomValue = parseInt(editorAreaMarginBottom.replace('px', ''), 10);
-			} else {
-				editorAreaMarginBottomValue = 0;
-			}
-
-			const editorHeight = elements.editorArea.clientHeight + editorAreaMarginTopValue + editorAreaMarginBottomValue;
-
-			let targetHeight = viewportHeight - nonChatHeight - editorHeight;
-			targetHeight = Math.max(targetHeight, minimumHeight);
+			const targetHeight = viewportHeight - nonChatHeight - nonContentHeight;
+			console.log('o-chat targetHeight', targetHeight);
 
 			elements.commentArea.style.overflow = "auto";
 			elements.commentArea.style.height = targetHeight + "px";
@@ -330,11 +320,7 @@ function WidgetUi (widgetContainer, config) {
 	}
 
 	const onResizeFetch = function () {
-		if (['default', 'S'].indexOf(oGrid.getCurrentLayout()) !== -1) {
-			suspendVerticalStretch();
-		} else {
-			adjustStretchVertical();
-		}
+		adjustStretchVertical();
 	};
 
 	this.clearStretch = function () {
