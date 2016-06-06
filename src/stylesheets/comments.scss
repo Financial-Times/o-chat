@@ -129,15 +129,11 @@
 }
 
 &.o-chat--stretch-vertical.o-chat--order-inverted {
-	@include oGridRespondTo($until: M) {
-		.o-chat--wrapper {
-			&:last-child {
-				border-bottom: 1px solid oColorsGetPaletteColor("pink-tint2");
-			}
+	.o-chat--comments-wrapper {
+		display: flex;
 
-			&:first-child {
-				border-bottom: 0;
-			}
+		.o-chat--comments-container {
+			align-self: flex-end;
 		}
 	}
 }
