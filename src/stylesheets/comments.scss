@@ -131,11 +131,12 @@
 &.o-chat--stretch-vertical.o-chat--order-inverted {
 	.o-chat--comments-area {
 		display: flex;
+		flex-direction: column;
 
-		.o-chat--comments-container {
-			height: 100%;
-			max-width: 100%;
-			align-self: flex-end;
+		&:before {
+			display: flex;
+			flex: 1 1 auto;
+			content: '';
 		}
 	}
 }
