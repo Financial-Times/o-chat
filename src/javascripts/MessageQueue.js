@@ -15,7 +15,7 @@ const storageBaseName = "o-chat-comment-queue-";
  */
 function MessageQueue (collectionId) {
 	if (typeof collectionId === "undefined") {
-		throw "Collection ID not provided.";
+		throw new Error("Collection ID not provided.");
 	}
 
 	/**

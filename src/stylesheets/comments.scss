@@ -75,9 +75,9 @@
 	}
 
 	&.o-chat--delete-progress {
-		// scss-lint:disable VendorPrefixes
+		// sass-lint:disable no-vendor-prefixes
 		-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
-		// scss-lint:enable VendorPrefixes
+		// sass-lint:enable no-vendor-prefixes
 		filter: alpha(opacity=50);
 		opacity: 0.5;
 	}

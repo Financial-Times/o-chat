@@ -325,44 +325,44 @@ function WidgetUi (widgetContainer, config) {
 
 	// Specific functions for the widget that was shrinked to a fixed height
 
-		function initScrollPagination () {
-			scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(elements.commentArea, function (scrollPos) {
-				if (!widgetContainer.classList.contains('o-chat--stretch-vertical') || ['default', 'S'].indexOf(oGrid.getCurrentLayout()) === -1) {
-					if (config.orderType === 'inverted') {
-						if (scrollPos < 0.2 * elements.commentArea.scrollHeight) {
-							events.trigger('nextPage');
-							oCommentUtilities.logger.debug('nextPage');
-						}
-					} else {
-						if (scrollPos + elements.commentArea.clientHeight > 0.8 * elements.commentArea.scrollHeight) {
-							events.trigger('nextPage');
-							oCommentUtilities.logger.debug('nextPage');
-						}
+	function initScrollPagination () {
+		scrollMonitor = new oCommentUtilities.dom.ScrollMonitor(elements.commentArea, function (scrollPos) {
+			if (!widgetContainer.classList.contains('o-chat--stretch-vertical') || ['default', 'S'].indexOf(oGrid.getCurrentLayout()) === -1) {
+				if (config.orderType === 'inverted') {
+					if (scrollPos < 0.2 * elements.commentArea.scrollHeight) {
+						events.trigger('nextPage');
+						oCommentUtilities.logger.debug('nextPage');
+					}
+				} else {
+					if (scrollPos + elements.commentArea.clientHeight > 0.8 * elements.commentArea.scrollHeight) {
+						events.trigger('nextPage');
+						oCommentUtilities.logger.debug('nextPage');
 					}
 				}
-			});
-		}
-
-		function initNotification () {
-			newCommentNotification = new NewCommentNotification(self, elements.commentArea, (config.orderType === "inverted" ? 'bottom' : 'top'));
-		}
-
-
-		function scrollToLastComment () {
-			if (config.orderType === "inverted") {
-				elements.commentArea.scrollTop = elements.commentArea.scrollHeight - elements.commentArea.clientHeight + 1;
-			} else {
-				elements.commentArea.scrollTop = 0;
 			}
-		}
+		});
+	}
 
-		function notifyNewComment () {
-			setTimeout(executeWhenNotDestroyed(function () {
-				if (newCommentNotification) {
-					newCommentNotification.newComment();
-				}
-			}), 100);
+	function initNotification () {
+		newCommentNotification = new NewCommentNotification(self, elements.commentArea, (config.orderType === "inverted" ? 'bottom' : 'top'));
+	}
+
+
+	function scrollToLastComment () {
+		if (config.orderType === "inverted") {
+			elements.commentArea.scrollTop = elements.commentArea.scrollHeight - elements.commentArea.clientHeight + 1;
+		} else {
+			elements.commentArea.scrollTop = 0;
 		}
+	}
+
+	function notifyNewComment () {
+		setTimeout(executeWhenNotDestroyed(function () {
+			if (newCommentNotification) {
+				newCommentNotification.newComment();
+			}
+		}), 100);
+	}
 
 	this.login = function (token, pseudonym, isAdmin) {
 		if (elements.editorAuth) {
