@@ -9,11 +9,14 @@
 	"browserFeatures": {
 		"required": ["createevent", "customevents"]
 	},
-	"demos": [
-		{
-			"path": "/demos/main.html",
-			"expanded": true,
-			"description": ""
-		}
-	]
+	"demosDefaults": {
+		"sass": "demos/src/demo.scss",
+		"js": "demos/src/demo.js",
+		"data": "demos/src/data.json"
+	},
+	"demos": [{
+		"name": "demo",
+		"template": "/demos/src/demo.mustache",
+		"description": ""
+	}]
 }
