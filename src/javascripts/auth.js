@@ -156,7 +156,7 @@ exports.loginRequired = function (callback, force) {
 				globalEvents.trigger('auth.loginRequired', {
 					callback: function (errExt) {
 						if (errExt) {
-							callback(errExt || new Error("Login failed."));
+							callback(errExt);
 							return;
 						}
 

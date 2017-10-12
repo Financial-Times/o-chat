@@ -594,9 +594,7 @@ const Widget = function () {
 				}
 			}
 		});
-	};
-
-
+	}
 
 	// sign in button pressed
 	self.ui.on('signIn', function () {
@@ -772,8 +770,6 @@ const Widget = function () {
 
 						self.ui.setEditorError(errMsg);
 					}
-
-					return;
 				}
 			} else {
 				self.ui.setEditorError(oCommentUi.i18n.texts.genericError);
@@ -876,8 +872,6 @@ const Widget = function () {
 
 						userDialogs.showMessage("Delete comment", errMsg);
 					}
-
-					return;
 				}
 			} else {
 				self.ui.markCommentAsDeleteInProgressEnded(commentId);
@@ -981,7 +975,7 @@ const Widget = function () {
 
 	// init
 	if (this.config.autoInit !== false) {
-		this.init.call(this);
+		this.init();
 	}
 };
 oCommentUi.Widget.__extend(Widget, 'oChat', 'o-chat');
