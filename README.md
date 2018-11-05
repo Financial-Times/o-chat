@@ -1,4 +1,4 @@
-# o-chat [![Build Status](https://travis-ci.org/Financial-Times/o-chat.svg?branch=master)](https://travis-ci.org/Financial-Times/o-chat)
+# o-chat [![Build Status](https://travis-ci.org/Financial-Times/o-chat.svg?branch=master)](https://travis-ci.org/Financial-Times/o-chat) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](#licence)
 
 A simple chat client integrated with FT's membership systems. If you simply wish to add a chat client to some content this is the component to use.
 
