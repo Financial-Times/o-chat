@@ -33,8 +33,7 @@ jobs:
     steps:
       - checkout
       - run: npm ci || npm i
-      - run: npm i bower
-      - run: ./node_modules/.bin/bower install
+      - run: make install
       - run: make ci
   node-v6:
     <<: *node-base
