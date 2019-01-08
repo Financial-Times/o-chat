@@ -9,7 +9,6 @@
 		"slack": "financialtimes/ft-origami"
 	},
 	"supportStatus": "active",
-	"ci": {},
 	"browserFeatures": {
 		"required": ["createevent", "customevents"]
 	},
