@@ -19,6 +19,7 @@
 	},
 	"demos": [{
 		"name": "demo",
+		"title": "Demo",
 		"template": "/demos/src/demo.mustache",
 		"description": "Chat demo"
 	}]
