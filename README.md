@@ -1,5 +1,7 @@
 # o-chat [![Build Status](https://travis-ci.org/Financial-Times/o-chat.svg?branch=master)](https://travis-ci.org/Financial-Times/o-chat) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](#licence)
 
+`o-chat` is deprecated. There is [no direct replacement](https://github.com/Financial-Times/o-chat/issues/8), please contact the Origami team if you have any questions or requests.
+
 A simple chat client integrated with FT's membership systems. If you simply wish to add a chat client to some content this is the component to use.
 
 ## Contents
@@ -24,16 +26,16 @@ A simple chat client integrated with FT's membership systems. If you simply wish
 
 * You must be on an FT.com domain or sub-domain for authentication to work
 
-## <div id="product"></div> Adding chat to your product 
-### <div id="decl"></div> Declaratively 
+## <div id="product"></div> Adding chat to your product
+### <div id="decl"></div> Declaratively
 Use the following markup to enable chat:
 
 ```html
 <div data-o-component="o-chat"
-    id="{idOfTheElement}" 
-    data-o-chat-auto-init="true|false" 
-    data-o-chat-config-title="{article-title}" 
-    data-o-chat-config-url="{page-url}" 
+    id="{idOfTheElement}"
+    data-o-chat-auto-init="true|false"
+    data-o-chat-config-title="{article-title}"
+    data-o-chat-config-url="{page-url}"
     data-o-chat-config-article-id="{article-id}">
 
         <div class="o--if-no-js">To participate in this chat, you need to upgrade to a newer web browser. <a href="http://help.ft.com/tools-services/browser-compatibility/">Learn more.</a></div>
@@ -53,7 +55,7 @@ If you defer initialising oChat by using `data-o-chat-auto-init="false"` then yo
 oChat.init();
 ```
 
-### <div id="imper"></div> Imperatively 
+### <div id="imper"></div> Imperatively
 Create an instance of the component with the parameters that are available:
 
 ```javascript
@@ -85,18 +87,18 @@ The configuration object which is passed to the contructor can/should have the f
  - articleId: ID of the article, any string
  - url: canonical URL of the page
  - title: Title of the page
-    
+
 ###### Optional fields:
 
  - order: This specifies how the widget is built. It can have two values:
     + normal: the commenting box is placed on top of the comment stream, and the comments are ordered as newest on top.
     + inverted: the commenting box is placed at the bottom of the comment stream, and the comments are ordered newest on bottom.
-    
+
     Default value is 'normal'.
  - layout: Specifies the layout style of the widget. It can have two values:
     + normal: When placed in the main area of the page.
     + side: When placed in the side area of the page.
-    
+
     Default value is 'side'.
  - datetimeFormat: How to format the timestamps. This is an object and has two fields:
     + minutesUntilAbsoluteTime: specifies after how many minutes to switch from relative time to absolute. If -1 is specified, the timestamps will be in the absolute format immediately. By default it is set to -1.
@@ -104,7 +106,7 @@ The configuration object which is passed to the contructor can/should have the f
  - autoInit: if this is set to false, the object will be created, but it will not be initialized automatically (the DOM will not be populated, call to backend services will not be made). In this case you should call the `init` method on the instance when you want to initialize it.
 
 
-## <div id="login"></div> Login integration 
+## <div id="login"></div> Login integration
 Users need to have a valid FT session in order to post comments. The default behavior for a user without a valid session is to redirect to the FT's login page (https://registration.ft.com). However you may wish to integrate with your product's authentication process for a slicker UX in which case you can override the default behaviour.
 
  1. Override the `auth.loginRequiredDefaultBehavior` function
@@ -148,9 +150,9 @@ oChat.on('auth.loginRequired', function (evt) {
 
 
 
-## <div id="events"></div> Events 
+## <div id="events"></div> Events
 ### Local events
-These events are triggered on the instance's DOM element. 
+These events are triggered on the instance's DOM element.
 All events have a payload of data which helps getting the ID of the instance and the instance object itself:
 
 ```javascript
@@ -390,7 +392,7 @@ In order to override the default font, set a value for the following variable:
 $o-chat-font-family: font1, font2;
 ```
 
-## <div id="browser"></div> Browser support 
+## <div id="browser"></div> Browser support
 Works in accordance with our [support policy](https://docs.google.com/a/ft.com/document/d/1dX92MPm9ZNY2jqFidWf_E6V4S6pLkydjcPmk5F989YI/edit)
 
 ## <div id="core"></div> Core/Enhanced Experience
